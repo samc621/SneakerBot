@@ -1,0 +1,23 @@
+{
+  "name": "sneakerbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node ./app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samc621/SneakerBot.git"
+  },
+  "author": "Samuel Corso",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/samc621/SneakerBot/issues"
+  },
+  "homepage": "https://github.com/samc621/SneakerBot#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "puppeteer": "^5.5.0"
+  }
+}

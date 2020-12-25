@@ -1,2 +1,3 @@
 # SneakerBot
-A Chrome Extension for a sneaker bot. Currently works with Footlocker.com
+
+This bot uses Node.js and Puppeteer to automate the checkout on various sneaker websites. It currently works for add to cart on Footlocker.com.
