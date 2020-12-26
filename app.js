@@ -1,14 +1,23 @@
 const express = require("express");
 const app = express();
-const footlocker = require("./sites/footlocker");
+const footsites = require("./sites/footsites");
+const nike = require("./sites/nike");
 
-const footlockerAddToCart = async (req, res) => {
+const addToCart = async (req, res) => {
   try {
+    const site = req.body.site;
     const url = req.body.url;
     const styleIndex = req.body.styleIndex;
     const size = req.body.size;
 
-    await footlocker.addToCart(url, styleIndex, size);
+    switch (site) {
+      case "nike":
+        await nike.addToCart(url, styleIndex, size);
+        break;
+      case "footsites":
+        await footsites.addToCart(url, styleIndex, size);
+        break;
+    }
 
     return res.status(200).json({
       success: false,
@@ -25,6 +34,6 @@ const footlockerAddToCart = async (req, res) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.route("/footlocker/AddToCart").post(footlockerAddToCart);
+app.route("/addToCart").post(addToCart);
 
 app.listen(8000, () => console.log("App listening on port 8000"));
