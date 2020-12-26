@@ -1,6 +1,5 @@
 const puppeteer = require("puppeteer");
-
-let page;
+const useProxy = require("puppeteer-page-proxy");
 
 function delay(time) {
   return new Promise(function (resolve) {
@@ -8,17 +7,17 @@ function delay(time) {
   });
 }
 
-exports.addToCart = async (url, styleIndex, size) => {
+exports.addToCart = async (url, proxy, styleIndex, size) => {
   try {
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
       args: ["--start-maximized"]
     });
-    page = await browser.newPage();
+    const page = await browser.newPage();
+    await useProxy(page, proxy);
     await page.goto(url);
     await delay(5000);
-    // await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
 
     let isInCart = false;
     let retries = 0;
@@ -67,8 +66,9 @@ exports.addToCart = async (url, styleIndex, size) => {
         retries++;
       }
     }
-    return isInCart;
+    return { isInCart };
   } catch (err) {
+    console.log(err);
     throw new Error(err.message);
   }
 };

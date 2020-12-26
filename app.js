@@ -6,24 +6,25 @@ const nike = require("./sites/nike");
 const addToCart = async (req, res) => {
   try {
     const site = req.body.site;
+    const proxy = req.body.proxy || null;
     const url = req.body.url;
     const styleIndex = req.body.styleIndex;
     const size = req.body.size;
 
-    let added;
+    let status = {};
     switch (site) {
       case "nike":
-        added = await nike.addToCart(url, styleIndex, size);
+        status = await nike.addToCart(url, proxy, styleIndex, size);
         break;
       case "footsites":
-        added = await footsites.addToCart(url, styleIndex, size);
+        status = await footsites.addToCart(url, proxy, styleIndex, size);
         break;
     }
 
     return res.status(200).json({
       success: false,
       message: "The task is complete",
-      data: { added }
+      data: status
     });
   } catch (err) {
     return res.status(500).json({

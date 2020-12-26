@@ -1,6 +1,5 @@
 const puppeteer = require("puppeteer");
-
-let page;
+const useProxy = require("puppeteer-page-proxy");
 
 function delay(time) {
   return new Promise(function (resolve) {
@@ -8,21 +7,24 @@ function delay(time) {
   });
 }
 
-exports.addToCart = async (url, styleIndex, size) => {
+exports.addToCart = async (url, proxy, styleIndex, size) => {
   try {
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
       args: ["--start-maximized"]
     });
-    page = await browser.newPage();
+    const page = await browser.newPage();
+    await useProxy(page, proxy);
     await page.goto(url);
     await delay(5000);
     await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
+    await delay(5000);
 
     let isInCart = false;
+    let hasCaptcha = false;
     let retries = 0;
-    while (!isInCart && retries < 3) {
+    while (!isInCart && !hasCaptcha && retries < 3) {
       const stylesSelector =
         "div.c-form-field.c-form-field--radio.SelectStyle.col";
       await page.waitForSelector(stylesSelector).then(() => {
@@ -30,7 +32,7 @@ exports.addToCart = async (url, styleIndex, size) => {
       });
       const styles = await page.$$(stylesSelector);
       await styles[styleIndex].click();
-      await delay(10000);
+      await delay(5000);
 
       const sizesSelector = "div.c-form-field.c-form-field--radio.ProductSize";
       await page.waitForSelector(sizesSelector).then(() => {
@@ -46,7 +48,7 @@ exports.addToCart = async (url, styleIndex, size) => {
           break;
         }
       }
-      await delay(10000);
+      await delay(5000);
 
       const atcButtonSelector =
         "button.Button.Button.ProductDetails-form__action";
@@ -55,6 +57,13 @@ exports.addToCart = async (url, styleIndex, size) => {
       });
       await page.click(atcButtonSelector);
       await delay(1000);
+
+      const catchaSelector =
+        "div.ReactModal__Content.ReactModal__Content--after-open.FL.c-modal.large.c-backend-error-modal";
+      if (await page.$(catchaSelector)) {
+        hasCaptcha = true;
+        break;
+      }
 
       const cartSelector = "span.CartCount-badge";
       let cart = await page.$$(cartSelector);
@@ -67,8 +76,9 @@ exports.addToCart = async (url, styleIndex, size) => {
         retries++;
       }
     }
-    return isInCart;
+    return { isInCart, hasCaptcha };
   } catch (err) {
+    console.log(err);
     throw new Error(err.message);
   }
 };
