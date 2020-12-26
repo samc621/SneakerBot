@@ -10,18 +10,20 @@ const addToCart = async (req, res) => {
     const styleIndex = req.body.styleIndex;
     const size = req.body.size;
 
+    let added;
     switch (site) {
       case "nike":
-        await nike.addToCart(url, styleIndex, size);
+        added = await nike.addToCart(url, styleIndex, size);
         break;
       case "footsites":
-        await footsites.addToCart(url, styleIndex, size);
+        added = await footsites.addToCart(url, styleIndex, size);
         break;
     }
 
     return res.status(200).json({
       success: false,
-      message: "The product has been added to your cart"
+      message: "The task is complete",
+      data: { added }
     });
   } catch (err) {
     return res.status(500).json({
