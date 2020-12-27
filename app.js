@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const footsites = require("./sites/footsites");
 const nike = require("./sites/nike");
+const { testProxy } = require("./helpers/proxies");
 
 const addToCart = async (req, res) => {
   try {
@@ -10,6 +11,10 @@ const addToCart = async (req, res) => {
     const url = req.body.url;
     const styleIndex = req.body.styleIndex;
     const size = req.body.size;
+
+    if (proxy && !testProxy(proxy)) {
+      throw new Error("The proxy is not working.");
+    }
 
     let status = {};
     switch (site) {

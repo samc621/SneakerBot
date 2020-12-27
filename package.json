@@ -19,6 +19,8 @@
   "dependencies": {
     "express": "^4.17.1",
     "puppeteer": "^5.5.0",
-    "puppeteer-page-proxy": "^1.2.8"
+    "puppeteer-page-proxy": "^1.2.8",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6"
   }
 }
