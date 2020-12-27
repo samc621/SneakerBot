@@ -1,8 +1,11 @@
 const express = require("express");
 const app = express();
+require("dotenv-flow").config();
+
 const footsites = require("./sites/footsites");
 const nike = require("./sites/nike");
 const { testProxy } = require("./helpers/proxies");
+const { sendEmail } = require("./helpers//email");
 
 const addToCart = async (req, res) => {
   try {
@@ -25,6 +28,18 @@ const addToCart = async (req, res) => {
         status = await footsites.addToCart(url, proxy, styleIndex, size);
         break;
     }
+
+    let recipient = process.env.EMAIL_USERNAME;
+    let subject;
+    let text;
+    if (status.hasCaptcha) {
+      subject = "ATC task has captcha";
+      text = `The ATC task for ${url} size ${size} has a captcha. Please open the browser to check on it.`;
+    } else if (status.isInCart) {
+      subject = "ATC task success";
+      text = `The ATC task for ${url} size ${size} has succeeded.`;
+    }
+    await sendEmail(recipient, subject, text);
 
     return res.status(200).json({
       success: false,

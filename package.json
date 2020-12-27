@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/samc621/SneakerBot#readme",
   "dependencies": {
+    "dotenv-flow": "^3.2.0",
     "express": "^4.17.1",
+    "nodemailer": "^6.4.17",
     "puppeteer": "^5.5.0",
     "puppeteer-page-proxy": "^1.2.8",
     "request": "^2.88.2",
