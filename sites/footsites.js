@@ -33,8 +33,7 @@ exports.guestCheckout = async (
     let isInCart = false;
     let hasCaptcha = false;
     let checkoutComplete = false;
-    let retries = 0;
-    while (!isInCart && !hasCaptcha && retries < 3) {
+    while (!isInCart && !hasCaptcha) {
       const stylesSelector =
         "div.c-form-field.c-form-field--radio.SelectStyle.col";
       await page.waitForSelector(stylesSelector);
@@ -76,8 +75,6 @@ exports.guestCheckout = async (
       cartCount = cartCount ? await cartCount.jsonValue() : 0;
       if (cartCount == 1) {
         isInCart = true;
-      } else {
-        retries++;
       }
     }
 

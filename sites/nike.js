@@ -29,9 +29,8 @@ exports.guestCheckout = async (
     await delay(2000);
 
     let isInCart = false;
-    let retries = 0;
     let checkoutComplete = false;
-    while (!isInCart && retries < 3) {
+    while (!isInCart) {
       const stylesSelector = "div.colorway-product-overlay.css-sa2cc9";
       await page.waitForSelector(stylesSelector);
       const styles = await page.$$(stylesSelector);
@@ -66,8 +65,6 @@ exports.guestCheckout = async (
       cartCount = await cartCount.jsonValue();
       if (cartCount == 1) {
         isInCart = true;
-      } else {
-        retries++;
       }
     }
 
