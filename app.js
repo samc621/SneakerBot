@@ -16,7 +16,6 @@ const guestCheckout = async (req, res) => {
     const size = req.body.size;
     const address = req.body.address;
     const shippingSpeedIndex = req.body.shippingSpeedIndex;
-    const cardDetails = req.body.cardDetails;
 
     if (proxy && !testProxy(proxy)) {
       throw new Error("The proxy is not working.");
@@ -32,8 +31,7 @@ const guestCheckout = async (req, res) => {
           size,
           address,
           shippingSpeedIndex,
-          address,
-          cardDetails
+          address
         );
         break;
       case "footsites":
@@ -44,8 +42,7 @@ const guestCheckout = async (req, res) => {
           size,
           address,
           shippingSpeedIndex,
-          address,
-          cardDetails
+          address
         );
         break;
     }

@@ -14,8 +14,7 @@ exports.guestCheckout = async (
   size,
   shippingAddress,
   shippingSpeedIndex,
-  billingAddress,
-  cardDetails
+  billingAddress
 ) => {
   try {
     const browser = await puppeteer.launch({
@@ -79,13 +78,7 @@ exports.guestCheckout = async (
     }
 
     if (isInCart) {
-      await checkout(
-        page,
-        shippingAddress,
-        shippingSpeedIndex,
-        billingAddress,
-        cardDetails
-      );
+      await checkout(page, shippingAddress, shippingSpeedIndex, billingAddress);
 
       const cartSelector = "span.CartCount-badge";
       let cart = await page.$$(cartSelector);
@@ -108,10 +101,16 @@ async function checkout(
   page,
   shippingAddress,
   shippingSpeedIndex,
-  billingAddress,
-  cardDetails
+  billingAddress
 ) {
   try {
+    const cardDetails = {
+      cardNumber: process.env.CARD_NUMBER,
+      expirationMonth: process.env.EXPIRATION_MONTH,
+      expirationYear: process.env.EXPIRATION_YEAR,
+      securityCode: process.env.SECURITY_CODE
+    };
+
     await page.goto("https://footlocker.com/checkout");
 
     const firstNameSelector = 'input[name="firstName"]';
@@ -203,7 +202,7 @@ async function checkout(
     const cardExpirationMonthFrame = await cardExpirationMonthFrameHandle.contentFrame();
     await cardExpirationMonthFrame.type(
       creditCardExpirationMonthSelector,
-      String(cardDetails.expirationDate).substring(0, 2),
+      cardDetails.expirationMonth,
       {
         delay: 10
       }
@@ -217,7 +216,7 @@ async function checkout(
     const cardExpirationYearFrame = await cardExpirationYearFrameHandle.contentFrame();
     await cardExpirationYearFrame.type(
       creditCardExpirationYearSelector,
-      String(cardDetails.expirationDate).substring(2, 4),
+      cardDetails.expirationYear,
       {
         delay: 10
       }
@@ -226,7 +225,7 @@ async function checkout(
 
     const cardCVVFrameHandle = await page.$(cardCVVIframeSelector);
     const cardCVVFrame = await cardCVVFrameHandle.contentFrame();
-    await cardCVVFrame.type(creditCardCVVSelector, cardDetails.cvv, {
+    await cardCVVFrame.type(creditCardCVVSelector, cardDetails.securityCode, {
       delay: 10
     });
     await delay(2000);

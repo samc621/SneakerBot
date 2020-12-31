@@ -14,8 +14,7 @@ exports.guestCheckout = async (
   size,
   shippingAddress,
   shippingSpeedIndex,
-  billingAddress,
-  cardDetails
+  billingAddress
 ) => {
   try {
     const browser = await puppeteer.launch({
@@ -69,13 +68,7 @@ exports.guestCheckout = async (
     }
 
     if (isInCart) {
-      await checkout(
-        page,
-        shippingAddress,
-        shippingSpeedIndex,
-        billingAddress,
-        cardDetails
-      );
+      await checkout(page, shippingAddress, shippingSpeedIndex, billingAddress);
 
       const cartSelector = "span.CartCount-badge";
       let cart = await page.$$(cartSelector);
@@ -98,10 +91,16 @@ async function checkout(
   page,
   shippingAddress,
   shippingSpeedIndex,
-  billingAddress,
-  cardDetails
+  billingAddress
 ) {
   try {
+    const cardDetails = {
+      cardNumber: process.env.CARD_NUMBER,
+      expirationMonth: process.env.EXPIRATION_MONTH,
+      expirationYear: process.env.EXPIRATION_YEAR,
+      securityCode: process.env.SECURITY_CODE
+    };
+
     await page.goto("https://nike.com/checkout");
 
     const enterAddressManuallyButtonSelector = "a#addressSuggestionOptOut";
@@ -182,14 +181,14 @@ async function checkout(
 
     await frame.type(
       creditCardExpirationDateSelector,
-      cardDetails.expirationDate,
+      String(cardDetails.expirationMonth).concat(cardDetails.expirationYear),
       {
         delay: 10
       }
     );
     await delay(2000);
 
-    await frame.type(creditCardCVVSelector, cardDetails.cvv, {
+    await frame.type(creditCardCVVSelector, cardDetails.securityCode, {
       delay: 10
     });
     await delay(2000);
