@@ -7,13 +7,16 @@ const nike = require("./sites/nike");
 const { testProxy } = require("./helpers/proxies");
 const { sendEmail } = require("./helpers//email");
 
-const addToCart = async (req, res) => {
+const guestCheckout = async (req, res) => {
   try {
     const site = req.body.site;
     const proxy = req.body.proxy || null;
     const url = req.body.url;
     const styleIndex = req.body.styleIndex;
     const size = req.body.size;
+    const address = req.body.address;
+    const shippingSpeedIndex = req.body.shippingSpeedIndex;
+    const cardDetails = req.body.cardDetails;
 
     if (proxy && !testProxy(proxy)) {
       throw new Error("The proxy is not working.");
@@ -22,10 +25,28 @@ const addToCart = async (req, res) => {
     let status = {};
     switch (site) {
       case "nike":
-        status = await nike.addToCart(url, proxy, styleIndex, size);
+        status = await nike.guestCheckout(
+          url,
+          proxy,
+          styleIndex,
+          size,
+          address,
+          shippingSpeedIndex,
+          address,
+          cardDetails
+        );
         break;
       case "footsites":
-        status = await footsites.addToCart(url, proxy, styleIndex, size);
+        status = await footsites.guestCheckout(
+          url,
+          proxy,
+          styleIndex,
+          size,
+          address,
+          shippingSpeedIndex,
+          address,
+          cardDetails
+        );
         break;
     }
 
@@ -33,11 +54,14 @@ const addToCart = async (req, res) => {
     let subject;
     let text;
     if (status.hasCaptcha) {
-      subject = "ATC task has captcha";
-      text = `The ATC task for ${url} size ${size} has a captcha. Please open the browser to check on it.`;
-    } else if (status.isInCart) {
-      subject = "ATC task success";
-      text = `The ATC task for ${url} size ${size} has succeeded.`;
+      subject = "Checkout task unsuccessful";
+      text = `The checkout task for ${url} size ${size} has a captcha. Please open the browser to check on it.`;
+    } else if (status.isInCart && !status.checkoutComplete) {
+      subject = "Checkout task unsuccessful";
+      text = `The checkout task for ${url} size ${size} has a checkout error. Please open the browser to check on it.`;
+    } else if (status.checkoutComplete) {
+      subject = "Checkout task successful";
+      text = `The checkout task for ${url} size ${size} has completed.`;
     }
     await sendEmail(recipient, subject, text);
 
@@ -57,6 +81,6 @@ const addToCart = async (req, res) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.route("/addToCart").post(addToCart);
+app.route("/guestCheckout").post(guestCheckout);
 
 app.listen(8000, () => console.log("App listening on port 8000"));
