@@ -9,7 +9,7 @@ function delay(time) {
 
 exports.guestCheckout = async (
   url,
-  proxy,
+  proxyString,
   styleIndex,
   size,
   shippingAddress,
@@ -23,7 +23,7 @@ exports.guestCheckout = async (
       args: ["--start-maximized"]
     });
     const page = await browser.newPage();
-    await useProxy(page, proxy);
+    await useProxy(page, proxyString);
     await page.goto(url);
     await delay(2000);
 

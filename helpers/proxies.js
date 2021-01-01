@@ -1,10 +1,20 @@
 const rp = require("request-promise");
 
-exports.testProxy = async proxy => {
+exports.createProxyString = proxy => {
+  return `${proxy.protocol}://
+      ${
+        proxy.username
+          ? `${proxy.username}${proxy.password ? `:${proxy.password}@` : "@"}`
+          : ""
+      }
+      ${proxy.ip_address}${proxy.port ? `:${proxy.port}` : ""}`;
+};
+
+exports.testProxy = async proxyString => {
   try {
     const options = {
       uri: "http://www.google.com",
-      proxy,
+      proxy: proxyString,
       resolveWithFullResponse: true
     };
 

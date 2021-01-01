@@ -9,7 +9,7 @@ function delay(time) {
 
 exports.guestCheckout = async (
   url,
-  proxy,
+  proxyString,
   styleIndex,
   size,
   shippingAddress,
@@ -23,7 +23,7 @@ exports.guestCheckout = async (
       args: ["--start-maximized"]
     });
     const page = await browser.newPage();
-    await useProxy(page, proxy);
+    await useProxy(page, proxyString);
     await page.goto(url);
     await delay(5000);
     await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
@@ -47,7 +47,7 @@ exports.guestCheckout = async (
         const sizeValue = await sizes[i].$eval("input", el =>
           el.getAttribute("value")
         );
-        if (sizeValue == size) {
+        if (Number(sizeValue) == size) {
           await sizes[i].click();
           break;
         }
