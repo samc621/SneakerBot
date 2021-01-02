@@ -1,11 +1,6 @@
 const puppeteer = require("puppeteer");
 const useProxy = require("puppeteer-page-proxy");
-
-function delay(time) {
-  return new Promise(function (resolve) {
-    setTimeout(resolve, time);
-  });
-}
+const { delay } = require("../helpers/delay");
 
 exports.guestCheckout = async (
   url,
