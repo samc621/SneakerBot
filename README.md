@@ -1,6 +1,6 @@
 # SneakerBot
 
-This bot uses Node.js and Puppeteer to automate the checkout on various sneaker websites. It currently works for add to cart on the Footsites (footlocker.com, footaction.com, eastbay.com, champssports.com) and Nike.com.
+This bot uses Node.js and Puppeteer to automate the checkout on various sneaker websites. It currently works on the Footsites (footlocker.com, footaction.com, eastbay.com, champssports.com) and Nike.com.
 
 ## Configure environment variables
 
@@ -15,6 +15,8 @@ Declare the environment name with:
 `$ npm start`
 
 ## API
+
+For each API, view the docs and try the requests in Postman.
 
 - [Addresses](https://documenter.getpostman.com/view/5027621/TVt2c3ef)
 - [Proxies](https://documenter.getpostman.com/view/5027621/TVt2c3ee)
