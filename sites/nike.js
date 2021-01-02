@@ -70,7 +70,7 @@ exports.guestCheckout = async (
     if (isInCart) {
       await checkout(page, shippingAddress, shippingSpeedIndex, billingAddress);
 
-      const cartSelector = "span.CartCount-badge";
+      const cartSelector = "span.va-sm-m.fs12-sm.ta-sm-c";
       let cart = await page.$$(cartSelector);
       cart = cart.pop();
       let cartCount = cart ? await cart.getProperty("innerText") : null;
@@ -80,7 +80,7 @@ exports.guestCheckout = async (
       }
     }
 
-    return { isInCart };
+    return { isInCart, checkoutComplete };
   } catch (err) {
     console.error(err);
     throw new Error(err.message);
@@ -138,13 +138,13 @@ async function checkout(
     await enterAddressDetails(page, shippingAddress);
 
     await page.waitForSelector(emailSelector);
-    await page.type(emailSelector, shippingAddress.email, {
+    await page.type(emailSelector, shippingAddress.email_address, {
       delay: 10
     });
     await delay(2000);
 
     await page.waitForSelector(phoneNumberSelector);
-    await page.type(phoneNumberSelector, shippingAddress.phoneNumber, {
+    await page.type(phoneNumberSelector, shippingAddress.phone_number, {
       delay: 10
     });
     await delay(2000);
@@ -223,25 +223,25 @@ async function enterAddressDetails(page, address) {
     const postalCodeSelector = 'input[name="address.postalCode"]';
 
     await page.waitForSelector(firstNameSelector);
-    await page.type(firstNameSelector, address.firstName, {
+    await page.type(firstNameSelector, address.first_name, {
       delay: 10
     });
     await delay(2000);
 
     await page.waitForSelector(lastNameSelector);
-    await page.type(lastNameSelector, address.lastName, {
+    await page.type(lastNameSelector, address.last_name, {
       delay: 10
     });
     await delay(2000);
 
     await page.waitForSelector(address1Selector);
-    await page.type(address1Selector, address.address1, {
+    await page.type(address1Selector, address.address_line_1, {
       delay: 10
     });
     await delay(2000);
 
     await page.waitForSelector(address2Selector);
-    await page.type(address2Selector, address.address2, {
+    await page.type(address2Selector, address.address_line_2, {
       delay: 10
     });
     await delay(2000);
@@ -257,7 +257,7 @@ async function enterAddressDetails(page, address) {
     await delay(2000);
 
     await page.waitForSelector(postalCodeSelector);
-    await page.type(postalCodeSelector, address.postalCode, {
+    await page.type(postalCodeSelector, address.postal_code, {
       delay: 10
     });
     await delay(2000);
