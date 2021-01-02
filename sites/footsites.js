@@ -87,6 +87,7 @@ exports.guestCheckout = async (
       cartCount = cartCount ? await cartCount.jsonValue() : 0;
       if (cartCount == 0) {
         checkoutComplete = true;
+        browser.close();
       }
     }
 
