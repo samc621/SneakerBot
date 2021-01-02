@@ -2,39 +2,39 @@ const Joi = require("joi");
 
 module.exports = {
   create: {
-    body: {
+    body: Joi.object({
       ip_address: Joi.string().required(),
       port: Joi.number().integer().optional(),
       protocol: Joi.string().required(),
-      username: Joi.string().optional(),
-      password: Joi.string().optional()
-    }
+      username: Joi.string().allow(null).optional(),
+      password: Joi.string().allow(null).optional()
+    })
   },
   findOne: {
-    params: {
+    params: Joi.object({
       id: Joi.number().required()
-    }
+    })
   },
   findAll: {
-    query: {
+    query: Joi.object({
       protocol: Joi.string().optional()
-    }
+    })
   },
   update: {
-    params: {
+    params: Joi.object({
       id: Joi.number().required()
-    },
-    body: {
+    }),
+    body: Joi.object({
       ip_address: Joi.string().optional(),
       port: Joi.number().integer().optional(),
       protocol: Joi.string().optional(),
-      username: Joi.string().optional(),
-      password: Joi.string().optional()
-    }
+      username: Joi.string().allow(null).optional(),
+      password: Joi.string().allow(null).optional()
+    })
   },
   deleted: {
-    params: {
+    params: Joi.object({
       id: Joi.number().required()
-    }
+    })
   }
 };

@@ -2,7 +2,7 @@ const Joi = require("joi");
 
 module.exports = {
   create: {
-    body: {
+    body: Joi.object({
       type: Joi.string().valid("billing", "shipping").required(),
       first_name: Joi.string().required(),
       last_name: Joi.string().required(),
@@ -14,23 +14,23 @@ module.exports = {
       country: Joi.string().required(),
       email_address: Joi.string().email().required(),
       phone_number: Joi.string().required()
-    }
+    })
   },
   findOne: {
-    params: {
+    params: Joi.object({
       id: Joi.number().required()
-    }
+    })
   },
   findAll: {
-    query: {
+    query: Joi.object({
       type: Joi.string().valid("billing", "shipping").optional()
-    }
+    })
   },
   update: {
-    params: {
+    params: Joi.object({
       id: Joi.number().required()
-    },
-    body: {
+    }),
+    body: Joi.object({
       type: Joi.string().valid("billing", "shipping").optional(),
       first_name: Joi.string().optional(),
       last_name: Joi.string().optional(),
@@ -42,11 +42,11 @@ module.exports = {
       country: Joi.string().optional(),
       email_address: Joi.string().email().optional(),
       phone_number: Joi.string().optional()
-    }
+    })
   },
   deleted: {
-    params: {
+    params: Joi.object({
       id: Joi.number().required()
-    }
+    })
   }
 };
