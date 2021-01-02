@@ -20,6 +20,22 @@ Declare the environment name with:
 
 ## Start the server
 
+Tasks run parallelly using [puppeteer-cluster](https://github.com/thomasdondorf/puppeteer-cluster).
+
+Before starting up the server, define the number of concurrent tasks you plan to run:
+
+`$ export PARALLEL_TASKS=5`
+
+If you do not define this variable, it will default to `1`.
+
+You can of course run more tasks, but they will be queued to run in a first-in, first-out (FIFO) manner.
+
+Keep in mind that tasks that do not result in `checkoutComplete` will remain idle (not terminate) so that you can open the browser and view the error(s).
+
+Each task uses its own browser, so it's also important to keep in mind the CPU constraints of your machine.
+
+When you're ready, start the server with:
+
 `$ npm start`
 
 ## API

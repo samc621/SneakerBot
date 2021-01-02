@@ -25,6 +25,7 @@
     "nodemailer": "^6.4.17",
     "pg": "^8.5.1",
     "puppeteer": "^5.5.0",
+    "puppeteer-cluster": "^0.22.0",
     "puppeteer-page-proxy": "^1.2.8",
     "request": "^2.88.2",
     "request-promise": "^4.2.6"

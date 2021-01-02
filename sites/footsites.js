@@ -1,8 +1,8 @@
-const puppeteer = require("puppeteer");
 const useProxy = require("puppeteer-page-proxy");
 const { delay } = require("../helpers/delay");
 
 exports.guestCheckout = async (
+  page,
   url,
   proxyString,
   styleIndex,
@@ -12,12 +12,6 @@ exports.guestCheckout = async (
   billingAddress
 ) => {
   try {
-    const browser = await puppeteer.launch({
-      headless: false,
-      defaultViewport: null,
-      args: ["--start-maximized"]
-    });
-    const page = await browser.newPage();
     await useProxy(page, proxyString);
     await page.goto(url);
     await delay(5000);
@@ -82,7 +76,6 @@ exports.guestCheckout = async (
       cartCount = cartCount ? await cartCount.jsonValue() : 0;
       if (cartCount == 0) {
         checkoutComplete = true;
-        browser.close();
       }
     }
 
