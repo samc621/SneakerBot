@@ -50,7 +50,7 @@ exports.updateAddress = async (req, res) => {
 exports.deleteAddress = async (req, res) => {
   try {
     const id = req.params.id;
-    const address = await new Address(id).update({ isDeleted: true });
+    const address = await new Address(id).update({ is_deleted: true });
 
     return response.Ok(res, "Address successfully deleted", address);
   } catch (err) {

@@ -50,7 +50,7 @@ exports.updateProxy = async (req, res) => {
 exports.deleteProxy = async (req, res) => {
   try {
     const id = req.params.id;
-    const proxy = await new Proxy(id).update({ isDeleted: true });
+    const proxy = await new Proxy(id).update({ is_deleted: true });
 
     return response.Ok(res, "Proxy successfully deleted", proxy);
   } catch (err) {
