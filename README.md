@@ -10,6 +10,14 @@ Declare the environment name with:
 
 `$ export NODE_ENV=local`
 
+## Run the DB migrations
+
+`$ knex migrate:latest`
+
+## Run the DB seeders
+
+`$knex seed:run`
+
 ## Start the server
 
 `$ npm start`
