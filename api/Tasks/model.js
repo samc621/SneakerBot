@@ -14,17 +14,21 @@ class TasksModel {
   }
 
   async find(data) {
-    data["isDeleted"] = false;
-    return knex(this.tableName).where(data).orderBy("created_at", "desc");
-  }
-
-  async findOne(data) {
-    data["isDeleted"] = false;
+    data["tasks.is_deleted"] = false;
     return knex(this.tableName)
       .select(knex.raw(`tasks.*, sites.name AS "site_name"`))
       .leftJoin("sites", "tasks.site_id", "=", "sites.id")
       .where(data)
-      .orderBy("created_at", "desc")
+      .orderBy("tasks.created_at", "desc");
+  }
+
+  async findOne(data) {
+    data["tasks.is_deleted"] = false;
+    return knex(this.tableName)
+      .select(knex.raw(`tasks.*, sites.name AS "site_name"`))
+      .leftJoin("sites", "tasks.site_id", "=", "sites.id")
+      .where(data)
+      .orderBy("tasks.created_at", "desc")
       .first();
   }
 
