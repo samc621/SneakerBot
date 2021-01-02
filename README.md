@@ -13,3 +13,9 @@ Declare the environment name with:
 ## Start the server
 
 `$ npm start`
+
+## API
+
+- [Addresses](https://documenter.getpostman.com/view/5027621/TVt2c3ef)
+- [Proxies](https://documenter.getpostman.com/view/5027621/TVt2c3ee)
+- [Tasks](https://documenter.getpostman.com/view/5027621/TVt2c3ed)
