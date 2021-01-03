@@ -36,6 +36,8 @@ You can of course run more tasks, but they will be queued to run in a first-in, 
 
 Keep in mind that tasks that do not result in `checkoutComplete` will remain idle (not terminate) so that you can open the browser and view the error(s).
 
+If a task encounters a captcha (usually only on the footsites), it will auto-retry after you manually complete it.
+
 Each task uses its own browser, so it's also important to keep in mind the CPU constraints of your machine.
 
 When you're ready, start the server with:
