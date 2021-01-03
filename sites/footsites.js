@@ -16,7 +16,7 @@ exports.guestCheckout = async (
     await page.goto(url);
     await delay(5000);
     await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
-    await delay(5000);
+    await delay(2000);
 
     let isInCart = false;
     let hasCaptcha = false;
@@ -27,7 +27,7 @@ exports.guestCheckout = async (
       await page.waitForSelector(stylesSelector);
       const styles = await page.$$(stylesSelector);
       await styles[styleIndex].click();
-      await delay(5000);
+      await delay(2000);
 
       const sizesSelector = "div.c-form-field.c-form-field--radio.ProductSize";
       await page.waitForSelector(sizesSelector);
@@ -41,7 +41,7 @@ exports.guestCheckout = async (
           break;
         }
       }
-      await delay(5000);
+      await delay(2000);
 
       const atcButtonSelector =
         "button.Button.Button.ProductDetails-form__action";
