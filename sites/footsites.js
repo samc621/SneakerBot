@@ -1,6 +1,10 @@
 const useProxy = require("puppeteer-page-proxy");
 const { delay } = require("../helpers/delay");
 
+exports.getCaptchaSelector = () => {
+  return "div.ReactModal__Content.ReactModal__Content--after-open.FL.c-modal.large.c-backend-error-modal";
+};
+
 exports.guestCheckout = async (
   page,
   url,
@@ -47,11 +51,10 @@ exports.guestCheckout = async (
         "button.Button.Button.ProductDetails-form__action";
       await page.waitForSelector(atcButtonSelector);
       await page.click(atcButtonSelector);
-      await delay(1000);
+      await delay(2000);
 
-      const catchaSelector =
-        "div.ReactModal__Content.ReactModal__Content--after-open.FL.c-modal.large.c-backend-error-modal";
-      if (await page.$(catchaSelector)) {
+      const captchaSelector = this.getCaptchaSelector();
+      if (await page.$(captchaSelector)) {
         hasCaptcha = true;
         break;
       }
@@ -105,7 +108,7 @@ async function checkout(
     const firstNameSelector = 'input[name="firstName"]';
     const lastNameSelector = 'input[name="lastName"]';
     const emailSelector = 'input[name="email"]';
-    const phoneNumberSelector = 'input[name="address.phone"]';
+    const phoneNumberSelector = 'input[name="phone"]';
     const submitButtonsSelector = "button.Button";
 
     const shippingSpeedsSelector = "li.SelectCustom-option";
@@ -126,13 +129,13 @@ async function checkout(
       "label[for=ShippingAddress_checkbox_setAsBilling]";
 
     await page.waitForSelector(firstNameSelector);
-    await page.type(firstNameSelector, address.first_name, {
+    await page.type(firstNameSelector, shippingAddress.first_name, {
       delay: 10
     });
     await delay(2000);
 
     await page.waitForSelector(lastNameSelector);
-    await page.type(lastNameSelector, address.last_name, {
+    await page.type(lastNameSelector, shippingAddress.last_name, {
       delay: 10
     });
     await delay(2000);

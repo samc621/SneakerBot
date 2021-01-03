@@ -43,7 +43,7 @@ exports.guestCheckout = async (
         "button.ncss-btn-primary-dark.btn-lg.css-y0myut.add-to-cart-btn";
       await page.waitForSelector(atcButtonSelector);
       await page.click(atcButtonSelector);
-      await delay(1000);
+      await delay(2000);
 
       const cartSelector =
         "span.pre-jewel.pre-cart-jewel.text-color-primary-dark";
