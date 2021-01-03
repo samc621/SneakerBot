@@ -227,11 +227,9 @@ async function checkout(
     await billingAddressSubmitButtonSelector.click();
     await delay(2000);
 
-    // const orderSubmitButtonSelector = await page.$$(
-    //   submitButtonsSelector
-    // )[2];
-    // await orderSubmitButtonSelector.click();
-    // await delay(2000);
+    const orderSubmitButtonSelector = await page.$$(submitButtonsSelector)[2];
+    await orderSubmitButtonSelector.click();
+    await delay(2000);
   } catch (err) {
     console.error(err);
     throw new Error(err.message);

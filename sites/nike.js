@@ -192,9 +192,9 @@ async function checkout(
     await page.click(billingAddressSubmitButtonSelector);
     await delay(2000);
 
-    // await page.waitForSelector(orderSubmitButtonSelector);
-    // await page.click(orderSubmitButtonSelector);
-    // await delay(2000);
+    await page.waitForSelector(orderSubmitButtonSelector);
+    await page.click(orderSubmitButtonSelector);
+    await delay(2000);
   } catch (err) {
     console.error(err);
     throw new Error(err.message);
