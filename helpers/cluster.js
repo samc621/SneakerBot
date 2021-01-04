@@ -18,7 +18,11 @@ class PuppeteerCluster {
       puppeteerOptions: {
         headless: false,
         defaultViewport: null,
-        args: ["--start-maximized"]
+        args: [
+          "--start-maximized",
+          "--disable-web-security",
+          "--disable-features=IsolateOrigins,site-per-process"
+        ]
       }
     });
 

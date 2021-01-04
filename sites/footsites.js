@@ -40,7 +40,8 @@ exports.guestCheckout = async (
         const sizeValue = await sizes[i].$eval("input", el =>
           el.getAttribute("value")
         );
-        if (Number(sizeValue) == size) {
+        const parsedSize = isNaN(size) ? sizeValue : Number(sizeValue);
+        if (parsedSize == size) {
           await sizes[i].click();
           break;
         }
@@ -111,6 +112,8 @@ async function checkout(
     const phoneNumberSelector = 'input[name="phone"]';
     const submitButtonsSelector = "button.Button";
 
+    const shippingSpeedsAvailableSelector =
+      "button#DeliveryOptions_selectCustom_deliveryModeId";
     const shippingSpeedsSelector = "li.SelectCustom-option";
 
     const cardNumberIframeSelector =
@@ -155,8 +158,8 @@ async function checkout(
     await page.waitForSelector(submitButtonsSelector);
     const contactInformationSubmitButtonSelector = await page.$$(
       submitButtonsSelector
-    )[0];
-    await contactInformationSubmitButtonSelector.click();
+    );
+    await contactInformationSubmitButtonSelector[0].click();
     await delay(2000);
 
     await enterAddressDetails(page, shippingAddress);
@@ -165,20 +168,37 @@ async function checkout(
     await page.click(differentBillingAddressSelector);
     await delay(2000);
 
-    await page.waitForSelector(shippingSpeedsSelector);
-    const shippingSpeeds = await page.$$(shippingSpeedsSelector);
-    await shippingSpeeds[shippingSpeedIndex].click();
-    await delay(2000);
+    const shippingSpeedsAvailable = (await page.$(
+      shippingSpeedsAvailableSelector
+    ))
+      ? true
+      : false;
+    if (shippingSpeedsAvailable) {
+      await page.click(shippingSpeedsAvailableSelector);
+      await page.waitForSelector(shippingSpeedsSelector);
+      const shippingSpeeds = await page.$$(shippingSpeedsSelector);
+      await shippingSpeeds[shippingSpeedIndex].click();
+      await delay(2000);
+    }
 
+    await page.waitForSelector(submitButtonsSelector);
     const shippingAddressSubmitButtonSelector = await page.$$(
       submitButtonsSelector
-    )[1];
-    await shippingAddressSubmitButtonSelector.click();
+    );
+    await shippingAddressSubmitButtonSelector[1].click();
+    await delay(2000);
+
+    await page.waitForSelector(submitButtonsSelector);
+    const shippingAddressSubmitButtonTwoSelector = await page.$$(
+      submitButtonsSelector
+    );
+    await shippingAddressSubmitButtonTwoSelector[3].click();
     await delay(2000);
 
     await page.waitForSelector(cardNumberIframeSelector);
     const cardNumberFrameHandle = await page.$(cardNumberIframeSelector);
     const cardNumberFrame = await cardNumberFrameHandle.contentFrame();
+    await cardNumberFrame.waitForSelector(creditCardNumberSelector);
     await cardNumberFrame.type(
       creditCardNumberSelector,
       cardDetails.cardNumber,
@@ -192,6 +212,9 @@ async function checkout(
       cardExpMonthIframeSelector
     );
     const cardExpirationMonthFrame = await cardExpirationMonthFrameHandle.contentFrame();
+    await cardExpirationMonthFrame.waitForSelector(
+      creditCardExpirationMonthSelector
+    );
     await cardExpirationMonthFrame.type(
       creditCardExpirationMonthSelector,
       cardDetails.expirationMonth,
@@ -206,6 +229,9 @@ async function checkout(
       cardExpYearIframeSelector
     );
     const cardExpirationYearFrame = await cardExpirationYearFrameHandle.contentFrame();
+    await cardExpirationYearFrame.waitForSelector(
+      creditCardExpirationYearSelector
+    );
     await cardExpirationYearFrame.type(
       creditCardExpirationYearSelector,
       cardDetails.expirationYear,
@@ -226,12 +252,12 @@ async function checkout(
 
     const billingAddressSubmitButtonSelector = await page.$$(
       submitButtonsSelector
-    )[4];
-    await billingAddressSubmitButtonSelector.click();
+    );
+    await billingAddressSubmitButtonSelector[4].click();
     await delay(2000);
 
-    const orderSubmitButtonSelector = await page.$$(submitButtonsSelector)[2];
-    await orderSubmitButtonSelector.click();
+    const orderSubmitButtonSelector = await page.$$(submitButtonsSelector);
+    await orderSubmitButtonSelector[2].click();
     await delay(2000);
   } catch (err) {
     console.error(err);
@@ -249,11 +275,23 @@ async function enterAddressDetails(page, address) {
     const stateSelector = 'select[name="region"]';
     const postalCodeSelector = 'input[name="postalCode"]';
 
+    const firstNameHandle = await page.$(firstNameSelector);
+    await firstNameHandle.click();
+    await firstNameHandle.focus();
+    await firstNameHandle.click({ clickCount: 3 });
+    await firstNameHandle.press("Backspace");
+
     await page.waitForSelector(firstNameSelector);
     await page.type(firstNameSelector, address.first_name, {
       delay: 10
     });
     await delay(2000);
+
+    const lastNameHandle = await page.$(lastNameSelector);
+    await lastNameHandle.click();
+    await lastNameHandle.focus();
+    await lastNameHandle.click({ clickCount: 3 });
+    await lastNameHandle.press("Backspace");
 
     await page.waitForSelector(lastNameSelector);
     await page.type(lastNameSelector, address.last_name, {
@@ -279,15 +317,17 @@ async function enterAddressDetails(page, address) {
     });
     await delay(2000);
 
-    await page.waitForSelector(citySelector);
-    await page.type(citySelector, address.city, {
-      delay: 10
-    });
-    await delay(2000);
+    // Prefilled by footsites
 
-    await page.waitForSelector(stateSelector);
-    await page.select(stateSelector, address.state);
-    await delay(2000);
+    // await page.waitForSelector(citySelector);
+    // await page.type(citySelector, address.city, {
+    //   delay: 10
+    // });
+    // await delay(2000);
+
+    // await page.waitForSelector(stateSelector);
+    // await page.select(stateSelector, address.state);
+    // await delay(2000);
   } catch (err) {
     console.error(err);
     throw new Error(err.message);
