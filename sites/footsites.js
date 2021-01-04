@@ -258,7 +258,7 @@ async function checkout(
 
     const orderSubmitButtonSelector = await page.$$(submitButtonsSelector);
     await orderSubmitButtonSelector[2].click();
-    await delay(2000);
+    await delay(5000);
   } catch (err) {
     console.error(err);
     throw new Error(err.message);

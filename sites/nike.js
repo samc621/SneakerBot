@@ -19,13 +19,13 @@ exports.guestCheckout = async (
     let isInCart = false;
     let checkoutComplete = false;
     while (!isInCart) {
-      const stylesSelector = "div.colorway-product-overlay.css-sa2cc9";
+      const stylesSelector = "div.colorway-product-overlay";
       await page.waitForSelector(stylesSelector);
       const styles = await page.$$(stylesSelector);
       await styles[styleIndex].click();
       await delay(2000);
 
-      const sizesSelector = "div.mt2-sm.css-1j3x2vp div";
+      const sizesSelector = "div.mt2-sm div";
       await page.waitForSelector(sizesSelector);
       const sizes = await page.$$(sizesSelector);
       for (var i = 0; i < sizes.length; i++) {
@@ -40,7 +40,7 @@ exports.guestCheckout = async (
       await delay(2000);
 
       const atcButtonSelector =
-        "button.ncss-btn-primary-dark.btn-lg.css-y0myut.add-to-cart-btn";
+        "button.ncss-btn-primary-dark.btn-lg.add-to-cart-btn";
       await page.waitForSelector(atcButtonSelector);
       await page.click(atcButtonSelector);
       await delay(2000);
@@ -114,7 +114,7 @@ async function checkout(
       "button[data-attr=continueToOrderReviewBtn]";
 
     const orderSubmitButtonSelector =
-      "button[data-attr=continueToOrderReviewBtn]";
+      "button.d-lg-ib.d-sm-h.fs14-sm.ncss-brand.ncss-btn-accent.pb2-lg.pb3-sm.prl5-sm.pt2-lg.pt3-sm.u-uppercase";
 
     await page.waitForSelector(enterAddressManuallyButtonSelector);
     await page.click(enterAddressManuallyButtonSelector);
@@ -194,7 +194,7 @@ async function checkout(
 
     await page.waitForSelector(orderSubmitButtonSelector);
     await page.click(orderSubmitButtonSelector);
-    await delay(2000);
+    await delay(5000);
   } catch (err) {
     console.error(err);
     throw new Error(err.message);
