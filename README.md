@@ -1,6 +1,6 @@
 # SneakerBot
 
-This bot uses Node.js and Puppeteer to automate the checkout on various sneaker websites. It currently works on the Footsites (footlocker.com, footaction.com, eastbay.com, champssports.com) and Nike.com.
+This bot uses Node.js and Puppeteer to automate the checkout on various sneaker websites. It currently works on the Footsites (footlocker.com, footaction.com, eastbay.com, champssports.com), Nike.com, and all Shopify sites (e.g. BdgaStore, Concepts, Kith, etc.).
 
 ## Configure environment variables
 
