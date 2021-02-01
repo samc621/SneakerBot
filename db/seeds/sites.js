@@ -1,12 +1,16 @@
 exports.seed = function (knex) {
-  // Deletes ALL existing entries
+  const sites = [
+    { id: 1, name: "nike" },
+    { id: 2, name: "footsites" },
+    { id: 3, name: "shopify" }
+  ]
+
   return knex("sites")
-    .del()
-    .then(function () {
-      // Inserts seed entries
-      return knex("sites").insert([
-        { id: 1, name: "nike" },
-        { id: 2, name: "footsites" }
-      ]);
+    .then(rows => {
+      sites.forEach(site => {
+        if (!rows.map(row => row.name).includes(site.name)) {
+          return knex("sites").insert(site)
+        }
+      })
     });
 };

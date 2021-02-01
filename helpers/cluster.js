@@ -8,7 +8,7 @@ const { testProxy, createProxyString } = require("./proxies");
 const { sendEmail } = require("./email");
 
 class PuppeteerCluster {
-  constructor() {}
+  constructor() { }
 
   static async build() {
     const cluster = await Cluster.launch({
@@ -70,7 +70,7 @@ class PuppeteerCluster {
           if (status.hasCaptcha) {
             subject = "Checkout task unsuccessful";
             text = `The checkout task for ${task.url} size ${task.size} has a captcha. Please open the browser and complete it within 5 minutes.`;
-          } else if (status.isInCart && !status.checkoutComplete) {
+          } else if (!status.checkoutComplete) {
             subject = "Checkout task unsuccessful";
             text = `The checkout task for ${task.url} size ${task.size} has a checkout error. Please open the browser to check on it.`;
           } else if (status.checkoutComplete) {
@@ -79,17 +79,21 @@ class PuppeteerCluster {
           }
           await sendEmail(recipient, subject, text);
 
-          if (status.checkoutComplete) {
-            complete = true;
-            break;
-          }
-
           if (status.hasCaptcha) {
             const captchaSelector = require(`../sites/${task.site_name}`).getCaptchaSelector();
             await page.waitForSelector(captchaSelector, {
               hidden: true,
               timeout: 5 * 60 * 1000
             });
+          }
+
+          if (!status.checkoutComplete) {
+            await page.waitForTimeout(5 * 60 * 1000);
+          }
+
+          if (status.checkoutComplete) {
+            complete = true;
+            break;
           }
         }
       } catch (err) {
