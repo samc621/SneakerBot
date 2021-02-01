@@ -13,7 +13,7 @@ exports.guestCheckout = async (
   try {
     await useProxy(page, proxyString);
     await page.goto(url);
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     let isInCart = false;
     let checkoutComplete = false;
@@ -22,7 +22,7 @@ exports.guestCheckout = async (
       await page.waitForSelector(stylesSelector);
       const styles = await page.$$(stylesSelector);
       await styles[styleIndex].click();
-      await pageWait(2000);
+      await page.waitFor(2000);
 
       const sizesSelector = "div.mt2-sm div";
       await page.waitForSelector(sizesSelector);
@@ -36,13 +36,13 @@ exports.guestCheckout = async (
           break;
         }
       }
-      await pageWait(2000);
+      await page.waitFor(2000);
 
       const atcButtonSelector =
         "button.ncss-btn-primary-dark.btn-lg.add-to-cart-btn";
       await page.waitForSelector(atcButtonSelector);
       await page.click(atcButtonSelector);
-      await pageWait(2000);
+      await page.waitFor(2000);
 
       const cartSelector =
         "span.pre-jewel.pre-cart-jewel.text-color-primary-dark";
@@ -117,11 +117,11 @@ async function checkout(
 
     await page.waitForSelector(enterAddressManuallyButtonSelector);
     await page.click(enterAddressManuallyButtonSelector);
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(address2ExpandButtonSelector);
     await page.click(address2ExpandButtonSelector);
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await enterAddressDetails(page, shippingAddress);
 
@@ -129,26 +129,26 @@ async function checkout(
     await page.type(emailSelector, shippingAddress.email_address, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(phoneNumberSelector);
     await page.type(phoneNumberSelector, shippingAddress.phone_number, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(shippingAddressSubmitButtonSelector);
     await page.click(shippingAddressSubmitButtonSelector);
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(shippingSpeedsSelector);
     const shippingSpeeds = await page.$$(shippingSpeedsSelector);
     await shippingSpeeds[shippingSpeedIndex].click();
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(shippingSpeedSubmitButtonSelector);
     await page.click(shippingSpeedSubmitButtonSelector);
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(cardDetailsIframeSelector);
     const frameHandle = await page.$(cardDetailsIframeSelector);
@@ -165,7 +165,7 @@ async function checkout(
     await frame.type(creditCardNumberSelector, last3, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await frame.type(
       creditCardExpirationDateSelector,
@@ -174,26 +174,26 @@ async function checkout(
         delay: 10
       }
     );
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await frame.type(creditCardCVVSelector, cardDetails.securityCode, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(differentBillingAddressSelector);
     await page.click(differentBillingAddressSelector);
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await enterAddressDetails(page, billingAddress);
 
     await page.waitForSelector(billingAddressSubmitButtonSelector);
     await page.click(billingAddressSubmitButtonSelector);
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(orderSubmitButtonSelector);
     await page.click(orderSubmitButtonSelector);
-    await pageWait(5000);
+    await page.waitFor(5000);
   } catch (err) {
     console.error(err);
     throw new Error(err.message);
@@ -214,41 +214,41 @@ async function enterAddressDetails(page, address) {
     await page.type(firstNameSelector, address.first_name, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(lastNameSelector);
     await page.type(lastNameSelector, address.last_name, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(address1Selector);
     await page.type(address1Selector, address.address_line_1, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(address2Selector);
     await page.type(address2Selector, address.address_line_2, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(citySelector);
     await page.type(citySelector, address.city, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(stateSelector);
     await page.select(stateSelector, address.state);
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(postalCodeSelector);
     await page.type(postalCodeSelector, address.postal_code, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
   } catch (err) {
     console.error(err);
     throw new Error(err.message);

@@ -17,9 +17,9 @@ exports.guestCheckout = async (
   try {
     await useProxy(page, proxyString);
     await page.goto(url);
-    await pageWait(5000);
+    await page.waitFor(5000);
     await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     let isInCart = false;
     let hasCaptcha = false;
@@ -30,7 +30,7 @@ exports.guestCheckout = async (
       await page.waitForSelector(stylesSelector);
       const styles = await page.$$(stylesSelector);
       await styles[styleIndex].click();
-      await pageWait(2000);
+      await page.waitFor(2000);
 
       const sizesSelector = "div.c-form-field.c-form-field--radio.ProductSize";
       await page.waitForSelector(sizesSelector);
@@ -45,13 +45,13 @@ exports.guestCheckout = async (
           break;
         }
       }
-      await pageWait(2000);
+      await page.waitFor(2000);
 
       const atcButtonSelector =
         "button.Button.Button.ProductDetails-form__action";
       await page.waitForSelector(atcButtonSelector);
       await page.click(atcButtonSelector);
-      await pageWait(2000);
+      await page.waitFor(2000);
 
       const captchaSelector = this.getCaptchaSelector();
       if (await page.$(captchaSelector)) {
@@ -134,38 +134,38 @@ async function checkout(
     await page.type(firstNameSelector, shippingAddress.first_name, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(lastNameSelector);
     await page.type(lastNameSelector, shippingAddress.last_name, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(emailSelector);
     await page.type(emailSelector, shippingAddress.email_address, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(phoneNumberSelector);
     await page.type(phoneNumberSelector, shippingAddress.phone_number, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(submitButtonsSelector);
     const contactInformationSubmitButtonSelector = await page.$$(
       submitButtonsSelector
     );
     await contactInformationSubmitButtonSelector[0].click();
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await enterAddressDetails(page, shippingAddress);
 
     await page.waitForSelector(differentBillingAddressSelector);
     await page.click(differentBillingAddressSelector);
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     const shippingSpeedsAvailable = (await page.$(
       shippingSpeedsAvailableSelector
@@ -177,7 +177,7 @@ async function checkout(
       await page.waitForSelector(shippingSpeedsSelector);
       const shippingSpeeds = await page.$$(shippingSpeedsSelector);
       await shippingSpeeds[shippingSpeedIndex].click();
-      await pageWait(2000);
+      await page.waitFor(2000);
     }
 
     await page.waitForSelector(submitButtonsSelector);
@@ -185,14 +185,14 @@ async function checkout(
       submitButtonsSelector
     );
     await shippingAddressSubmitButtonSelector[1].click();
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(submitButtonsSelector);
     const shippingAddressSubmitButtonTwoSelector = await page.$$(
       submitButtonsSelector
     );
     await shippingAddressSubmitButtonTwoSelector[3].click();
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(cardNumberIframeSelector);
     const cardNumberFrameHandle = await page.$(cardNumberIframeSelector);
@@ -221,7 +221,7 @@ async function checkout(
         delay: 10
       }
     );
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(cardExpYearIframeSelector);
     const cardExpirationYearFrameHandle = await page.$(
@@ -238,14 +238,14 @@ async function checkout(
         delay: 10
       }
     );
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     const cardCVVFrameHandle = await page.$(cardCVVIframeSelector);
     const cardCVVFrame = await cardCVVFrameHandle.contentFrame();
     await cardCVVFrame.type(creditCardCVVSelector, cardDetails.securityCode, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await enterAddressDetails(page, billingAddress);
 
@@ -253,11 +253,11 @@ async function checkout(
       submitButtonsSelector
     );
     await billingAddressSubmitButtonSelector[4].click();
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     const orderSubmitButtonSelector = await page.$$(submitButtonsSelector);
     await orderSubmitButtonSelector[2].click();
-    await pageWait(5000);
+    await page.waitFor(5000);
   } catch (err) {
     console.error(err);
     throw new Error(err.message);
@@ -284,7 +284,7 @@ async function enterAddressDetails(page, address) {
     await page.type(firstNameSelector, address.first_name, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     const lastNameHandle = await page.$(lastNameSelector);
     await lastNameHandle.click();
@@ -296,25 +296,25 @@ async function enterAddressDetails(page, address) {
     await page.type(lastNameSelector, address.last_name, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(address1Selector);
     await page.type(address1Selector, address.address_line_1, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(address2Selector);
     await page.type(address2Selector, address.address_line_2, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     await page.waitForSelector(postalCodeSelector);
     await page.type(postalCodeSelector, address.postal_code, {
       delay: 10
     });
-    await pageWait(2000);
+    await page.waitFor(2000);
 
     // Prefilled by footsites
 
@@ -322,11 +322,11 @@ async function enterAddressDetails(page, address) {
     // await page.type(citySelector, address.city, {
     //   delay: 10
     // });
-    // await pageWait(2000);
+    // await page.waitFor(2000);
 
     // await page.waitForSelector(stateSelector);
     // await page.select(stateSelector, address.state);
-    // await pageWait(2000);
+    // await page.waitFor(2000);
   } catch (err) {
     console.error(err);
     throw new Error(err.message);
