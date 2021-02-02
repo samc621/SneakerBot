@@ -1,93 +1,75 @@
-const useProxy = require("puppeteer-page-proxy");
+const useProxy = require('puppeteer-page-proxy');
 
-exports.getCaptchaSelector = () => {
-  return "div.ReactModal__Content.ReactModal__Content--after-open.FL.c-modal.large.c-backend-error-modal";
-};
+exports.getCaptchaSelector = () => 'div.ReactModal__Content.ReactModal__Content--after-open.FL.c-modal.large.c-backend-error-modal';
 
-exports.guestCheckout = async (
-  page,
-  url,
-  proxyString,
-  styleIndex,
-  size,
-  shippingAddress,
-  shippingSpeedIndex,
-  billingAddress
-) => {
+async function enterAddressDetails(page, address) {
   try {
-    await useProxy(page, proxyString);
-    await page.goto(url);
-    await page.waitForTimeout(5000);
-    await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
+    const firstNameSelector = 'input[name="firstName"]';
+    const lastNameSelector = 'input[name="lastName"]';
+    const address1Selector = 'input[name="line1"]';
+    const address2Selector = 'input[name="line2"]';
+    const citySelector = 'input[name="town"]';
+    const stateSelector = 'select[name="region"]';
+    const postalCodeSelector = 'input[name="postalCode"]';
+
+    const firstNameHandle = await page.$(firstNameSelector);
+    await firstNameHandle.click();
+    await firstNameHandle.focus();
+    await firstNameHandle.click({ clickCount: 3 });
+    await firstNameHandle.press('Backspace');
+
+    await page.waitForSelector(firstNameSelector);
+    await page.type(firstNameSelector, address.first_name, {
+      delay: 10
+    });
     await page.waitForTimeout(2000);
 
-    let isInCart = false;
-    let hasCaptcha = false;
-    let checkoutComplete = false;
-    while (!isInCart && !hasCaptcha) {
-      const stylesSelector =
-        "div.c-form-field.c-form-field--radio.SelectStyle.col";
-      await page.waitForSelector(stylesSelector);
-      const styles = await page.$$(stylesSelector);
-      await styles[styleIndex].click();
-      await page.waitForTimeout(2000);
+    const lastNameHandle = await page.$(lastNameSelector);
+    await lastNameHandle.click();
+    await lastNameHandle.focus();
+    await lastNameHandle.click({ clickCount: 3 });
+    await lastNameHandle.press('Backspace');
 
-      const sizesSelector = "div.c-form-field.c-form-field--radio.ProductSize";
-      await page.waitForSelector(sizesSelector);
-      const sizes = await page.$$(sizesSelector);
-      for (var i = 0; i < sizes.length; i++) {
-        const sizeValue = await sizes[i].$eval("input", el =>
-          el.getAttribute("value")
-        );
-        const parsedSize = isNaN(size) ? sizeValue : Number(sizeValue);
-        if (parsedSize == size) {
-          await sizes[i].click();
-          break;
-        }
-      }
-      await page.waitForTimeout(2000);
+    await page.waitForSelector(lastNameSelector);
+    await page.type(lastNameSelector, address.last_name, {
+      delay: 10
+    });
+    await page.waitForTimeout(2000);
 
-      const atcButtonSelector =
-        "button.Button.Button.ProductDetails-form__action";
-      await page.waitForSelector(atcButtonSelector);
-      await page.click(atcButtonSelector);
-      await page.waitForTimeout(2000);
+    await page.waitForSelector(address1Selector);
+    await page.type(address1Selector, address.address_line_1, {
+      delay: 10
+    });
+    await page.waitForTimeout(2000);
 
-      const captchaSelector = this.getCaptchaSelector();
-      if (await page.$(captchaSelector)) {
-        hasCaptcha = true;
-        break;
-      }
+    await page.waitForSelector(address2Selector);
+    await page.type(address2Selector, address.address_line_2, {
+      delay: 10
+    });
+    await page.waitForTimeout(2000);
 
-      const cartSelector = "span.CartCount-badge";
-      let cart = await page.$$(cartSelector);
-      cart = cart.pop();
-      let cartCount = cart ? await cart.getProperty("innerText") : null;
-      cartCount = cartCount ? await cartCount.jsonValue() : 0;
-      if (cartCount == 1) {
-        isInCart = true;
-      }
-    }
+    await page.waitForSelector(postalCodeSelector);
+    await page.type(postalCodeSelector, address.postal_code, {
+      delay: 10
+    });
+    await page.waitForTimeout(2000);
 
-    if (isInCart) {
-      await checkout(page, shippingAddress, shippingSpeedIndex, billingAddress);
+    // Prefilled by footsites
 
-      const cartSelector = "span.CartCount-badge";
-      let cart = await page.$$(cartSelector);
-      cart = cart.pop();
-      let cartCount = cart ? await cart.getProperty("innerText") : null;
-      cartCount = cartCount ? await cartCount.jsonValue() : 0;
-      if (cartCount == 0) {
-        checkoutComplete = true;
-      }
-    }
+    // await page.waitForSelector(citySelector);
+    // await page.type(citySelector, address.city, {
+    //   delay: 10
+    // });
+    // await page.waitForTimeout(2000);
 
-    return { isInCart, hasCaptcha, checkoutComplete };
+    // await page.waitForSelector(stateSelector);
+    // await page.select(stateSelector, address.state);
+    // await page.waitForTimeout(2000);
   } catch (err) {
     console.error(err);
     throw new Error(err.message);
   }
-};
+}
 
 async function checkout(
   page,
@@ -103,32 +85,27 @@ async function checkout(
       securityCode: process.env.SECURITY_CODE
     };
 
-    await page.goto("https://footlocker.com/checkout");
+    await page.goto('https://footlocker.com/checkout');
 
     const firstNameSelector = 'input[name="firstName"]';
     const lastNameSelector = 'input[name="lastName"]';
     const emailSelector = 'input[name="email"]';
     const phoneNumberSelector = 'input[name="phone"]';
-    const submitButtonsSelector = "button.Button";
+    const submitButtonsSelector = 'button.Button';
 
-    const shippingSpeedsAvailableSelector =
-      "button#DeliveryOptions_selectCustom_deliveryModeId";
-    const shippingSpeedsSelector = "li.SelectCustom-option";
+    const shippingSpeedsAvailableSelector = 'button#DeliveryOptions_selectCustom_deliveryModeId';
+    const shippingSpeedsSelector = 'li.SelectCustom-option';
 
-    const cardNumberIframeSelector =
-      "span[data-cse=encryptedCardNumber] iframe";
-    const creditCardNumberSelector = "input#encryptedCardNumber";
-    const cardExpMonthIframeSelector =
-      "span[data-cse=encryptedExpiryMonth] iframe";
-    const creditCardExpirationMonthSelector = "input#encryptedExpiryMonth";
-    const cardExpYearIframeSelector =
-      "span[data-cse=encryptedExpiryYear] iframe";
-    const creditCardExpirationYearSelector = "input#encryptedExpiryYear";
-    const cardCVVIframeSelector = "span[data-cse=encryptedSecurityCode] iframe";
-    const creditCardCVVSelector = "input#encryptedSecurityCode";
+    const cardNumberIframeSelector = 'span[data-cse=encryptedCardNumber] iframe';
+    const creditCardNumberSelector = 'input#encryptedCardNumber';
+    const cardExpMonthIframeSelector = 'span[data-cse=encryptedExpiryMonth] iframe';
+    const creditCardExpirationMonthSelector = 'input#encryptedExpiryMonth';
+    const cardExpYearIframeSelector = 'span[data-cse=encryptedExpiryYear] iframe';
+    const creditCardExpirationYearSelector = 'input#encryptedExpiryYear';
+    const cardCVVIframeSelector = 'span[data-cse=encryptedSecurityCode] iframe';
+    const creditCardCVVSelector = 'input#encryptedSecurityCode';
 
-    const differentBillingAddressSelector =
-      "label[for=ShippingAddress_checkbox_setAsBilling]";
+    const differentBillingAddressSelector = 'label[for=ShippingAddress_checkbox_setAsBilling]';
 
     await page.waitForSelector(firstNameSelector);
     await page.type(firstNameSelector, shippingAddress.first_name, {
@@ -167,11 +144,9 @@ async function checkout(
     await page.click(differentBillingAddressSelector);
     await page.waitForTimeout(2000);
 
-    const shippingSpeedsAvailable = (await page.$(
+    const shippingSpeedsAvailable = await page.$(
       shippingSpeedsAvailableSelector
-    ))
-      ? true
-      : false;
+    );
     if (shippingSpeedsAvailable) {
       await page.click(shippingSpeedsAvailableSelector);
       await page.waitForSelector(shippingSpeedsSelector);
@@ -264,71 +239,83 @@ async function checkout(
   }
 }
 
-async function enterAddressDetails(page, address) {
+exports.guestCheckout = async (
+  page,
+  url,
+  proxyString,
+  styleIndex,
+  size,
+  shippingAddress,
+  shippingSpeedIndex,
+  billingAddress
+) => {
   try {
-    const firstNameSelector = 'input[name="firstName"]';
-    const lastNameSelector = 'input[name="lastName"]';
-    const address1Selector = 'input[name="line1"]';
-    const address2Selector = 'input[name="line2"]';
-    const citySelector = 'input[name="town"]';
-    const stateSelector = 'select[name="region"]';
-    const postalCodeSelector = 'input[name="postalCode"]';
-
-    const firstNameHandle = await page.$(firstNameSelector);
-    await firstNameHandle.click();
-    await firstNameHandle.focus();
-    await firstNameHandle.click({ clickCount: 3 });
-    await firstNameHandle.press("Backspace");
-
-    await page.waitForSelector(firstNameSelector);
-    await page.type(firstNameSelector, address.first_name, {
-      delay: 10
-    });
+    await useProxy(page, proxyString);
+    await page.goto(url);
+    await page.waitForTimeout(5000);
+    await page.reload({ waitUntil: ['networkidle0', 'domcontentloaded'] });
     await page.waitForTimeout(2000);
 
-    const lastNameHandle = await page.$(lastNameSelector);
-    await lastNameHandle.click();
-    await lastNameHandle.focus();
-    await lastNameHandle.click({ clickCount: 3 });
-    await lastNameHandle.press("Backspace");
+    let isInCart = false;
+    let hasCaptcha = false;
+    let checkoutComplete = false;
+    while (!isInCart && !hasCaptcha) {
+      const stylesSelector = 'div.c-form-field.c-form-field--radio.SelectStyle.col';
+      await page.waitForSelector(stylesSelector);
+      const styles = await page.$$(stylesSelector);
+      await styles[styleIndex].click();
+      await page.waitForTimeout(2000);
 
-    await page.waitForSelector(lastNameSelector);
-    await page.type(lastNameSelector, address.last_name, {
-      delay: 10
-    });
-    await page.waitForTimeout(2000);
+      const sizesSelector = 'div.c-form-field.c-form-field--radio.ProductSize';
+      await page.waitForSelector(sizesSelector);
+      const sizes = await page.$$(sizesSelector);
+      for (let i = 0; i < sizes.length; i + 1) {
+        const sizeValue = await sizes[i].$eval('input', (el) => el.getAttribute('value'));
+        const parsedSize = Number.isNaN(size) ? sizeValue : Number(sizeValue);
+        if (parsedSize === Number.isNaN(size) ? size : Number(size)) {
+          await sizes[i].click();
+          break;
+        }
+      }
+      await page.waitForTimeout(2000);
 
-    await page.waitForSelector(address1Selector);
-    await page.type(address1Selector, address.address_line_1, {
-      delay: 10
-    });
-    await page.waitForTimeout(2000);
+      const atcButtonSelector = 'button.Button.Button.ProductDetails-form__action';
+      await page.waitForSelector(atcButtonSelector);
+      await page.click(atcButtonSelector);
+      await page.waitForTimeout(2000);
 
-    await page.waitForSelector(address2Selector);
-    await page.type(address2Selector, address.address_line_2, {
-      delay: 10
-    });
-    await page.waitForTimeout(2000);
+      const captchaSelector = this.getCaptchaSelector();
+      if (await page.$(captchaSelector)) {
+        hasCaptcha = true;
+        break;
+      }
 
-    await page.waitForSelector(postalCodeSelector);
-    await page.type(postalCodeSelector, address.postal_code, {
-      delay: 10
-    });
-    await page.waitForTimeout(2000);
+      const cartSelector = 'span.CartCount-badge';
+      let cart = await page.$$(cartSelector);
+      cart = cart.pop();
+      let cartCount = cart ? await cart.getProperty('innerText') : null;
+      cartCount = cartCount ? await cartCount.jsonValue() : 0;
+      if (parseInt(cartCount) === 1) {
+        isInCart = true;
+      }
+    }
 
-    // Prefilled by footsites
+    if (isInCart) {
+      await checkout(page, shippingAddress, shippingSpeedIndex, billingAddress);
 
-    // await page.waitForSelector(citySelector);
-    // await page.type(citySelector, address.city, {
-    //   delay: 10
-    // });
-    // await page.waitForTimeout(2000);
+      const cartSelector = 'span.CartCount-badge';
+      let cart = await page.$$(cartSelector);
+      cart = cart.pop();
+      let cartCount = cart ? await cart.getProperty('innerText') : null;
+      cartCount = cartCount ? await cartCount.jsonValue() : 0;
+      if (parseInt(cartCount) === 0) {
+        checkoutComplete = true;
+      }
+    }
 
-    // await page.waitForSelector(stateSelector);
-    // await page.select(stateSelector, address.state);
-    // await page.waitForTimeout(2000);
+    return { isInCart, hasCaptcha, checkoutComplete };
   } catch (err) {
     console.error(err);
     throw new Error(err.message);
   }
-}
+};

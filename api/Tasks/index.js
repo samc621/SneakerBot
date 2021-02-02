@@ -1,6 +1,7 @@
-const express = require("express");
+const express = require('express');
+const { validate } = require('express-validation');
+
 const router = express.Router();
-const { validate } = require("express-validation");
 
 const {
   createTask,
@@ -9,7 +10,7 @@ const {
   updateTask,
   deleteTask,
   startTask
-} = require("./controller");
+} = require('./controller');
 const {
   create,
   findOne,
@@ -17,17 +18,17 @@ const {
   update,
   deleted,
   start
-} = require("./validation");
+} = require('./validation');
 
 router
-  .route("/")
+  .route('/')
   .post(validate(create), createTask)
   .get(validate(findAll), getTasks);
 
-router.route("/:id/start").post(validate(start), startTask);
+router.route('/:id/start').post(validate(start), startTask);
 
 router
-  .route("/:id")
+  .route('/:id')
   .get(validate(findOne), getTask)
   .patch(validate(update), updateTask)
   .delete(validate(deleted), deleteTask);

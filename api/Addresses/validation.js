@@ -1,9 +1,9 @@
-const Joi = require("joi");
+const Joi = require('joi');
 
 module.exports = {
   create: {
     body: Joi.object({
-      type: Joi.string().valid("billing", "shipping").required(),
+      type: Joi.string().valid('billing', 'shipping').required(),
       first_name: Joi.string().required(),
       last_name: Joi.string().required(),
       address_line_1: Joi.string().required(),
@@ -23,7 +23,7 @@ module.exports = {
   },
   findAll: {
     query: Joi.object({
-      type: Joi.string().valid("billing", "shipping").optional()
+      type: Joi.string().valid('billing', 'shipping').optional()
     })
   },
   update: {
@@ -31,7 +31,7 @@ module.exports = {
       id: Joi.number().required()
     }),
     body: Joi.object({
-      type: Joi.string().valid("billing", "shipping").optional(),
+      type: Joi.string().valid('billing', 'shipping').optional(),
       first_name: Joi.string().optional(),
       last_name: Joi.string().optional(),
       address_line_1: Joi.string().optional(),

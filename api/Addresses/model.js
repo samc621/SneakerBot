@@ -1,4 +1,4 @@
-const knex = require("../../config/knex");
+const knex = require('../../config/knex');
 
 class AddressesModel {
   constructor(id) {

@@ -1,11 +1,11 @@
-const Proxy = require("./model");
-const response = require("../../helpers/server-response");
+const Proxy = require('./model');
+const response = require('../../helpers/server-response');
 
 exports.createProxy = async (req, res) => {
   try {
     const proxy = await new Proxy().create(req.body);
 
-    return response.Ok(res, "Proxy successfully created", proxy);
+    return response.Ok(res, 'Proxy successfully created', proxy);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);
@@ -14,10 +14,10 @@ exports.createProxy = async (req, res) => {
 
 exports.getProxy = async (req, res) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const proxy = await new Proxy().findOne({ id });
 
-    return response.Ok(res, "Proxy successfully found", proxy);
+    return response.Ok(res, 'Proxy successfully found', proxy);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);
@@ -28,7 +28,7 @@ exports.getProxies = async (req, res) => {
   try {
     const proxies = await new Proxy().find(req.query);
 
-    return response.Ok(res, "Proxies successfully found", proxies);
+    return response.Ok(res, 'Proxies successfully found', proxies);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);
@@ -37,10 +37,10 @@ exports.getProxies = async (req, res) => {
 
 exports.updateProxy = async (req, res) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const proxy = await new Proxy(id).update(req.body);
 
-    return response.Ok(res, "Proxy successfully updated", proxy);
+    return response.Ok(res, 'Proxy successfully updated', proxy);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);
@@ -49,10 +49,10 @@ exports.updateProxy = async (req, res) => {
 
 exports.deleteProxy = async (req, res) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const proxy = await new Proxy(id).update({ is_deleted: true });
 
-    return response.Ok(res, "Proxy successfully deleted", proxy);
+    return response.Ok(res, 'Proxy successfully deleted', proxy);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);

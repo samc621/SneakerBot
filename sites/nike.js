@@ -1,79 +1,59 @@
-const useProxy = require("puppeteer-page-proxy");
+const useProxy = require('puppeteer-page-proxy');
 
-exports.guestCheckout = async (
-  page,
-  url,
-  proxyString,
-  styleIndex,
-  size,
-  shippingAddress,
-  shippingSpeedIndex,
-  billingAddress
-) => {
+async function enterAddressDetails(page, address) {
   try {
-    await useProxy(page, proxyString);
-    await page.goto(url);
+    const firstNameSelector = 'input[name="address.firstName"]';
+    const lastNameSelector = 'input[name="address.lastName"]';
+    const address1Selector = 'input[name="address.address1"]';
+    const address2Selector = 'input[name="address.address2"]';
+    const citySelector = 'input[name="address.city"]';
+    const stateSelector = 'select[name="address.state"]';
+    const postalCodeSelector = 'input[name="address.postalCode"]';
+
+    await page.waitForSelector(firstNameSelector);
+    await page.type(firstNameSelector, address.first_name, {
+      delay: 10
+    });
     await page.waitForTimeout(2000);
 
-    let isInCart = false;
-    let checkoutComplete = false;
-    while (!isInCart) {
-      const stylesSelector = "div.colorway-product-overlay";
-      await page.waitForSelector(stylesSelector);
-      const styles = await page.$$(stylesSelector);
-      await styles[styleIndex].click();
-      await page.waitForTimeout(2000);
+    await page.waitForSelector(lastNameSelector);
+    await page.type(lastNameSelector, address.last_name, {
+      delay: 10
+    });
+    await page.waitForTimeout(2000);
 
-      const sizesSelector = "div.mt2-sm div";
-      await page.waitForSelector(sizesSelector);
-      const sizes = await page.$$(sizesSelector);
-      for (var i = 0; i < sizes.length; i++) {
-        const sizeValue = await sizes[i].$eval("input", el =>
-          el.getAttribute("value")
-        );
-        if (sizeValue.endsWith(size)) {
-          await sizes[i].click();
-          break;
-        }
-      }
-      await page.waitForTimeout(2000);
+    await page.waitForSelector(address1Selector);
+    await page.type(address1Selector, address.address_line_1, {
+      delay: 10
+    });
+    await page.waitForTimeout(2000);
 
-      const atcButtonSelector =
-        "button.ncss-btn-primary-dark.btn-lg.add-to-cart-btn";
-      await page.waitForSelector(atcButtonSelector);
-      await page.click(atcButtonSelector);
-      await page.waitForTimeout(2000);
+    await page.waitForSelector(address2Selector);
+    await page.type(address2Selector, address.address_line_2, {
+      delay: 10
+    });
+    await page.waitForTimeout(2000);
 
-      const cartSelector =
-        "span.pre-jewel.pre-cart-jewel.text-color-primary-dark";
-      let cart = await page.$$(cartSelector);
-      cart = cart.pop();
-      let cartCount = await cart.getProperty("innerText");
-      cartCount = await cartCount.jsonValue();
-      if (cartCount == 1) {
-        isInCart = true;
-      }
-    }
+    await page.waitForSelector(citySelector);
+    await page.type(citySelector, address.city, {
+      delay: 10
+    });
+    await page.waitForTimeout(2000);
 
-    if (isInCart) {
-      await checkout(page, shippingAddress, shippingSpeedIndex, billingAddress);
+    await page.waitForSelector(stateSelector);
+    await page.select(stateSelector, address.state);
+    await page.waitForTimeout(2000);
 
-      const cartSelector = "span.va-sm-m.fs12-sm.ta-sm-c";
-      let cart = await page.$$(cartSelector);
-      cart = cart.pop();
-      let cartCount = cart ? await cart.getProperty("innerText") : null;
-      cartCount = cartCount ? await cartCount.jsonValue() : 0;
-      if (cartCount == 0) {
-        checkoutComplete = true;
-      }
-    }
-
-    return { isInCart, checkoutComplete };
+    await page.waitForSelector(postalCodeSelector);
+    await page.type(postalCodeSelector, address.postal_code, {
+      delay: 10
+    });
+    await page.waitForTimeout(2000);
   } catch (err) {
     console.error(err);
     throw new Error(err.message);
   }
-};
+}
 
 async function checkout(
   page,
@@ -89,31 +69,26 @@ async function checkout(
       securityCode: process.env.SECURITY_CODE
     };
 
-    await page.goto("https://nike.com/checkout");
+    await page.goto('https://nike.com/checkout');
 
-    const enterAddressManuallyButtonSelector = "a#addressSuggestionOptOut";
-    const address2ExpandButtonSelector = "button[aria-controls=address2]";
+    const enterAddressManuallyButtonSelector = 'a#addressSuggestionOptOut';
+    const address2ExpandButtonSelector = 'button[aria-controls=address2]';
     const emailSelector = 'input[name="address.email"]';
     const phoneNumberSelector = 'input[name="address.phoneNumber"]';
-    const shippingAddressSubmitButtonSelector =
-      "button.js-next-step.saveAddressBtn";
+    const shippingAddressSubmitButtonSelector = 'button.js-next-step.saveAddressBtn';
 
-    const shippingSpeedsSelector = "div.shippingOptionsSelectorContainer";
-    const shippingSpeedSubmitButtonSelector =
-      "button.js-next-step.continuePaymentBtn";
+    const shippingSpeedsSelector = 'div.shippingOptionsSelectorContainer';
+    const shippingSpeedSubmitButtonSelector = 'button.js-next-step.continuePaymentBtn';
 
-    const cardDetailsIframeSelector =
-      "iframe.credit-card-iframe.mt1.u-full-width.prl2-sm";
-    const creditCardNumberSelector = "input#creditCardNumber";
-    const creditCardExpirationDateSelector = "input#expirationDate";
-    const creditCardCVVSelector = "input#cvNumber";
+    const cardDetailsIframeSelector = 'iframe.credit-card-iframe.mt1.u-full-width.prl2-sm';
+    const creditCardNumberSelector = 'input#creditCardNumber';
+    const creditCardExpirationDateSelector = 'input#expirationDate';
+    const creditCardCVVSelector = 'input#cvNumber';
 
-    const differentBillingAddressSelector = "label[for=billingAddress]";
-    const billingAddressSubmitButtonSelector =
-      "button[data-attr=continueToOrderReviewBtn]";
+    const differentBillingAddressSelector = 'label[for=billingAddress]';
+    const billingAddressSubmitButtonSelector = 'button[data-attr=continueToOrderReviewBtn]';
 
-    const orderSubmitButtonSelector =
-      "button.d-lg-ib.d-sm-h.fs14-sm.ncss-brand.ncss-btn-accent.pb2-lg.pb3-sm.prl5-sm.pt2-lg.pt3-sm.u-uppercase";
+    const orderSubmitButtonSelector = 'button.d-lg-ib.d-sm-h.fs14-sm.ncss-brand.ncss-btn-accent.pb2-lg.pb3-sm.prl5-sm.pt2-lg.pt3-sm.u-uppercase';
 
     await page.waitForSelector(enterAddressManuallyButtonSelector);
     await page.click(enterAddressManuallyButtonSelector);
@@ -200,57 +175,73 @@ async function checkout(
   }
 }
 
-async function enterAddressDetails(page, address) {
+exports.guestCheckout = async (
+  page,
+  url,
+  proxyString,
+  styleIndex,
+  size,
+  shippingAddress,
+  shippingSpeedIndex,
+  billingAddress
+) => {
   try {
-    const firstNameSelector = 'input[name="address.firstName"]';
-    const lastNameSelector = 'input[name="address.lastName"]';
-    const address1Selector = 'input[name="address.address1"]';
-    const address2Selector = 'input[name="address.address2"]';
-    const citySelector = 'input[name="address.city"]';
-    const stateSelector = 'select[name="address.state"]';
-    const postalCodeSelector = 'input[name="address.postalCode"]';
-
-    await page.waitForSelector(firstNameSelector);
-    await page.type(firstNameSelector, address.first_name, {
-      delay: 10
-    });
+    await useProxy(page, proxyString);
+    await page.goto(url);
     await page.waitForTimeout(2000);
 
-    await page.waitForSelector(lastNameSelector);
-    await page.type(lastNameSelector, address.last_name, {
-      delay: 10
-    });
-    await page.waitForTimeout(2000);
+    let isInCart = false;
+    let checkoutComplete = false;
+    while (!isInCart) {
+      const stylesSelector = 'div.colorway-product-overlay';
+      await page.waitForSelector(stylesSelector);
+      const styles = await page.$$(stylesSelector);
+      await styles[styleIndex].click();
+      await page.waitForTimeout(2000);
 
-    await page.waitForSelector(address1Selector);
-    await page.type(address1Selector, address.address_line_1, {
-      delay: 10
-    });
-    await page.waitForTimeout(2000);
+      const sizesSelector = 'div.mt2-sm div';
+      await page.waitForSelector(sizesSelector);
+      const sizes = await page.$$(sizesSelector);
+      for (let i = 0; i < sizes.length; i + 1) {
+        const sizeValue = await sizes[i].$eval('input', (el) => el.getAttribute('value'));
+        if (sizeValue.endsWith(size)) {
+          await sizes[i].click();
+          break;
+        }
+      }
+      await page.waitForTimeout(2000);
 
-    await page.waitForSelector(address2Selector);
-    await page.type(address2Selector, address.address_line_2, {
-      delay: 10
-    });
-    await page.waitForTimeout(2000);
+      const atcButtonSelector = 'button.ncss-btn-primary-dark.btn-lg.add-to-cart-btn';
+      await page.waitForSelector(atcButtonSelector);
+      await page.click(atcButtonSelector);
+      await page.waitForTimeout(2000);
 
-    await page.waitForSelector(citySelector);
-    await page.type(citySelector, address.city, {
-      delay: 10
-    });
-    await page.waitForTimeout(2000);
+      const cartSelector = 'span.pre-jewel.pre-cart-jewel.text-color-primary-dark';
+      let cart = await page.$$(cartSelector);
+      cart = cart.pop();
+      let cartCount = await cart.getProperty('innerText');
+      cartCount = await cartCount.jsonValue();
+      if (parseInt(cartCount) === 1) {
+        isInCart = true;
+      }
+    }
 
-    await page.waitForSelector(stateSelector);
-    await page.select(stateSelector, address.state);
-    await page.waitForTimeout(2000);
+    if (isInCart) {
+      await checkout(page, shippingAddress, shippingSpeedIndex, billingAddress);
 
-    await page.waitForSelector(postalCodeSelector);
-    await page.type(postalCodeSelector, address.postal_code, {
-      delay: 10
-    });
-    await page.waitForTimeout(2000);
+      const cartSelector = 'span.va-sm-m.fs12-sm.ta-sm-c';
+      let cart = await page.$$(cartSelector);
+      cart = cart.pop();
+      let cartCount = cart ? await cart.getProperty('innerText') : null;
+      cartCount = cartCount ? await cartCount.jsonValue() : 0;
+      if (parseInt(cartCount) === 0) {
+        checkoutComplete = true;
+      }
+    }
+
+    return { isInCart, checkoutComplete };
   } catch (err) {
     console.error(err);
     throw new Error(err.message);
   }
-}
+};

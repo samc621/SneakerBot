@@ -1,0 +1,25 @@
+{
+    "extends": "airbnb-base",
+    "root": true,
+    "env": {
+        "node": true,
+        "es6": true
+    },
+    "rules": {
+        "max-len": [
+            "warn",
+            140
+        ],
+        "no-console": "off",
+        "comma-dangle": [
+            "error",
+            "never"
+        ],
+        "no-unused-vars": "warn",
+        "no-await-in-loop": "off",
+        "radix": "off",
+        "no-undef": "warn",
+        "global-require": "off",
+        "import/no-dynamic-require": "warn"
+    }
+}

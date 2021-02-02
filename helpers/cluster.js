@@ -1,15 +1,13 @@
-const { Cluster } = require("puppeteer-cluster");
+const { Cluster } = require('puppeteer-cluster');
 
-const Task = require("../api/Tasks/model");
-const Proxy = require("../api/Proxies/model");
-const Address = require("../api/Addresses/model");
+const Task = require('../api/Tasks/model');
+const Proxy = require('../api/Proxies/model');
+const Address = require('../api/Addresses/model');
 
-const { testProxy, createProxyString } = require("./proxies");
-const { sendEmail } = require("./email");
+const { testProxy, createProxyString } = require('./proxies');
+const { sendEmail } = require('./email');
 
 class PuppeteerCluster {
-  constructor() { }
-
   static async build() {
     const cluster = await Cluster.launch({
       concurrency: Cluster.CONCURRENCY_BROWSER,
@@ -19,9 +17,9 @@ class PuppeteerCluster {
         headless: false,
         defaultViewport: null,
         args: [
-          "--start-maximized",
-          "--disable-web-security",
-          "--disable-features=IsolateOrigins,site-per-process"
+          '--start-maximized',
+          '--disable-web-security',
+          '--disable-features=IsolateOrigins,site-per-process'
         ]
       }
     });
@@ -29,12 +27,12 @@ class PuppeteerCluster {
     cluster.task(async ({ page, data: taskId }) => {
       try {
         const data = {};
-        data["tasks.id"] = taskId;
+        data['tasks.id'] = taskId;
         const task = await new Task().findOne(data);
 
         const proxies = await new Proxy().find({ has_been_used: false });
 
-        const validProxy = proxies.find(async proxy => {
+        const validProxy = proxies.find(async (proxy) => {
           const proxyString = createProxyString(proxy);
           if (await testProxy(proxyString)) {
             await new Proxy(proxy.id).update({ has_been_used: true });
@@ -64,17 +62,17 @@ class PuppeteerCluster {
             billingAddress
           );
 
-          let recipient = task.notification_email_address;
+          const recipient = task.notification_email_address;
           let subject;
           let text;
           if (status.hasCaptcha) {
-            subject = "Checkout task unsuccessful";
+            subject = 'Checkout task unsuccessful';
             text = `The checkout task for ${task.url} size ${task.size} has a captcha. Please open the browser and complete it within 5 minutes.`;
           } else if (!status.checkoutComplete) {
-            subject = "Checkout task unsuccessful";
+            subject = 'Checkout task unsuccessful';
             text = `The checkout task for ${task.url} size ${task.size} has a checkout error. Please open the browser to check on it.`;
           } else if (status.checkoutComplete) {
-            subject = "Checkout task successful";
+            subject = 'Checkout task successful';
             text = `The checkout task for ${task.url} size ${task.size} has completed.`;
           }
           await sendEmail(recipient, subject, text);

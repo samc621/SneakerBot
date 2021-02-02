@@ -1,18 +1,20 @@
-const environment = process.env.NODE_ENV || "local";
-const configuration = require("../../knexfile")[environment];
-const knex = require("knex")(configuration);
+let knex = require('knex');
 
-let retries = 5;
+const environment = process.env.NODE_ENV || 'development';
+const configuration = require('../../knexfile')[environment];
+knex = require('knex')(configuration);
 
 function connectToDB() {
-  while (retries > 0) {
-    knex.raw("select 1+1 as result").catch(err => {
-      console.error("Couldn't connect to DB: ", err);
+  let retries = 5;
+  let connected = false;
+  if (!connected && retries > 0) {
+    knex.raw('select 1+1 as result').catch((err) => {
+      console.error("Couldn't connect to DB", err);
       retries -= 1;
-      console.log(`Retries left: ${retries}`);
+      console.error(`Retries left: ${retries}`);
       setTimeout(connectToDB, 5000);
     });
-    break;
+    connected = true;
   }
 }
 

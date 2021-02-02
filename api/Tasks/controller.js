@@ -1,6 +1,6 @@
-const Task = require("./model");
-const PuppeteerCluster = require("../../helpers/cluster");
-const response = require("../../helpers/server-response");
+const Task = require('./model');
+const PuppeteerCluster = require('../../helpers/cluster');
+const response = require('../../helpers/server-response');
 
 let cluster;
 (async () => {
@@ -11,7 +11,7 @@ exports.createTask = async (req, res) => {
   try {
     const task = await new Task().create(req.body);
 
-    return response.Ok(res, "Task successfully created", task);
+    return response.Ok(res, 'Task successfully created', task);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);
@@ -20,12 +20,12 @@ exports.createTask = async (req, res) => {
 
 exports.getTask = async (req, res) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const data = {};
-    data["tasks.id"] = id;
+    data['tasks.id'] = id;
     const task = await new Task().findOne(data);
 
-    return response.Ok(res, "Task successfully found", task);
+    return response.Ok(res, 'Task successfully found', task);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);
@@ -36,7 +36,7 @@ exports.getTasks = async (req, res) => {
   try {
     const tasks = await new Task().find(req.query);
 
-    return response.Ok(res, "Tasks successfully found", tasks);
+    return response.Ok(res, 'Tasks successfully found', tasks);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);
@@ -45,10 +45,10 @@ exports.getTasks = async (req, res) => {
 
 exports.updateTask = async (req, res) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const task = await new Task(id).update(req.body);
 
-    return response.Ok(res, "Task successfully updated", task);
+    return response.Ok(res, 'Task successfully updated', task);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);
@@ -57,10 +57,10 @@ exports.updateTask = async (req, res) => {
 
 exports.deleteTask = async (req, res) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const task = await new Task(id).update({ is_deleted: true });
 
-    return response.Ok(res, "Task successfully deleted", task);
+    return response.Ok(res, 'Task successfully deleted', task);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);
@@ -69,10 +69,10 @@ exports.deleteTask = async (req, res) => {
 
 exports.startTask = async (req, res) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const task = cluster.queue(id);
 
-    return response.Ok(res, "Task successfully started", task);
+    return response.Ok(res, 'Task successfully started', task);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);
