@@ -118,7 +118,7 @@ async function checkout(
         await sendEmail(recipient, subject, text);
 
         await Promise.race([
-          new Promise((resolve) => {
+          new Promise(() => {
             setTimeout(() => {
               throw new Error('The captcha was not solved in time.');
             }, 5 * 60 * 1000);

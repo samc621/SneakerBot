@@ -15,12 +15,9 @@
             "error",
             "never"
         ],
-        "no-unused-vars": "warn",
         "no-await-in-loop": "off",
         "radix": "off",
         "no-undef": "warn",
-        "global-require": "off",
-        "import/no-dynamic-require": "warn",
         "no-loop-func": "off",
         "arrow-body-style": "off",
         "no-continue": "off"

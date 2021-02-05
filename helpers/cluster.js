@@ -7,6 +7,8 @@ const Address = require('../api/Addresses/model');
 const { testProxy, createProxyString } = require('./proxies');
 const { sendEmail } = require('./email');
 
+const sites = require('../sites');
+
 class PuppeteerCluster {
   static async build() {
     const cluster = await Cluster.launch({
@@ -49,7 +51,7 @@ class PuppeteerCluster {
           id: task.billing_address_id
         });
 
-        const checkoutComplete = await require(`../sites/${task.site_name}`).guestCheckout(
+        const checkoutComplete = await sites[task.site_name].guestCheckout(
           page,
           task.url,
           proxy,
@@ -67,7 +69,10 @@ class PuppeteerCluster {
         let text;
         if (!checkoutComplete) {
           subject = 'Checkout task unsuccessful';
-          text = `The checkout task for ${task.url} size ${task.size} has a checkout error. Please open the browser to check on it within 5 minutes.`;
+          text = `
+            The checkout task for ${task.url} size ${task.size} has a checkout error. 
+            Please open the browser to check on it within 5 minutes.
+          `;
         } else {
           subject = 'Checkout task successful';
           text = `The checkout task for ${task.url} size ${task.size} has completed.`;

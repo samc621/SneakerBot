@@ -8,8 +8,8 @@ async function enterAddressDetails(page, address) {
     const lastNameSelector = 'input[name="lastName"]';
     const address1Selector = 'input[name="line1"]';
     const address2Selector = 'input[name="line2"]';
-    const citySelector = 'input[name="town"]';
-    const stateSelector = 'select[name="region"]';
+    // const citySelector = 'input[name="town"]';
+    // const stateSelector = 'select[name="region"]';
     const postalCodeSelector = 'input[name="postalCode"]';
 
     const firstNameHandle = await page.$(firstNameSelector);
