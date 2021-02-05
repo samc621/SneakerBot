@@ -1,6 +1,6 @@
 const useProxy = require('puppeteer-page-proxy');
-
-exports.getCaptchaSelector = () => 'div#g-recaptcha';
+const { solveCaptcha } = require('../helpers/captcha');
+const { sendEmail } = require('../helpers/email');
 
 async function enterAddressDetails(page, address, type) {
   try {
@@ -69,7 +69,11 @@ async function checkout(
   shippingAddress,
   shippingSpeedIndex,
   billingAddress,
-  domain
+  domain,
+  autoSolveCaptchas,
+  notificationEmailAddress,
+  url,
+  size
 ) {
   try {
     let hasCaptcha = false;
@@ -83,7 +87,6 @@ async function checkout(
       securityCode: process.env.SECURITY_CODE
     };
 
-    const captchaSelector = exports.getCaptchaSelector();
     const emailSelector = 'input#checkout_email';
     const submitButtonsSelector = 'button#continue_button';
 
@@ -97,12 +100,43 @@ async function checkout(
 
     const differentBillingAddressSelector = 'input#checkout_different_billing_address_true';
 
+    const captchaSelector = 'div#g-recaptcha';
     try {
-      await page.waitForSelector(captchaSelector);
-      hasCaptcha = true;
-      return { hasCaptcha, checkoutComplete };
+      hasCaptcha = await page.waitForSelector(captchaSelector);
     } catch (err) {
       // no-op if timeout occurs
+    }
+
+    if (hasCaptcha) {
+      if (autoSolveCaptchas) {
+        const solved = await solveCaptcha(page, captchaSelector);
+        if (solved) hasCaptcha = false;
+      } else {
+        const recipient = notificationEmailAddress;
+        const subject = 'Checkout task unsuccessful';
+        const text = `The checkout task for ${url} size ${size} has a captcha. Please open the browser and complete it within 5 minutes.`;
+        await sendEmail(recipient, subject, text);
+
+        await Promise.race([
+          new Promise((resolve) => {
+            setTimeout(() => {
+              throw new Error('The captcha was not solved in time.');
+            }, 5 * 60 * 1000);
+          }),
+          new Promise((resolve) => {
+            const interval = setInterval(async () => {
+              const solved = await page.evaluate(() => {
+                return document.querySelector('#g-recaptcha-response').value.length > 0;
+              });
+              if (solved) {
+                hasCaptcha = false;
+                resolve();
+                clearInterval(interval);
+              }
+            }, 1000);
+          })
+        ]);
+      }
     }
 
     await page.waitForSelector(emailSelector);
@@ -195,7 +229,7 @@ async function checkout(
       checkoutComplete = true;
     }
 
-    return { hasCaptcha, checkoutComplete };
+    return checkoutComplete;
   } catch (err) {
     console.error(err);
     throw new Error(err.message);
@@ -210,7 +244,9 @@ exports.guestCheckout = async (
   size,
   shippingAddress,
   shippingSpeedIndex,
-  billingAddress
+  billingAddress,
+  autoSolveCaptchas,
+  notificationEmailAddress
 ) => {
   try {
     const domain = url.split('/').slice(0, 3).join('/');
@@ -223,38 +259,48 @@ exports.guestCheckout = async (
       return variants.find((variant) => variant.name.endsWith(sizeStr)).id;
     }, size);
 
-    const isInCart = await page.evaluate(async (id) => {
-      const item = { id, quantity: 1 };
+    let isInCart = false;
+    while (!isInCart) {
+      isInCart = await page.evaluate(async (id) => {
+        const item = { id, quantity: 1 };
 
-      const data = {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          items: [item]
-        })
-      };
+        const data = {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            items: [item]
+          })
+        };
 
-      const response = await fetch('/cart/add.js', data);
-      if (response.status === 200) return true;
-      return false;
-    }, variantId);
-
-    await page.waitForTimeout(2000);
-
-    await page.goto(`${domain}/checkout`, { waitUntil: 'networkidle0' });
-
-    let hasCaptcha = false;
-    let checkoutComplete = false;
-    if (isInCart) {
-      const status = await checkout(page, shippingAddress, shippingSpeedIndex, billingAddress, domain);
-      hasCaptcha = status.hasCaptcha;
-      checkoutComplete = status.checkoutComplete;
+        const response = await fetch('/cart/add.js', data);
+        if (response.status === 200) return true;
+        return false;
+      }, variantId);
     }
 
-    return { isInCart, hasCaptcha, checkoutComplete };
+    let checkoutComplete = false;
+    if (isInCart) {
+      await page.waitForTimeout(2000);
+
+      await page.goto(`${domain}/checkout`, { waitUntil: 'networkidle0' });
+
+      checkoutComplete = await checkout(
+        page,
+        shippingAddress,
+        shippingSpeedIndex,
+        billingAddress,
+        domain,
+        autoSolveCaptchas,
+        notificationEmailAddress,
+        url,
+        size
+      );
+    }
+
+    return checkoutComplete;
   } catch (err) {
     console.error(err);
     throw new Error(err.message);

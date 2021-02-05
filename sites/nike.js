@@ -199,28 +199,34 @@ exports.guestCheckout = async (
       await styles[styleIndex].click();
       await page.waitForTimeout(2000);
 
-      const sizesSelector = 'div.mt2-sm div';
+      const sizesSelector = 'div.mt2-sm div input';
       await page.waitForSelector(sizesSelector);
-      const sizes = await page.$$(sizesSelector);
-      for (let i = 0; i < sizes.length; i + 1) {
-        const sizeValue = await sizes[i].$eval('input', (el) => el.getAttribute('value'));
-        if (sizeValue.endsWith(size)) {
-          await sizes[i].click();
-          break;
+      await page.evaluate((sizesSelectorText, sizeValue) => {
+        const sizes = Array.from(document.querySelectorAll(sizesSelectorText));
+        const matchingSize = sizes.find((sz) => sz.value.endsWith(sizeValue));
+        if (matchingSize) {
+          matchingSize.click();
         }
-      }
+      }, sizesSelector, size);
       await page.waitForTimeout(2000);
 
       const atcButtonSelector = 'button.ncss-btn-primary-dark.btn-lg.add-to-cart-btn';
       await page.waitForSelector(atcButtonSelector);
-      await page.click(atcButtonSelector);
+      await page.evaluate((atcButtonSelectorText) => {
+        const buttons = Array.from(document.querySelectorAll(atcButtonSelectorText));
+        const button = buttons.find((btn) => btn.innerText === 'Add to Bag');
+        if (button) {
+          button.click();
+        }
+      }, atcButtonSelector);
       await page.waitForTimeout(2000);
 
       const cartSelector = 'span.pre-jewel.pre-cart-jewel.text-color-primary-dark';
-      let cart = await page.$$(cartSelector);
-      cart = cart.pop();
-      let cartCount = await cart.getProperty('innerText');
-      cartCount = await cartCount.jsonValue();
+      await page.waitForSelector(cartSelector);
+      const cartCount = await page.evaluate((cartTextSelector) => {
+        return document.querySelector(cartTextSelector).innerText;
+      }, cartSelector);
+
       if (parseInt(cartCount) === 1) {
         isInCart = true;
       }
@@ -230,16 +236,17 @@ exports.guestCheckout = async (
       await checkout(page, shippingAddress, shippingSpeedIndex, billingAddress);
 
       const cartSelector = 'span.va-sm-m.fs12-sm.ta-sm-c';
-      let cart = await page.$$(cartSelector);
-      cart = cart.pop();
-      let cartCount = cart ? await cart.getProperty('innerText') : null;
-      cartCount = cartCount ? await cartCount.jsonValue() : 0;
+      await page.waitForSelector(cartSelector);
+      const cartCount = await page.evaluate((cartTextSelector) => {
+        return document.querySelector(cartTextSelector).innerText;
+      }, cartSelector);
+
       if (parseInt(cartCount) === 0) {
         checkoutComplete = true;
       }
     }
 
-    return { isInCart, checkoutComplete };
+    return checkoutComplete;
   } catch (err) {
     console.error(err);
     throw new Error(err.message);

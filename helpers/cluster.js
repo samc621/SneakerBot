@@ -49,50 +49,33 @@ class PuppeteerCluster {
           id: task.billing_address_id
         });
 
-        let complete = false;
-        while (complete === false) {
-          const status = await require(`../sites/${task.site_name}`).guestCheckout(
-            page,
-            task.url,
-            proxy,
-            task.style_index,
-            task.size,
-            shippingAddress,
-            task.shipping_speed_index,
-            billingAddress
-          );
+        const checkoutComplete = await require(`../sites/${task.site_name}`).guestCheckout(
+          page,
+          task.url,
+          proxy,
+          task.style_index,
+          task.size,
+          shippingAddress,
+          task.shipping_speed_index,
+          billingAddress,
+          task.auto_solve_captchas,
+          task.notification_email_address
+        );
 
-          const recipient = task.notification_email_address;
-          let subject;
-          let text;
-          if (status.hasCaptcha) {
-            subject = 'Checkout task unsuccessful';
-            text = `The checkout task for ${task.url} size ${task.size} has a captcha. Please open the browser and complete it within 5 minutes.`;
-          } else if (!status.checkoutComplete) {
-            subject = 'Checkout task unsuccessful';
-            text = `The checkout task for ${task.url} size ${task.size} has a checkout error. Please open the browser to check on it.`;
-          } else if (status.checkoutComplete) {
-            subject = 'Checkout task successful';
-            text = `The checkout task for ${task.url} size ${task.size} has completed.`;
-          }
-          await sendEmail(recipient, subject, text);
+        const recipient = task.notification_email_address;
+        let subject;
+        let text;
+        if (!checkoutComplete) {
+          subject = 'Checkout task unsuccessful';
+          text = `The checkout task for ${task.url} size ${task.size} has a checkout error. Please open the browser to check on it within 5 minutes.`;
+        } else {
+          subject = 'Checkout task successful';
+          text = `The checkout task for ${task.url} size ${task.size} has completed.`;
+        }
+        await sendEmail(recipient, subject, text);
 
-          if (status.hasCaptcha) {
-            const captchaSelector = require(`../sites/${task.site_name}`).getCaptchaSelector();
-            await page.waitForSelector(captchaSelector, {
-              hidden: true,
-              timeout: 5 * 60 * 1000
-            });
-          }
-
-          if (!status.checkoutComplete) {
-            await page.waitForTimeout(5 * 60 * 1000);
-          }
-
-          if (status.checkoutComplete) {
-            complete = true;
-            break;
-          }
+        if (!checkoutComplete) {
+          await page.waitForTimeout(5 * 60 * 1000);
         }
       } catch (err) {
         console.error(err.messsage);

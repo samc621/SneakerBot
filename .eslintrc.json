@@ -20,6 +20,10 @@
         "radix": "off",
         "no-undef": "warn",
         "global-require": "off",
-        "import/no-dynamic-require": "warn"
+        "import/no-dynamic-require": "warn",
+        "no-loop-func": "off",
+        "arrow-body-style": "off",
+        "no-param-reassign": "off",
+        "no-continue": "off"
     }
 }

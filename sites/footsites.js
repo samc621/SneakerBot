@@ -1,6 +1,6 @@
 const useProxy = require('puppeteer-page-proxy');
-
-exports.getCaptchaSelector = () => 'div.ReactModal__Content.ReactModal__Content--after-open.FL.c-modal.large.c-backend-error-modal';
+const { solveCaptcha } = require('../helpers/captcha');
+const { sendEmail } = require('../helpers/email');
 
 async function enterAddressDetails(page, address) {
   try {
@@ -247,19 +247,22 @@ exports.guestCheckout = async (
   size,
   shippingAddress,
   shippingSpeedIndex,
-  billingAddress
+  billingAddress,
+  autoSolveCaptchas,
+  notificationEmailAddress
 ) => {
   try {
     await useProxy(page, proxyString);
-    await page.goto(url);
-    await page.waitForTimeout(5000);
-    await page.reload({ waitUntil: ['networkidle0', 'domcontentloaded'] });
-    await page.waitForTimeout(2000);
 
     let isInCart = false;
     let hasCaptcha = false;
     let checkoutComplete = false;
     while (!isInCart && !hasCaptcha) {
+      await page.goto(url);
+      await page.waitForTimeout(5000);
+      await page.reload({ waitUntil: ['networkidle0', 'domcontentloaded'] });
+      await page.waitForTimeout(2000);
+
       const stylesSelector = 'div.c-form-field.c-form-field--radio.SelectStyle.col';
       await page.waitForSelector(stylesSelector);
       const styles = await page.$$(stylesSelector);
@@ -284,17 +287,45 @@ exports.guestCheckout = async (
       await page.click(atcButtonSelector);
       await page.waitForTimeout(2000);
 
-      const captchaSelector = this.getCaptchaSelector();
-      if (await page.$(captchaSelector)) {
-        hasCaptcha = true;
-        break;
+      const captchaIframeSelector = 'iframe#dataDomeCaptcha';
+      const captchaSelector = 'div.g-recaptcha';
+      try {
+        hasCaptcha = await page.waitForSelector(captchaIframeSelector);
+      } catch (err) {
+        // no-op if timeout occurs
+      }
+
+      if (hasCaptcha) {
+        if (autoSolveCaptchas) {
+          const solved = await solveCaptcha(page, captchaSelector, captchaIframeSelector);
+          if (solved) hasCaptcha = false;
+        } else {
+          const recipient = notificationEmailAddress;
+          const subject = 'Checkout task unsuccessful';
+          const text = `The checkout task for ${url} size ${size} has a captcha. Please open the browser and complete it within 5 minutes.`;
+          await sendEmail(recipient, subject, text);
+
+          try {
+            await page.waitForSelector(captchaIframeSelector, {
+              hidden: true,
+              timeout: 5 * 60 * 1000
+            });
+            hasCaptcha = false;
+          } catch (err) {
+            throw new Error('The captcha was not solved in time.');
+          }
+        }
+
+        await page.waitForTimeout(2000);
+        continue;
       }
 
       const cartSelector = 'span.CartCount-badge';
-      let cart = await page.$$(cartSelector);
-      cart = cart.pop();
-      let cartCount = cart ? await cart.getProperty('innerText') : null;
-      cartCount = cartCount ? await cartCount.jsonValue() : 0;
+      await page.waitForSelector(cartSelector);
+      const cartCount = await page.evaluate((cartTextSelector) => {
+        return document.querySelector(cartTextSelector).innerText;
+      }, cartSelector);
+
       if (parseInt(cartCount) === 1) {
         isInCart = true;
       }
@@ -304,16 +335,17 @@ exports.guestCheckout = async (
       await checkout(page, shippingAddress, shippingSpeedIndex, billingAddress);
 
       const cartSelector = 'span.CartCount-badge';
-      let cart = await page.$$(cartSelector);
-      cart = cart.pop();
-      let cartCount = cart ? await cart.getProperty('innerText') : null;
-      cartCount = cartCount ? await cartCount.jsonValue() : 0;
+      await page.waitForSelector(cartSelector);
+      const cartCount = await page.evaluate((cartTextSelector) => {
+        return document.querySelector(cartTextSelector).innerText;
+      }, cartSelector);
+
       if (parseInt(cartCount) === 0) {
         checkoutComplete = true;
       }
     }
 
-    return { isInCart, hasCaptcha, checkoutComplete };
+    return checkoutComplete;
   } catch (err) {
     console.error(err);
     throw new Error(err.message);
