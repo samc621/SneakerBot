@@ -40,7 +40,7 @@ const getCaptchaResult = async (captchaId) => {
   }
 };
 
-exports.solveCaptcha = async (page, captchaSelector, captchaIframeSelector, siteName) => {
+exports.solveCaptcha = async (page, captchaSelector, captchaIframeSelector) => {
   try {
     console.log('detected captcha, solving');
 
@@ -80,12 +80,15 @@ exports.solveCaptcha = async (page, captchaSelector, captchaIframeSelector, site
 
         if (captchaAnswer) {
           console.log('got captcha result from 2captcha');
-          await context.evaluate((captchaAnswerText, siteNameText) => {
+          await context.evaluate((captchaAnswerText) => {
             document.querySelector('#g-recaptcha-response').innerHTML = captchaAnswerText;
-            if (siteNameText === 'footsites') {
-              ___grecaptcha_cfg.clients['0'].K.K.callback(captchaAnswerText);
+            const callbackFunction = ___grecaptcha_cfg.clients['0'].K.K.callback;
+            if (typeof callbackFunction === 'function') {
+              callbackFunction(captchaAnswerText);
+            } else if (typeof callbackFunction === 'string') {
+              window[callbackFunction](captchaAnswerText);
             }
-          }, captchaAnswer, siteName);
+          }, captchaAnswer);
           resolve();
           clearInterval(interval);
         }
