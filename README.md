@@ -1,6 +1,10 @@
 # SneakerBot
 
-This bot uses Node.js and Puppeteer to automate the checkout on various sneaker websites. It currently works on the Footsites (footlocker.com, footaction.com, eastbay.com, champssports.com), Nike.com, and all Shopify sites (e.g. BdgaStore, Concepts, Kith, etc.).
+This bot uses Node.js and Puppeteer to automate the checkout on various sneaker websites. It currently works on:
+
+1. Footsites (footlocker.com, footaction.com, eastbay.com, champssports.com)
+2. Shopify sites (e.g. BdgaStore, Concepts, Kith, etc.)
+3. Nike.com
 
 ## Configure environment variables
 
@@ -61,3 +65,15 @@ When creating a task, you can specify `auto_solve_captcha` (Boolean), however, t
 You must sign up for and fund a 2Captcha account, and then add your `API_KEY_2CAPTCHA` to the .env file in order to auto-solve captchas.
 
 For manually-solving captchas, you will be given a 5-minute timeout after the email notification to check the browser and solve the captcha.
+
+## Motivation
+
+As a teenager, I operated sneakerbots.us, where I sold sneakerbots like this in addition to early links and ATC services.
+
+Fastforward several years, I decided to upgrade this all-in-one bot from Java + Selenium to Node.js + Puppeteer, which I enjoy more for bot projects.
+
+I am open sourcing this repo now, since I no longer operate the business, but also because I am of the opinion that this software can rival any of the others out there that sell for hundreds of dollars.
+
+Feel free to open a Pull Request to contribute to this proejct and help make it better! I will continue to support more websites and add more features as I can.
+
+If you appreciate this, consider [buying me a coffe](https://www.buymeacoffee.com/samc621).
