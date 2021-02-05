@@ -297,7 +297,7 @@ exports.guestCheckout = async (
 
       if (hasCaptcha) {
         if (autoSolveCaptchas) {
-          const solved = await solveCaptcha(page, captchaSelector, captchaIframeSelector);
+          const solved = await solveCaptcha(page, captchaSelector, captchaIframeSelector, 'footsites');
           if (solved) hasCaptcha = false;
         } else {
           const recipient = notificationEmailAddress;

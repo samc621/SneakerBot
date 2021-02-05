@@ -40,7 +40,7 @@ const getCaptchaResult = async (captchaId) => {
   }
 };
 
-exports.solveCaptcha = async (page, captchaSelector, captchaIframeSelector) => {
+exports.solveCaptcha = async (page, captchaSelector, captchaIframeSelector, siteName) => {
   try {
     console.log('detected captcha, solving');
 
@@ -80,9 +80,12 @@ exports.solveCaptcha = async (page, captchaSelector, captchaIframeSelector) => {
 
         if (captchaAnswer) {
           console.log('got captcha result from 2captcha');
-          await context.evaluate((captchaAnswerText) => {
+          await context.evaluate((captchaAnswerText, siteNameText) => {
             document.querySelector('#g-recaptcha-response').innerHTML = captchaAnswerText;
-          }, captchaAnswer);
+            if (siteNameText === 'footsites') {
+              ___grecaptcha_cfg.clients['0'].K.K.callback(captchaAnswerText);
+            }
+          }, captchaAnswer, siteName);
           resolve();
           clearInterval(interval);
         }
