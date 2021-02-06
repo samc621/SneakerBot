@@ -84,7 +84,7 @@ async function checkout({
 }) {
   try {
     taskLogger.info('Navigating to checkout page');
-    await page.goto(`${domain}/delivery`, { waitUntil: 'networkidle0' });
+    await page.goto(`${domain}/delivery`, { waitUntil: 'domcontentloaded' });
 
     let checkoutComplete = false;
 
@@ -191,7 +191,7 @@ async function checkout({
     await page.click(placeOrderButtonsSelector);
     await page.waitForTimeout(5000);
 
-    await page.goto(`${domain}/payment`, { waitUntil: 'networkidle0' });
+    await page.goto(`${domain}/payment`, { waitUntil: 'domcontentloaded' });
     if (page.url() === `${domain}/cart`) {
       checkoutComplete = true;
     }
@@ -227,7 +227,7 @@ exports.guestCheckout = async ({
     await useProxy(page, proxyString);
 
     taskLogger.info('Navigating to URL');
-    await page.goto(url, { waitUntil: 'networkidle0' });
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
 
     const product_id = responseJson.id;
     const sizes = responseJson.variation_list;

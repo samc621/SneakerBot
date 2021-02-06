@@ -70,7 +70,7 @@ async function checkout({
     };
 
     taskLogger.info('Navigating to checkout page');
-    await page.goto('https://nike.com/checkout');
+    await page.goto('https://nike.com/checkout', { waitUntil: 'domcontentloaded' });
 
     const enterAddressManuallyButtonSelector = 'a#addressSuggestionOptOut';
     const address2ExpandButtonSelector = 'button[aria-controls=address2]';
@@ -193,8 +193,7 @@ exports.guestCheckout = async ({
   try {
     await useProxy(page, proxyString);
     taskLogger.info('Navigating to URL');
-    await page.goto(url);
-    await page.waitForTimeout(2000);
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
 
     let isInCart = false;
     let checkoutComplete = false;
@@ -203,7 +202,6 @@ exports.guestCheckout = async ({
       await page.waitForSelector(stylesSelector);
       const styles = await page.$$(stylesSelector);
       await styles[styleIndex].click();
-      await page.waitForTimeout(2000);
 
       const sizesSelector = 'div.mt2-sm div input';
       await page.waitForSelector(sizesSelector);
@@ -214,7 +212,6 @@ exports.guestCheckout = async ({
           matchingSize.click();
         }
       }, sizesSelector, size);
-      await page.waitForTimeout(2000);
 
       const atcButtonSelector = 'button.ncss-btn-primary-dark.btn-lg.add-to-cart-btn';
       await page.waitForSelector(atcButtonSelector);

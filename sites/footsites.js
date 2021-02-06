@@ -86,7 +86,7 @@ async function checkout({
     };
 
     taskLogger.info('Navigating to checkout page');
-    await page.goto('https://footlocker.com/checkout');
+    await page.goto('https://footlocker.com/checkout', { waitUntil: 'domcontentloaded' });
 
     const firstNameSelector = 'input[name="firstName"]';
     const lastNameSelector = 'input[name="lastName"]';
@@ -243,6 +243,20 @@ async function checkout({
   }
 }
 
+exports.closeModal = async ({ taskLogger, page }) => {
+  try {
+    const modalSelector = 'div#bluecoreActionScreen';
+    await page.waitForSelector(modalSelector, { visible: true });
+    const modal = await page.$(modalSelector);
+    taskLogger.info('Closing modal');
+    await modal.evaluate(() => {
+      document.querySelector('button.closeButtonWhite').click();
+    });
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
+
 exports.guestCheckout = async ({
   taskLogger,
   page,
@@ -262,18 +276,28 @@ exports.guestCheckout = async ({
     let isInCart = false;
     let hasCaptcha = false;
     let checkoutComplete = false;
+
+    taskLogger.info('Navigating to URL');
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+
+    await Promise.race([
+      async () => {
+        await page.waitForTimeout(7000);
+        taskLogger.info('Refreshing page');
+        await page.reload({ waitUntil: ['domcontentloaded'] });
+      },
+      await this.closeModal({ taskLogger, page })
+    ]);
+
     while (!isInCart && !hasCaptcha) {
-      taskLogger.info('Navigating to URL');
-      await page.goto(url);
-      await page.waitForTimeout(5000);
-      await page.reload({ waitUntil: ['networkidle0', 'domcontentloaded'] });
-      await page.waitForTimeout(2000);
+      if (page.url() !== url) {
+        await page.goto(url, { waitUntil: 'domcontentloaded' });
+      }
 
       const stylesSelector = 'div.c-form-field.c-form-field--radio.SelectStyle.col';
       await page.waitForSelector(stylesSelector);
       const styles = await page.$$(stylesSelector);
       await styles[styleIndex].click();
-      await page.waitForTimeout(2000);
 
       const sizesSelector = 'div.c-form-field.c-form-field--radio.ProductSize';
       await page.waitForSelector(sizesSelector);
@@ -286,7 +310,6 @@ exports.guestCheckout = async ({
           break;
         }
       }
-      await page.waitForTimeout(2000);
 
       const atcButtonSelector = 'button.Button.Button.ProductDetails-form__action';
       await page.waitForSelector(atcButtonSelector);

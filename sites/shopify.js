@@ -77,7 +77,7 @@ async function checkout({
 }) {
   try {
     taskLogger.info('Navigating to checkout page');
-    await page.goto(`${domain}/checkout`, { waitUntil: 'networkidle0' });
+    await page.goto(`${domain}/checkout`, { waitUntil: 'domcontentloaded' });
 
     let hasCaptcha = false;
     let checkoutComplete = false;
@@ -236,7 +236,7 @@ async function checkout({
     await page.click(submitButtonsSelector);
     await page.waitForTimeout(5000);
 
-    await page.goto(`${domain}/checkout`, { waitUntil: 'networkidle0' });
+    await page.goto(`${domain}/checkout`, { waitUntil: 'domcontentloaded' });
     if (page.url() === `${domain}/cart`) {
       checkoutComplete = true;
     }
@@ -264,7 +264,7 @@ exports.guestCheckout = async ({
 
     await useProxy(page, proxyString);
     taskLogger.info('Navigating to URL');
-    await page.goto(url, { waitUntil: 'networkidle0' });
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
 
     const variantId = await page.evaluate((sizeStr) => {
       const { variants } = window.ShopifyAnalytics.meta.product;
