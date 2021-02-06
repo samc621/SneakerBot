@@ -4,7 +4,8 @@ This bot uses Node.js and Puppeteer to automate the checkout on various sneaker 
 
 1. Footsites (footlocker.com, footaction.com, eastbay.com, champssports.com)
 2. Shopify sites (e.g. BdgaStore, Concepts, Kith, etc.)
-3. Nike.com
+3. Demandware sites (e.g. Adidas, YEEZY SUPPLY)
+4. Nike.com
 
 ## Configure environment variables
 

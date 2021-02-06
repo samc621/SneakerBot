@@ -17,7 +17,7 @@ const submitCaptcha = async (googleKey, pageUrl) => {
 
     throw new Error(responseJson.error_text);
   } catch (err) {
-    throw new Error(err);
+    throw new Error(err.message);
   }
 };
 
@@ -36,7 +36,7 @@ const getCaptchaResult = async (captchaId) => {
 
     throw new Error(responseJson.error_text);
   } catch (err) {
-    throw new Error(err);
+    throw new Error(err.message);
   }
 };
 

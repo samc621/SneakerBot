@@ -2,16 +2,14 @@ exports.seed = (knex) => {
   const sites = [
     { id: 1, name: 'nike' },
     { id: 2, name: 'footsites' },
-    { id: 3, name: 'shopify' }
+    { id: 3, name: 'shopify' },
+    { id: 4, name: 'demandware' }
   ];
 
   return knex('sites')
-    .then((rows) => {
-      sites.forEach((site) => {
-        if (!rows.map((row) => row.name).includes(site.name)) {
-          return knex('sites').insert(site);
-        }
-        return null;
-      });
-    });
+    .insert(sites)
+    .onConflict('id')
+    .ignore()
+    .returning('*')
+    .then((rows) => rows);
 };
