@@ -198,7 +198,6 @@ async function checkout({
 
     return checkoutComplete;
   } catch (err) {
-    console.log(err);
     throw new Error(err.message);
   }
 }
