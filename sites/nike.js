@@ -1,6 +1,6 @@
 const useProxy = require('puppeteer-page-proxy');
 
-async function enterAddressDetails(page, address) {
+async function enterAddressDetails({ page, address }) {
   try {
     const firstNameSelector = 'input[name="address.firstName"]';
     const lastNameSelector = 'input[name="address.lastName"]';
@@ -50,17 +50,17 @@ async function enterAddressDetails(page, address) {
     });
     await page.waitForTimeout(2000);
   } catch (err) {
-    console.error(err);
     throw new Error(err.message);
   }
 }
 
-async function checkout(
+async function checkout({
+  taskLogger,
   page,
   shippingAddress,
   shippingSpeedIndex,
   billingAddress
-) {
+}) {
   try {
     const cardDetails = {
       cardNumber: process.env.CARD_NUMBER,
@@ -69,6 +69,7 @@ async function checkout(
       securityCode: process.env.SECURITY_CODE
     };
 
+    taskLogger.info('Navigating to checkout page');
     await page.goto('https://nike.com/checkout');
 
     const enterAddressManuallyButtonSelector = 'a#addressSuggestionOptOut';
@@ -98,7 +99,8 @@ async function checkout(
     await page.click(address2ExpandButtonSelector);
     await page.waitForTimeout(2000);
 
-    await enterAddressDetails(page, shippingAddress);
+    taskLogger.info('Entering shipping details');
+    await enterAddressDetails({ page, address: shippingAddress });
 
     await page.waitForSelector(emailSelector);
     await page.type(emailSelector, shippingAddress.email_address, {
@@ -116,6 +118,7 @@ async function checkout(
     await page.click(shippingAddressSubmitButtonSelector);
     await page.waitForTimeout(2000);
 
+    taskLogger.info('Selecting desired shipping speed');
     await page.waitForSelector(shippingSpeedsSelector);
     const shippingSpeeds = await page.$$(shippingSpeedsSelector);
     await shippingSpeeds[shippingSpeedIndex].click();
@@ -125,6 +128,7 @@ async function checkout(
     await page.click(shippingSpeedSubmitButtonSelector);
     await page.waitForTimeout(2000);
 
+    taskLogger.info('Entering card details');
     await page.waitForSelector(cardDetailsIframeSelector);
     const frameHandle = await page.$(cardDetailsIframeSelector);
     const frame = await frameHandle.contentFrame();
@@ -160,7 +164,8 @@ async function checkout(
     await page.click(differentBillingAddressSelector);
     await page.waitForTimeout(2000);
 
-    await enterAddressDetails(page, billingAddress);
+    taskLogger.info('Entering billing details');
+    await enterAddressDetails({ page, address: billingAddress });
 
     await page.waitForSelector(billingAddressSubmitButtonSelector);
     await page.click(billingAddressSubmitButtonSelector);
@@ -170,12 +175,12 @@ async function checkout(
     await page.click(orderSubmitButtonSelector);
     await page.waitForTimeout(5000);
   } catch (err) {
-    console.error(err);
     throw new Error(err.message);
   }
 }
 
-exports.guestCheckout = async (
+exports.guestCheckout = async ({
+  taskLogger,
   page,
   url,
   proxyString,
@@ -184,9 +189,10 @@ exports.guestCheckout = async (
   shippingAddress,
   shippingSpeedIndex,
   billingAddress
-) => {
+}) => {
   try {
     await useProxy(page, proxyString);
+    taskLogger.info('Navigating to URL');
     await page.goto(url);
     await page.waitForTimeout(2000);
 
@@ -230,10 +236,13 @@ exports.guestCheckout = async (
       if (parseInt(cartCount) === 1) {
         isInCart = true;
       }
+      taskLogger.info('Not in cart, trying again');
     }
 
     if (isInCart) {
-      await checkout(page, shippingAddress, shippingSpeedIndex, billingAddress);
+      await checkout({
+        taskLogger, page, shippingAddress, shippingSpeedIndex, billingAddress
+      });
 
       const cartSelector = 'span.va-sm-m.fs12-sm.ta-sm-c';
       await page.waitForSelector(cartSelector);
@@ -248,7 +257,6 @@ exports.guestCheckout = async (
 
     return checkoutComplete;
   } catch (err) {
-    console.error(err);
     throw new Error(err.message);
   }
 };

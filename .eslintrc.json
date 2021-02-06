@@ -20,6 +20,7 @@
         "no-undef": "warn",
         "no-loop-func": "off",
         "arrow-body-style": "off",
-        "no-continue": "off"
+        "no-continue": "off",
+        "camelcase": "off"
     }
 }

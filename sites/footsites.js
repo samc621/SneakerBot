@@ -2,7 +2,7 @@ const useProxy = require('puppeteer-page-proxy');
 const { solveCaptcha } = require('../helpers/captcha');
 const { sendEmail } = require('../helpers/email');
 
-async function enterAddressDetails(page, address) {
+async function enterAddressDetails({ page, address }) {
   try {
     const firstNameSelector = 'input[name="firstName"]';
     const lastNameSelector = 'input[name="lastName"]';
@@ -66,17 +66,17 @@ async function enterAddressDetails(page, address) {
     // await page.select(stateSelector, address.state);
     // await page.waitForTimeout(2000);
   } catch (err) {
-    console.error(err);
     throw new Error(err.message);
   }
 }
 
-async function checkout(
+async function checkout({
+  taskLogger,
   page,
   shippingAddress,
   shippingSpeedIndex,
   billingAddress
-) {
+}) {
   try {
     const cardDetails = {
       cardNumber: process.env.CARD_NUMBER,
@@ -85,6 +85,7 @@ async function checkout(
       securityCode: process.env.SECURITY_CODE
     };
 
+    taskLogger.info('Navigating to checkout page');
     await page.goto('https://footlocker.com/checkout');
 
     const firstNameSelector = 'input[name="firstName"]';
@@ -138,7 +139,8 @@ async function checkout(
     await contactInformationSubmitButtonSelector[0].click();
     await page.waitForTimeout(2000);
 
-    await enterAddressDetails(page, shippingAddress);
+    taskLogger.info('Entering shipping details');
+    await enterAddressDetails({ page, address: shippingAddress });
 
     await page.waitForSelector(differentBillingAddressSelector);
     await page.click(differentBillingAddressSelector);
@@ -148,6 +150,7 @@ async function checkout(
       shippingSpeedsAvailableSelector
     );
     if (shippingSpeedsAvailable) {
+      taskLogger.info('Selecting desired shipping speed');
       await page.click(shippingSpeedsAvailableSelector);
       await page.waitForSelector(shippingSpeedsSelector);
       const shippingSpeeds = await page.$$(shippingSpeedsSelector);
@@ -169,6 +172,7 @@ async function checkout(
     await shippingAddressSubmitButtonTwoSelector[3].click();
     await page.waitForTimeout(2000);
 
+    taskLogger.info('Entering card details');
     await page.waitForSelector(cardNumberIframeSelector);
     const cardNumberFrameHandle = await page.$(cardNumberIframeSelector);
     const cardNumberFrame = await cardNumberFrameHandle.contentFrame();
@@ -222,7 +226,8 @@ async function checkout(
     });
     await page.waitForTimeout(2000);
 
-    await enterAddressDetails(page, billingAddress);
+    taskLogger.info('Entering billing details');
+    await enterAddressDetails({ page, address: billingAddress });
 
     const billingAddressSubmitButtonSelector = await page.$$(
       submitButtonsSelector
@@ -234,12 +239,12 @@ async function checkout(
     await orderSubmitButtonSelector[2].click();
     await page.waitForTimeout(5000);
   } catch (err) {
-    console.error(err);
     throw new Error(err.message);
   }
 }
 
-exports.guestCheckout = async (
+exports.guestCheckout = async ({
+  taskLogger,
   page,
   url,
   proxyString,
@@ -250,7 +255,7 @@ exports.guestCheckout = async (
   billingAddress,
   autoSolveCaptchas,
   notificationEmailAddress
-) => {
+}) => {
   try {
     await useProxy(page, proxyString);
 
@@ -258,6 +263,7 @@ exports.guestCheckout = async (
     let hasCaptcha = false;
     let checkoutComplete = false;
     while (!isInCart && !hasCaptcha) {
+      taskLogger.info('Navigating to URL');
       await page.goto(url);
       await page.waitForTimeout(5000);
       await page.reload({ waitUntil: ['networkidle0', 'domcontentloaded'] });
@@ -297,13 +303,16 @@ exports.guestCheckout = async (
 
       if (hasCaptcha) {
         if (autoSolveCaptchas) {
-          const solved = await solveCaptcha(page, captchaSelector, captchaIframeSelector);
+          const solved = await solveCaptcha({
+            taskLogger, page, captchaSelector, captchaIframeSelector
+          });
           if (solved) hasCaptcha = false;
         } else {
           const recipient = notificationEmailAddress;
           const subject = 'Checkout task unsuccessful';
           const text = `The checkout task for ${url} size ${size} has a captcha. Please open the browser and complete it within 5 minutes.`;
           await sendEmail(recipient, subject, text);
+          taskLogger.info(text);
 
           try {
             await page.waitForSelector(captchaIframeSelector, {
@@ -317,6 +326,7 @@ exports.guestCheckout = async (
         }
 
         await page.waitForTimeout(2000);
+        taskLogger.info('Need to restart task');
         continue;
       }
 
@@ -332,7 +342,9 @@ exports.guestCheckout = async (
     }
 
     if (isInCart) {
-      await checkout(page, shippingAddress, shippingSpeedIndex, billingAddress);
+      await checkout({
+        taskLogger, page, shippingAddress, shippingSpeedIndex, billingAddress
+      });
 
       const cartSelector = 'span.CartCount-badge';
       await page.waitForSelector(cartSelector);
@@ -347,7 +359,6 @@ exports.guestCheckout = async (
 
     return checkoutComplete;
   } catch (err) {
-    console.error(err);
     throw new Error(err.message);
   }
 };

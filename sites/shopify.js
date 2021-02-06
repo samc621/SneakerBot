@@ -2,7 +2,7 @@ const useProxy = require('puppeteer-page-proxy');
 const { solveCaptcha } = require('../helpers/captcha');
 const { sendEmail } = require('../helpers/email');
 
-async function enterAddressDetails(page, address, type) {
+async function enterAddressDetails({ page, address, type }) {
   try {
     const firstNameSelector = `input#checkout_${type}_address_first_name`;
     const lastNameSelector = `input#checkout_${type}_address_last_name`;
@@ -59,12 +59,12 @@ async function enterAddressDetails(page, address, type) {
     });
     await page.waitForTimeout(2000);
   } catch (err) {
-    console.error(err);
     throw new Error(err.message);
   }
 }
 
-async function checkout(
+async function checkout({
+  taskLogger,
   page,
   shippingAddress,
   shippingSpeedIndex,
@@ -74,8 +74,11 @@ async function checkout(
   notificationEmailAddress,
   url,
   size
-) {
+}) {
   try {
+    taskLogger.info('Navigating to checkout page');
+    await page.goto(`${domain}/checkout`, { waitUntil: 'networkidle0' });
+
     let hasCaptcha = false;
     let checkoutComplete = false;
 
@@ -109,13 +112,16 @@ async function checkout(
 
     if (hasCaptcha) {
       if (autoSolveCaptchas) {
-        const solved = await solveCaptcha(page, captchaSelector);
+        const solved = await solveCaptcha({
+          taskLogger, page, captchaSelector
+        });
         if (solved) hasCaptcha = false;
       } else {
         const recipient = notificationEmailAddress;
         const subject = 'Checkout task unsuccessful';
         const text = `The checkout task for ${url} size ${size} has a captcha. Please open the browser and complete it within 5 minutes.`;
-        await sendEmail(recipient, subject, text);
+        await sendEmail({ recipient, subject, text });
+        taskLogger.info(text);
 
         await Promise.race([
           new Promise(() => {
@@ -145,12 +151,14 @@ async function checkout(
     });
     await page.waitForTimeout(2000);
 
-    await enterAddressDetails(page, shippingAddress, 'shipping');
+    taskLogger.info('Entering shipping details');
+    await enterAddressDetails({ page, address: shippingAddress, type: 'shipping' });
 
     await page.waitForSelector(submitButtonsSelector);
     await page.click(submitButtonsSelector);
     await page.waitForTimeout(2000);
 
+    taskLogger.info('Selecting desired shipping speed');
     await page.waitForSelector(shippingSpeedsSelector);
     const shippingSpeeds = await page.$$(shippingSpeedsSelector);
     await shippingSpeeds[shippingSpeedIndex].click();
@@ -160,6 +168,7 @@ async function checkout(
     await page.click(submitButtonsSelector);
     await page.waitForTimeout(2000);
 
+    taskLogger.info('Entering card details');
     await page.waitForSelector(cardFieldsIframeSelector);
     const cardFieldIframes = await page.$$(cardFieldsIframeSelector);
 
@@ -215,7 +224,10 @@ async function checkout(
       await page.click(differentBillingAddressSelector);
       await page.waitForTimeout(2000);
 
-      await enterAddressDetails(page, billingAddress, 'billing');
+      taskLogger.info('Entering billing details');
+      await enterAddressDetails({
+        page, address: billingAddress, type: 'billing'
+      });
     } catch (err) {
       // no-op if timeout occurs
     }
@@ -231,27 +243,27 @@ async function checkout(
 
     return checkoutComplete;
   } catch (err) {
-    console.error(err);
     throw new Error(err.message);
   }
 }
 
-exports.guestCheckout = async (
+exports.guestCheckout = async ({
+  taskLogger,
   page,
   url,
   proxyString,
-  styleIndex,
   size,
   shippingAddress,
   shippingSpeedIndex,
   billingAddress,
   autoSolveCaptchas,
   notificationEmailAddress
-) => {
+}) => {
   try {
     const domain = url.split('/').slice(0, 3).join('/');
 
     await useProxy(page, proxyString);
+    taskLogger.info('Navigating to URL');
     await page.goto(url, { waitUntil: 'networkidle0' });
 
     const variantId = await page.evaluate((sizeStr) => {
@@ -285,9 +297,8 @@ exports.guestCheckout = async (
     if (isInCart) {
       await page.waitForTimeout(2000);
 
-      await page.goto(`${domain}/checkout`, { waitUntil: 'networkidle0' });
-
-      checkoutComplete = await checkout(
+      checkoutComplete = await checkout({
+        taskLogger,
         page,
         shippingAddress,
         shippingSpeedIndex,
@@ -297,12 +308,11 @@ exports.guestCheckout = async (
         notificationEmailAddress,
         url,
         size
-      );
+      });
     }
 
     return checkoutComplete;
   } catch (err) {
-    console.error(err);
     throw new Error(err.message);
   }
 };

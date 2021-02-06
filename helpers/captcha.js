@@ -40,9 +40,11 @@ const getCaptchaResult = async (captchaId) => {
   }
 };
 
-exports.solveCaptcha = async (page, captchaSelector, captchaIframeSelector) => {
+exports.solveCaptcha = async ({
+  taskLogger, page, captchaSelector, captchaIframeSelector
+}) => {
   try {
-    console.log('detected captcha, solving');
+    taskLogger.info('detected captcha, solving');
 
     if (!apiKey) {
       throw new Error('You must set an API_KEY_2CAPTCHA in your .env file.');
@@ -62,11 +64,11 @@ exports.solveCaptcha = async (page, captchaSelector, captchaIframeSelector) => {
       const kValue = iframeSrcParams.get('k');
       return kValue;
     }, captchaSelector);
-    console.log('extracted googleKey ', googleKey);
+    taskLogger.info(`extracted googleKey ${googleKey}`);
 
     const captcha = await submitCaptcha(googleKey, context.url());
     const captchaId = captcha.request;
-    console.log('submitted captcha to 2captcha, got id ', captchaId);
+    taskLogger.info(`submitted captcha to 2captcha, got id ${captchaId}`);
 
     await new Promise((resolve) => {
       const interval = setInterval(async () => {
@@ -79,7 +81,7 @@ exports.solveCaptcha = async (page, captchaSelector, captchaIframeSelector) => {
         const captchaAnswer = solvedCaptcha && solvedCaptcha.request;
 
         if (captchaAnswer) {
-          console.log('got captcha result from 2captcha');
+          taskLogger.info('got captcha result from 2captcha, submitting');
           await context.evaluate((captchaAnswerText) => {
             document.querySelector('#g-recaptcha-response').innerHTML = captchaAnswerText;
             const callbackFunction = ___grecaptcha_cfg.clients['0'].K.K.callback;

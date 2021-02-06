@@ -1,7 +1,7 @@
 require('dotenv-flow').config();
 const nodemailer = require('nodemailer');
 
-exports.sendEmail = async (to, subject, text) => {
+exports.sendEmail = async ({ recipient: to, subject, text }) => {
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,

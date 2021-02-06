@@ -6,6 +6,7 @@ const Address = require('../api/Addresses/model');
 
 const { testProxy, createProxyString } = require('./proxies');
 const { sendEmail } = require('./email');
+const Logger = require('./logger');
 
 const sites = require('../sites');
 
@@ -27,10 +28,26 @@ class PuppeteerCluster {
     });
 
     cluster.task(async ({ page, data: taskId }) => {
+      let taskLogger;
       try {
         const data = {};
         data['tasks.id'] = taskId;
         const task = await new Task().findOne(data);
+
+        const {
+          id,
+          shipping_address_id,
+          billing_address_id,
+          site_name,
+          url,
+          size,
+          style_index,
+          shipping_speed_index,
+          auto_solve_captchas,
+          notification_email_address
+        } = task;
+
+        taskLogger = new Logger().startTaskLogger(id);
 
         const proxies = await new Proxy().find({ has_been_used: false });
 
@@ -43,47 +60,52 @@ class PuppeteerCluster {
           return false;
         });
         const proxy = validProxy ? createProxyString(validProxy) : null;
+        if (proxy) {
+          taskLogger.info('Using proxy', proxy);
+        }
 
         const shippingAddress = await new Address().findOne({
-          id: task.shipping_address_id
+          id: shipping_address_id
         });
         const billingAddress = await new Address().findOne({
-          id: task.billing_address_id
+          id: billing_address_id
         });
 
-        const checkoutComplete = await sites[task.site_name].guestCheckout(
+        const checkoutComplete = await sites[site_name].guestCheckout({
+          taskLogger,
           page,
-          task.url,
+          url,
           proxy,
-          task.style_index,
-          task.size,
+          styleIndex: style_index,
+          size,
           shippingAddress,
-          task.shipping_speed_index,
+          shippingSpeedIndex: shipping_speed_index,
           billingAddress,
-          task.auto_solve_captchas,
-          task.notification_email_address
-        );
+          autoSolveCaptchas: auto_solve_captchas,
+          notificationEmailAddress: notification_email_address
+        });
 
-        const recipient = task.notification_email_address;
+        const recipient = notification_email_address;
         let subject;
         let text;
         if (!checkoutComplete) {
           subject = 'Checkout task unsuccessful';
           text = `
-            The checkout task for ${task.url} size ${task.size} has a checkout error. 
+            The checkout task for ${url} size ${size} has a checkout error. 
             Please open the browser to check on it within 5 minutes.
           `;
         } else {
           subject = 'Checkout task successful';
-          text = `The checkout task for ${task.url} size ${task.size} has completed.`;
+          text = `The checkout task for ${url} size ${size} has completed.`;
         }
-        await sendEmail(recipient, subject, text);
+        await sendEmail({ recipient, subject, text });
+        taskLogger.info(text);
 
         if (!checkoutComplete) {
           await page.waitForTimeout(5 * 60 * 1000);
         }
       } catch (err) {
-        console.error(err.messsage);
+        taskLogger.error(err);
       }
     });
 
