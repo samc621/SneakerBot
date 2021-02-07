@@ -3,12 +3,13 @@
     "root": true,
     "env": {
         "node": true,
-        "es6": true
+        "es6": true,
+        "browser": true
     },
     "rules": {
         "max-len": [
             "warn",
-            140
+            150
         ],
         "no-console": "off",
         "comma-dangle": [
@@ -22,6 +23,7 @@
         "arrow-body-style": "off",
         "no-continue": "off",
         "camelcase": "off",
-        "no-useless-catch": "off"
+        "no-useless-catch": "off",
+        "no-underscore-dangle": "off"
     }
 }
