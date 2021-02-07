@@ -21,6 +21,7 @@
         "no-loop-func": "off",
         "arrow-body-style": "off",
         "no-continue": "off",
-        "camelcase": "off"
+        "camelcase": "off",
+        "no-useless-catch": "off"
     }
 }

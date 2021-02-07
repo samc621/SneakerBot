@@ -22,6 +22,6 @@ exports.sendEmail = async ({ recipient: to, subject, text }) => {
 
     return info.messageId;
   } catch (err) {
-    throw new Error(err.message);
+    throw err;
   }
 };

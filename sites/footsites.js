@@ -66,7 +66,7 @@ async function enterAddressDetails({ page, address }) {
     // await page.select(stateSelector, address.state);
     // await page.waitForTimeout(2000);
   } catch (err) {
-    throw new Error(err.message);
+    throw err;
   }
 }
 
@@ -239,7 +239,7 @@ async function checkout({
     await orderSubmitButtonSelector[2].click();
     await page.waitForTimeout(5000);
   } catch (err) {
-    throw new Error(err.message);
+    throw err;
   }
 }
 
@@ -253,7 +253,7 @@ exports.closeModal = async ({ taskLogger, page }) => {
       document.querySelector('button.closeButtonWhite').click();
     });
   } catch (err) {
-    throw new Error(err.message);
+    throw err;
   }
 };
 
@@ -382,6 +382,6 @@ exports.guestCheckout = async ({
 
     return checkoutComplete;
   } catch (err) {
-    throw new Error(err.message);
+    throw err;
   }
 };

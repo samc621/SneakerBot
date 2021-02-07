@@ -59,7 +59,7 @@ async function enterAddressDetails({ page, address, type }) {
     });
     await page.waitForTimeout(2000);
   } catch (err) {
-    throw new Error(err.message);
+    throw err;
   }
 }
 
@@ -243,7 +243,7 @@ async function checkout({
 
     return checkoutComplete;
   } catch (err) {
-    throw new Error(err.message);
+    throw err;
   }
 }
 
@@ -313,6 +313,6 @@ exports.guestCheckout = async ({
 
     return checkoutComplete;
   } catch (err) {
-    throw new Error(err.message);
+    throw err;
   }
 };

@@ -70,7 +70,7 @@ async function enterAddressDetails({ page, address, type }) {
     });
     await page.waitForTimeout(2000);
   } catch (err) {
-    throw new Error(err.message);
+    throw err;
   }
 }
 
@@ -198,7 +198,7 @@ async function checkout({
 
     return checkoutComplete;
   } catch (err) {
-    throw new Error(err.message);
+    throw err;
   }
 }
 
@@ -227,7 +227,7 @@ exports.guestCheckout = async ({
     await useProxy(page, proxyString);
 
     taskLogger.info('Navigating to URL');
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await page.goto(url, { waitUntil: 'networkidle2' });
 
     const product_id = responseJson.id;
     const sizes = responseJson.variation_list;
@@ -277,6 +277,6 @@ exports.guestCheckout = async ({
 
     return checkoutComplete;
   } catch (err) {
-    throw new Error(err.message);
+    throw err;
   }
 };
