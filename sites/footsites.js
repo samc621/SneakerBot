@@ -243,7 +243,7 @@ async function checkout({
   }
 }
 
-exports.closeModal = async ({ taskLogger, page }) => {
+async function closeModal({ taskLogger, page }) {
   try {
     const modalSelector = 'div#bluecoreActionScreen';
     await page.waitForSelector(modalSelector, { visible: true });
@@ -255,7 +255,7 @@ exports.closeModal = async ({ taskLogger, page }) => {
   } catch (err) {
     throw err;
   }
-};
+}
 
 exports.guestCheckout = async ({
   taskLogger,
@@ -286,7 +286,7 @@ exports.guestCheckout = async ({
         taskLogger.info('Refreshing page');
         await page.reload({ waitUntil: ['domcontentloaded'] });
       },
-      await this.closeModal({ taskLogger, page })
+      await closeModal({ taskLogger, page })
     ]);
 
     while (!isInCart && !hasCaptcha) {

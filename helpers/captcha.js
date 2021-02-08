@@ -2,7 +2,7 @@ const rp = require('request-promise');
 
 const apiKey = process.env.API_KEY_2CAPTCHA;
 
-const submitCaptcha = async (googleKey, pageUrl) => {
+async function submitCaptcha(googleKey, pageUrl) {
   try {
     const options = {
       uri: `http://2captcha.com/in.php?key=${apiKey}&method=userrecaptcha&googlekey=${googleKey}&pageurl=${pageUrl}&json=1`,
@@ -19,9 +19,9 @@ const submitCaptcha = async (googleKey, pageUrl) => {
   } catch (err) {
     throw err;
   }
-};
+}
 
-const getCaptchaResult = async (captchaId) => {
+async function getCaptchaResult(captchaId) {
   try {
     const options = {
       uri: `http://2captcha.com/res.php?key=${apiKey}&action=get&id=${captchaId}&json=1`,
@@ -38,7 +38,7 @@ const getCaptchaResult = async (captchaId) => {
   } catch (err) {
     throw err;
   }
-};
+}
 
 exports.solveCaptcha = async ({
   taskLogger, page, captchaSelector, captchaIframeSelector
