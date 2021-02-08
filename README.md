@@ -61,7 +61,7 @@ For each API, view the docs and try the requests in Postman.
 
 This bot enables manual and automatic (via [2Captcha](https://2captcha.com)) solving of captchas.
 
-When creating a task, you can specify `auto_solve_captcha` (Boolean), however, this parameter is optional and defaults to true.
+When creating a task, you can specify `auto_solve_captcha` (Boolean), however, this parameter is optional and defaults to `true`.
 
 You must sign up for and fund a 2Captcha account, and then add your `API_KEY_2CAPTCHA` to the .env file in order to auto-solve captchas.
 
@@ -77,4 +77,4 @@ I am open sourcing this repo now, since I no longer operate the business, but al
 
 Feel free to open a Pull Request to contribute to this proejct and help make it better! I will continue to support more websites and add more features as I can.
 
-If you appreciate this, consider [buying me a coffe](https://www.buymeacoffee.com/samc621).
+If you appreciate this, consider [buying me a coffee](https://www.buymeacoffee.com/samc621).
