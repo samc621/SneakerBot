@@ -27,7 +27,6 @@
     "express-validation": "^3.0.6",
     "joi": "^17.3.0",
     "knex": "^0.21.15",
-    "logform": "^2.2.0",
     "nodemailer": "^6.4.17",
     "pg": "^8.5.1",
     "puppeteer": "^5.5.0",
