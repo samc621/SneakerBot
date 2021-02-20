@@ -6,7 +6,7 @@ This bot uses Node.js and Puppeteer to automate the checkout on various sneaker 
 2. Shopify sites (e.g. BdgaStore, Concepts, Kith, etc.)
 3. Demandware sites (e.g. Adidas)
 4. Nike.com
-5. Supreme New York
+5. Supreme
 
 ## Configure environment variables
 
