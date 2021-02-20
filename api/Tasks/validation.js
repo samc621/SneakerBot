@@ -5,9 +5,9 @@ module.exports = {
     body: Joi.object({
       site_id: Joi.number().integer().required(),
       url: Joi.string().required(),
-      style_index: Joi.number().integer().required(),
-      size: Joi.string().required(),
-      shipping_speed_index: Joi.number().integer().required(),
+      style_index: Joi.number().integer().allow(null).optional(),
+      size: Joi.string().allow(null).optional(),
+      shipping_speed_index: Joi.number().integer().allow(null).optional(),
       billing_address_id: Joi.number().integer().required(),
       shipping_address_id: Joi.number().integer().required(),
       notification_email_address: Joi.string().email().allow(null).optional()
@@ -35,9 +35,9 @@ module.exports = {
     body: Joi.object({
       site_id: Joi.number().integer().optional(),
       url: Joi.string().optional(),
-      style_index: Joi.number().integer().optional(),
-      size: Joi.string().optional(),
-      shipping_speed_index: Joi.number().integer().optional(),
+      style_index: Joi.number().integer().allow(null).optional(),
+      size: Joi.string().allow(null).optional(),
+      shipping_speed_index: Joi.number().integer().allow(null).optional(),
       billing_address_id: Joi.number().integer().optional(),
       shipping_address_id: Joi.number().integer().optional(),
       notification_email_address: Joi.string().email().allow(null).optional()
