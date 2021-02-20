@@ -51,54 +51,108 @@ exports.solveCaptcha = async ({
     }
 
     let context = page;
-    if (captchaIframeSelector) {
+    if (captchaSelector && captchaIframeSelector) {
       const frameHandle = await page.$(captchaIframeSelector);
       context = await frameHandle.contentFrame();
     }
 
-    const googleKey = await context.evaluate((captchaDivSelector) => {
-      const captchaDiv = document.querySelector(captchaDivSelector);
-      const iframe = captchaDiv.querySelector('iframe');
+    const googleKey = await context.evaluate(({ captchaSelector: captchaDivSelectorStr, captchaIframeSelector: captchaIframeSelectorStr }) => {
+      const captchaDiv = captchaDivSelectorStr && document.querySelector(captchaDivSelectorStr);
+      const iframe = captchaDiv ? captchaDiv.querySelector('iframe') : document.querySelector(captchaIframeSelectorStr);
       const iframeSrc = iframe.getAttribute('src');
       const iframeSrcParams = new URLSearchParams(iframeSrc);
       const kValue = iframeSrcParams.get('k');
       return kValue;
-    }, captchaSelector);
+    }, { captchaSelector, captchaIframeSelector });
     taskLogger.info(`Extracted googleKey ${googleKey}`);
 
     const captcha = await submitCaptcha(googleKey, context.url());
     const captchaId = captcha.request;
     taskLogger.info(`Submitted captcha to 2captcha, got id ${captchaId}`);
 
-    await new Promise((resolve) => {
-      const interval = setInterval(async () => {
-        let solvedCaptcha;
-        try {
-          solvedCaptcha = await getCaptchaResult(captchaId);
-        } catch (err) {
-          // no-op if captcha is still unsolved
+    let solved = false;
+    let captchaAnswer;
+    while (!solved) {
+      try {
+        const result = await getCaptchaResult(captchaId);
+        if (result && result.request) {
+          captchaAnswer = result.request;
+          solved = true;
         }
-        const captchaAnswer = solvedCaptcha && solvedCaptcha.request;
+      } catch (err) {
+        await page.waitForTimeout(1000);
+      }
+    }
+    let submissionSucccess = false;
+    if (captchaAnswer) {
+      taskLogger.info(`Got captcha result ${captchaAnswer} from 2captcha, submitting`);
+      submissionSucccess = await context.evaluate((captchaAnswerText) => {
+        function findRecaptchaClients() {
+          if (typeof (window.___grecaptcha_cfg) !== 'undefined') {
+            return Object.entries(window.___grecaptcha_cfg.clients).map(([cid, client]) => {
+              const data = { id: cid, version: cid >= 10000 ? 'V3' : 'V2' };
+              const objects = Object.entries(client).filter(([, value]) => value && typeof value === 'object');
 
-        if (captchaAnswer) {
-          taskLogger.info('Got captcha result from 2captcha, submitting');
-          await context.evaluate((captchaAnswerText) => {
-            document.querySelector('#g-recaptcha-response').innerHTML = captchaAnswerText;
-            const callbackFunction = window.___grecaptcha_cfg.clients['0'].K.K.callback;
-            if (typeof callbackFunction === 'function') {
-              callbackFunction(captchaAnswerText);
-            } else if (typeof callbackFunction === 'string') {
-              window[callbackFunction](captchaAnswerText);
-            }
-          }, captchaAnswer);
-          resolve();
-          clearInterval(interval);
+              objects.forEach(([toplevelKey, toplevel]) => {
+                const found = Object.entries(toplevel).find(([, value]) => (
+                  value && typeof value === 'object' && 'sitekey' in value && 'size' in value
+                ));
+                if (found) {
+                  const [sublevelKey, sublevel] = found;
+
+                  data.sitekey = sublevel.sitekey;
+                  const callbackKey = data.version === 'V2' ? 'callback' : 'promise-callback';
+                  const callback = sublevel[callbackKey];
+                  if (!callback) {
+                    data.callback = null;
+                    data.function = null;
+                  } else {
+                    data.function = callback;
+                    const keys = [cid, toplevelKey, sublevelKey, callbackKey].map((key) => `['${key}']`).join('');
+                    data.callback = `___grecaptcha_cfg.clients${keys}`;
+                  }
+                }
+              });
+              return data;
+            });
+          }
+          return [];
         }
-      }, 1000);
-    });
 
-    const solved = true;
-    return solved;
+        document.querySelector('#g-recaptcha-response').innerHTML = captchaAnswerText;
+        const recaptchaClients = findRecaptchaClients();
+        const defaultRecaptchaClient = recaptchaClients[0];
+        let callbackFunction = defaultRecaptchaClient.callback;
+
+        let success = false;
+
+        if (typeof callbackFunction === 'function') {
+          success = callbackFunction(captchaAnswerText);
+        }
+
+        if (typeof callbackFunction === 'string') {
+          callbackFunction = window[callbackFunction];
+          if (typeof callbackFunction === 'function') {
+            success = callbackFunction(captchaAnswerText);
+          }
+
+          if (typeof callbackFunction === 'string') {
+            success = window[callbackFunction](captchaAnswerText);
+          }
+        }
+
+        return success;
+      }, captchaAnswer);
+    }
+
+    if (!submissionSucccess) {
+      taskLogger.info('The captcha answer was not correct, it will need to be solved manually');
+      await page.evaluate(() => {
+        document.querySelector('#g-recaptcha-response').innerHTML = '';
+      });
+    }
+
+    return submissionSucccess;
   } catch (err) {
     throw err;
   }

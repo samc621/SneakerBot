@@ -3,7 +3,8 @@ exports.seed = (knex) => {
     { id: 1, name: 'nike' },
     { id: 2, name: 'footsites' },
     { id: 3, name: 'shopify' },
-    { id: 4, name: 'demandware' }
+    { id: 4, name: 'demandware' },
+    { id: 5, name: 'supremenewyork' }
   ];
 
   return knex('sites')
