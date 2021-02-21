@@ -42,7 +42,7 @@ You can of course run more tasks, but they will be queued to run in a first-in, 
 
 Keep in mind that tasks that do not result in `checkoutComplete` will remain idle (not terminate) so that you can open the browser and view the error(s).
 
-If a task encounters a captcha (usually only on the footsites), it will auto-retry after you manually complete it.
+If a task encounters a captcha that must be manually solved, it will also remain idle and await completion.
 
 Each task uses its own browser, so it's also important to keep in mind the CPU constraints of your machine.
 
@@ -65,6 +65,8 @@ This bot enables manual and automatic (via [2Captcha](https://2captcha.com)) sol
 When creating a task, you can specify `auto_solve_captcha` (Boolean), however, this parameter is optional and defaults to `true`.
 
 You must sign up for and fund a 2Captcha account, and then add your `API_KEY_2CAPTCHA` to the .env file in order to auto-solve captchas.
+
+In some cases, the captcha result provided by 2Captcha will be incorrect, in which case the captcha must be manually solved.
 
 For manually-solving captchas, you will be given a 5-minute timeout after the email notification to check the browser and solve the captcha.
 
