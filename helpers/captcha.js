@@ -83,10 +83,10 @@ exports.solveCaptcha = async ({
         await page.waitForTimeout(1000);
       }
     }
-    let submissionSucccess = false;
+
     if (captchaAnswer) {
       taskLogger.info(`Got captcha result ${captchaAnswer} from 2captcha, submitting`);
-      submissionSucccess = await context.evaluate((captchaAnswerText) => {
+      await context.evaluate((captchaAnswerText) => {
         function findRecaptchaClients() {
           if (typeof (window.___grecaptcha_cfg) !== 'undefined') {
             return Object.entries(window.___grecaptcha_cfg.clients).map(([cid, client]) => {
@@ -124,34 +124,31 @@ exports.solveCaptcha = async ({
         const defaultRecaptchaClient = recaptchaClients[0];
         let callbackFunction = defaultRecaptchaClient.callback;
 
-        let success = false;
-
         if (typeof callbackFunction === 'function') {
-          success = callbackFunction(captchaAnswerText);
+          callbackFunction(captchaAnswerText);
         }
 
         if (typeof callbackFunction === 'string') {
           callbackFunction = window[callbackFunction];
           if (typeof callbackFunction === 'function') {
-            success = callbackFunction(captchaAnswerText);
+            callbackFunction(captchaAnswerText);
           }
 
           if (typeof callbackFunction === 'string') {
-            success = window[callbackFunction](captchaAnswerText);
+            window[callbackFunction](captchaAnswerText);
           }
         }
-
-        return success;
       }, captchaAnswer);
     }
 
-    if (!submissionSucccess) {
-      taskLogger.info('The captcha answer was not correct, it will need to be solved manually');
-      await page.evaluate(() => {
-        document.querySelector('#g-recaptcha-response').innerHTML = '';
-      });
-    }
+    // if (!submissionSucccess) {
+    //   taskLogger.info('The captcha answer was not correct, it will need to be solved manually');
+    //   await page.evaluate(() => {
+    //     document.querySelector('#g-recaptcha-response').innerHTML = '';
+    //   });
+    // }
 
+    const submissionSucccess = true;
     return submissionSucccess;
   } catch (err) {
     throw err;
