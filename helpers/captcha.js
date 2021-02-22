@@ -126,28 +126,18 @@ exports.solveCaptcha = async ({
 
         if (typeof callbackFunction === 'function') {
           callbackFunction(captchaAnswerText);
-        }
-
-        if (typeof callbackFunction === 'string') {
-          callbackFunction = window[callbackFunction];
+        } else if (typeof callbackFunction === 'string') {
+          callbackFunction = eval(callbackFunction);
           if (typeof callbackFunction === 'function') {
             callbackFunction(captchaAnswerText);
-          }
-
-          if (typeof callbackFunction === 'string') {
+          } else if (typeof callbackFunction === 'string') {
             window[callbackFunction](captchaAnswerText);
           }
         }
+
+        return callbackFunction;
       }, captchaAnswer);
     }
-
-    // if (!submissionSucccess) {
-    //   taskLogger.info('The captcha answer was not correct, it will need to be solved manually');
-    //   await page.evaluate(() => {
-    //     document.querySelector('#g-recaptcha-response').innerHTML = '';
-    //   });
-    // }
-
     const submissionSucccess = true;
     return submissionSucccess;
   } catch (err) {

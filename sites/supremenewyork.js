@@ -135,54 +135,57 @@ async function checkout({
     });
     await page.waitForTimeout(2000);
 
-    await page.evaluate((orderTermsCheckboxSelectorStr) => {
-      document.querySelector(orderTermsCheckboxSelectorStr).checked = true;
-    }, orderTermsCheckboxSelector);
+    await page.waitForSelector(orderTermsCheckboxSelector);
+    await page.click(orderTermsCheckboxSelector);
+    await page.waitForTimeout(5000);
 
     await page.waitForSelector(submitButtonsSelector);
     await page.click(submitButtonsSelector);
     await page.waitForTimeout(5000);
 
-    const captchaIframeSelector = 'iframe[title="recaptcha challenge"]';
+    const captchaSelector = 'div.g-recaptcha';
     try {
-      hasCaptcha = await page.waitForSelector(captchaIframeSelector);
+      hasCaptcha = await page.waitForSelector(captchaSelector);
     } catch (err) {
       // no-op if timeout occurs
     }
 
-    if (hasCaptcha && autoSolveCaptchas) {
-      const solved = await solveCaptcha({
-        taskLogger, page, captchaIframeSelector
-      });
-      if (solved) hasCaptcha = false;
-    }
-
     if (hasCaptcha) {
-      const recipient = notificationEmailAddress;
-      const subject = 'Checkout task unsuccessful';
-      const text = `The checkout task for ${url} size ${size} has a captcha. Please open the browser and complete it within 5 minutes.`;
-      await sendEmail({ recipient, subject, text });
-      taskLogger.info(text);
+      if (autoSolveCaptchas) {
+        const solved = await solveCaptcha({
+          taskLogger, page, captchaSelector
+        });
+        if (solved) hasCaptcha = false;
+        await page.evaluate(() => {
+          document.querySelector('iframe[title="recaptcha challenge"]').parentNode.style = 'display:none';
+        });
+      } else {
+        const recipient = notificationEmailAddress;
+        const subject = 'Checkout task unsuccessful';
+        const text = `The checkout task for ${url} size ${size} has a captcha. Please open the browser and complete it within 5 minutes.`;
+        await sendEmail({ recipient, subject, text });
+        taskLogger.info(text);
 
-      await Promise.race([
-        new Promise(() => {
-          setTimeout(() => {
-            throw new Error('The captcha was not solved in time.');
-          }, 5 * 60 * 1000);
-        }),
-        new Promise((resolve) => {
-          const interval = setInterval(async () => {
-            const solved = await page.evaluate(() => {
-              return document.querySelector('#g-recaptcha-response').value.length > 0;
-            });
-            if (solved) {
-              hasCaptcha = false;
-              resolve();
-              clearInterval(interval);
-            }
-          }, 1000);
-        })
-      ]);
+        await Promise.race([
+          new Promise(() => {
+            setTimeout(() => {
+              throw new Error('The captcha was not solved in time.');
+            }, 5 * 60 * 1000);
+          }),
+          new Promise((resolve) => {
+            const interval = setInterval(async () => {
+              const solved = await page.evaluate(() => {
+                return document.querySelector('#g-recaptcha-response').value.length > 0;
+              });
+              if (solved) {
+                hasCaptcha = false;
+                resolve();
+                clearInterval(interval);
+              }
+            }, 1000);
+          })
+        ]);
+      }
     }
 
     const confirmationTabSelected = 'div#cart-header div#tabs div.tab.tab-confirmation.selected';

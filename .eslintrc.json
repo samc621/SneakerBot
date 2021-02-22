@@ -24,6 +24,7 @@
         "no-continue": "off",
         "camelcase": "off",
         "no-useless-catch": "off",
-        "no-underscore-dangle": "off"
+        "no-underscore-dangle": "off",
+        "no-eval": "warn"
     }
 }
