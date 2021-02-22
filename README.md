@@ -8,6 +8,13 @@ This bot uses Node.js and Puppeteer to automate the checkout on various sneaker 
 4. Nike.com
 5. Supreme
 
+## Prerequisites
+
+Install the following on your machine
+
+1. Node.js and npm
+2. Postgresql
+
 ## Configure environment variables
 
 Make a copy of the `.env.example` file, replacing `example` with the name of your `NODE_ENV` e.g. `local` or `development`.
