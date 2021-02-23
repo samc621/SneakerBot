@@ -10,10 +10,10 @@ This bot uses Node.js and Puppeteer to automate the checkout on various sneaker 
 
 ## Prerequisites
 
-Install the following on your machine
+Install the following on your machine:
 
-1. Node.js and npm
-2. Postgresql
+1. [Node.js](https://nodejs.org/en/download/) (comes with npm)
+2. [PostgreSQL](https://www.postgresql.org/download/)
 
 ## Configure environment variables
 
