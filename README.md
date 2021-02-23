@@ -73,8 +73,6 @@ When creating a task, you can specify `auto_solve_captcha` (Boolean), however, t
 
 You must sign up for and fund a 2Captcha account, and then add your `API_KEY_2CAPTCHA` to the .env file in order to auto-solve captchas.
 
-In some cases, the captcha result provided by 2Captcha will be incorrect, in which case the captcha must be manually solved.
-
 For manually-solving captchas, you will be given a 5-minute timeout after the email notification to check the browser and solve the captcha.
 
 ## Motivation
