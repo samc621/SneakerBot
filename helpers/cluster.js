@@ -14,7 +14,7 @@ class PuppeteerCluster {
   static async build() {
     const cluster = await Cluster.launch({
       concurrency: Cluster.CONCURRENCY_BROWSER,
-      maxConcurrency: process.env.PARALLEL_TASKS || 1,
+      maxConcurrency: parseInt(process.env.PARALLEL_TASKS) || 1,
       timeout: 5 * 60 * 1000,
       puppeteerOptions: {
         headless: false,
