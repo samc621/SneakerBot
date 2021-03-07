@@ -40,9 +40,13 @@ async function enterAddressDetails({ page, address }) {
     });
     await page.waitForTimeout(2000);
 
-    await page.waitForSelector(stateSelector);
-    await page.select(stateSelector, address.state);
-    await page.waitForTimeout(2000);
+    try {
+      await page.waitForSelector(stateSelector);
+      await page.select(stateSelector, address.state);
+      await page.waitForTimeout(2000);
+    } catch (err) {
+      // no op if timeout waiting for state selector
+    }
 
     await page.waitForSelector(postalCodeSelector);
     await page.type(postalCodeSelector, address.postal_code, {
@@ -198,10 +202,14 @@ exports.guestCheckout = async ({
     let isInCart = false;
     let checkoutComplete = false;
     while (!isInCart) {
-      const stylesSelector = 'div.colorway-product-overlay';
-      await page.waitForSelector(stylesSelector);
-      const styles = await page.$$(stylesSelector);
-      await styles[styleIndex].click();
+      try {
+        const stylesSelector = 'a.colorway-product-overlay';
+        await page.waitForSelector(stylesSelector);
+        const styles = await page.$$(stylesSelector);
+        await styles[styleIndex].click();
+      } catch (err) {
+        // no op if timeout waiting for style selector
+      }
 
       const sizesSelector = 'div.mt2-sm div input';
       await page.waitForSelector(sizesSelector);
