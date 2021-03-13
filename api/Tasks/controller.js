@@ -70,7 +70,8 @@ exports.deleteTask = async (req, res) => {
 exports.startTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const task = cluster.queue(id);
+    const { card_friendly_name } = req.body;
+    const task = cluster.queue({ taskId: id, cardFriendlyName: card_friendly_name });
 
     return response.Ok(res, 'Task successfully started', task);
   } catch (err) {

@@ -51,6 +51,9 @@ module.exports = {
   start: {
     params: Joi.object({
       id: Joi.number().required()
+    }),
+    body: Joi.object({
+      card_friendly_name: Joi.string().optional()
     })
   }
 };

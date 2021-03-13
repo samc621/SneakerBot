@@ -23,6 +23,14 @@ Declare the environment name with:
 
 `$ export NODE_ENV=local`
 
+## Optional: Configure credit cards
+
+The `.env` file that you configure is set up for a single credit card.
+
+However, if you want to specify multiple credit cards, make a copy of the `credit-cards-example.json` file, and remove the `-example` so it is just `credit-cards.json`.
+
+When starting a task, you can optionally specify the card you want to use via its `friendlyName`, otherwise the card from the `.env` file will be used.
+
 ## Install the dependencies
 
 `$ npm install`

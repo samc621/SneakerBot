@@ -1,5 +1,6 @@
 const useProxy = require('puppeteer-page-proxy');
 const { getStateNameFromAbbreviation } = require('../helpers/states');
+const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
 
 async function enterAddressDetails({ page, address, type }) {
   try {
@@ -80,7 +81,8 @@ async function checkout({
   shippingAddress,
   shippingSpeedIndex,
   billingAddress,
-  domain
+  domain,
+  cardFriendlyName
 }) {
   try {
     taskLogger.info('Navigating to checkout page');
@@ -88,13 +90,16 @@ async function checkout({
 
     let checkoutComplete = false;
 
-    const cardDetails = {
+    let cardDetails = {
       cardNumber: process.env.CARD_NUMBER,
       nameOnCard: process.env.NAME_ON_CARD,
       expirationMonth: process.env.EXPIRATION_MONTH,
       expirationYear: process.env.EXPIRATION_YEAR,
       securityCode: process.env.SECURITY_CODE
     };
+    if (cardFriendlyName) {
+      cardDetails = getCardDetailsByFriendlyName(cardFriendlyName);
+    }
 
     const shippingSpeedsSelector = 'div[data-auto-id="delivery-option"]';
     const manualAddressEntrySelector = 'a[aria-label="Enter address manually"]';
@@ -210,7 +215,8 @@ exports.guestCheckout = async ({
   size,
   shippingAddress,
   shippingSpeedIndex,
-  billingAddress
+  billingAddress,
+  cardFriendlyName
 }) => {
   try {
     const splitDomain = url.split('/').slice(0, 4);
@@ -271,7 +277,8 @@ exports.guestCheckout = async ({
         shippingAddress,
         shippingSpeedIndex,
         billingAddress,
-        domain
+        domain,
+        cardFriendlyName
       });
     }
 

@@ -1,6 +1,7 @@
 const useProxy = require('puppeteer-page-proxy');
 const { solveCaptcha } = require('../helpers/captcha');
 const { sendEmail } = require('../helpers/email');
+const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
 
 async function enterAddressDetails({ page, address }) {
   try {
@@ -75,15 +76,20 @@ async function checkout({
   page,
   shippingAddress,
   shippingSpeedIndex,
-  billingAddress
+  billingAddress,
+  cardFriendlyName
 }) {
   try {
-    const cardDetails = {
+    let cardDetails = {
       cardNumber: process.env.CARD_NUMBER,
+      nameOnCard: process.env.NAME_ON_CARD,
       expirationMonth: process.env.EXPIRATION_MONTH,
       expirationYear: process.env.EXPIRATION_YEAR,
       securityCode: process.env.SECURITY_CODE
     };
+    if (cardFriendlyName) {
+      cardDetails = getCardDetailsByFriendlyName(cardFriendlyName);
+    }
 
     taskLogger.info('Navigating to checkout page');
     await page.goto('https://footlocker.com/checkout', { waitUntil: 'domcontentloaded' });
@@ -268,7 +274,8 @@ exports.guestCheckout = async ({
   shippingSpeedIndex,
   billingAddress,
   autoSolveCaptchas,
-  notificationEmailAddress
+  notificationEmailAddress,
+  cardFriendlyName
 }) => {
   try {
     await useProxy(page, proxyString);
@@ -366,7 +373,7 @@ exports.guestCheckout = async ({
 
     if (isInCart) {
       await checkout({
-        taskLogger, page, shippingAddress, shippingSpeedIndex, billingAddress
+        taskLogger, page, shippingAddress, shippingSpeedIndex, billingAddress, cardFriendlyName
       });
 
       const cartSelector = 'span.CartCount-badge';

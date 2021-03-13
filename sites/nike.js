@@ -1,4 +1,5 @@
 const useProxy = require('puppeteer-page-proxy');
+const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
 
 async function enterAddressDetails({ page, address }) {
   try {
@@ -63,15 +64,21 @@ async function checkout({
   page,
   shippingAddress,
   shippingSpeedIndex,
-  billingAddress
+  billingAddress,
+  cardFriendlyName
 }) {
   try {
-    const cardDetails = {
+    let cardDetails = {
       cardNumber: process.env.CARD_NUMBER,
+      nameOnCard: process.env.NAME_ON_CARD,
       expirationMonth: process.env.EXPIRATION_MONTH,
       expirationYear: process.env.EXPIRATION_YEAR,
       securityCode: process.env.SECURITY_CODE
     };
+    if (cardFriendlyName) {
+      cardDetails = getCardDetailsByFriendlyName(cardFriendlyName);
+      console.log(cardFriendlyName, cardDetails);
+    }
 
     taskLogger.info('Navigating to checkout page');
     await page.goto('https://nike.com/checkout', { waitUntil: 'domcontentloaded' });
@@ -192,7 +199,8 @@ exports.guestCheckout = async ({
   size,
   shippingAddress,
   shippingSpeedIndex,
-  billingAddress
+  billingAddress,
+  cardFriendlyName
 }) => {
   try {
     await useProxy(page, proxyString);
@@ -246,7 +254,7 @@ exports.guestCheckout = async ({
 
     if (isInCart) {
       await checkout({
-        taskLogger, page, shippingAddress, shippingSpeedIndex, billingAddress
+        taskLogger, page, shippingAddress, shippingSpeedIndex, billingAddress, cardFriendlyName
       });
 
       const cartSelector = 'span.va-sm-m.fs12-sm.ta-sm-c';

@@ -1,6 +1,7 @@
 const useProxy = require('puppeteer-page-proxy');
 const { solveCaptcha } = require('../helpers/captcha');
 const { sendEmail } = require('../helpers/email');
+const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
 
 async function enterAddressDetails({ page, address }) {
   try {
@@ -72,7 +73,8 @@ async function checkout({
   autoSolveCaptchas,
   notificationEmailAddress,
   url,
-  size
+  size,
+  cardFriendlyName
 }) {
   try {
     taskLogger.info('Navigating to checkout page');
@@ -83,13 +85,16 @@ async function checkout({
     let hasCaptcha = false;
     let checkoutComplete = false;
 
-    const cardDetails = {
+    let cardDetails = {
       cardNumber: process.env.CARD_NUMBER,
       nameOnCard: process.env.NAME_ON_CARD,
       expirationMonth: process.env.EXPIRATION_MONTH,
       expirationYear: process.env.EXPIRATION_YEAR,
       securityCode: process.env.SECURITY_CODE
     };
+    if (cardFriendlyName) {
+      cardDetails = getCardDetailsByFriendlyName(cardFriendlyName);
+    }
 
     const creditCardNumberSelector = 'div#card_details input[placeholder="number"]';
     const creditCardExpirationMonthSelector = 'select#credit_card_month';
@@ -210,7 +215,8 @@ exports.guestCheckout = async ({
   size,
   billingAddress,
   autoSolveCaptchas,
-  notificationEmailAddress
+  notificationEmailAddress,
+  cardFriendlyName
 }) => {
   try {
     await useProxy(page, proxyString);
@@ -250,7 +256,8 @@ exports.guestCheckout = async ({
         autoSolveCaptchas,
         notificationEmailAddress,
         url,
-        size
+        size,
+        cardFriendlyName
       });
     }
 

@@ -27,7 +27,7 @@ class PuppeteerCluster {
       }
     });
 
-    cluster.task(async ({ page, data: taskId }) => {
+    cluster.task(async ({ page, data: { taskId, cardFriendlyName } }) => {
       let taskLogger;
       try {
         const data = {};
@@ -82,7 +82,8 @@ class PuppeteerCluster {
           shippingSpeedIndex: shipping_speed_index,
           billingAddress,
           autoSolveCaptchas: auto_solve_captchas,
-          notificationEmailAddress: notification_email_address
+          notificationEmailAddress: notification_email_address,
+          cardFriendlyName
         });
 
         const recipient = notification_email_address;
