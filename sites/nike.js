@@ -77,7 +77,6 @@ async function checkout({
     };
     if (cardFriendlyName) {
       cardDetails = getCardDetailsByFriendlyName(cardFriendlyName);
-      console.log(cardFriendlyName, cardDetails);
     }
 
     taskLogger.info('Navigating to checkout page');
@@ -149,12 +148,12 @@ async function checkout({
     });
 
     // strange bug with Nike, have to enter the last three digits of the card number twice
-    const last3 = String(cardDetails.cardNumber).substr(
-      cardDetails.cardNumber.length - 3
-    );
-    await frame.type(creditCardNumberSelector, last3, {
-      delay: 10
-    });
+    // const last3 = String(cardDetails.cardNumber).substr(
+    //   cardDetails.cardNumber.length - 3
+    // );
+    // await frame.type(creditCardNumberSelector, last3, {
+    //   delay: 10
+    // });
     await page.waitForTimeout(2000);
 
     await frame.type(
