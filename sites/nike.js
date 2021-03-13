@@ -143,19 +143,19 @@ async function checkout({
     const frameHandle = await page.$(cardDetailsIframeSelector);
     const frame = await frameHandle.contentFrame();
 
-    await frame.type(creditCardNumberSelector, cardDetails.cardNumber, {
-      delay: 10
-    });
-
-    // strange bug with Nike, have to enter the last three digits of the card number twice
-    // const last3 = String(cardDetails.cardNumber).substr(
-    //   cardDetails.cardNumber.length - 3
-    // );
-    // await frame.type(creditCardNumberSelector, last3, {
-    //   delay: 10
-    // });
+    // strange bug with Nike, frame.type() doesn't work on this field.
+    // have to manually set the value
+    await frame.evaluate(({ creditCardNumberSelector: creditCardNumberSelectorStr, cardDetails: cardDetailsObj }) => {
+      const fieldHandle = document.querySelector(creditCardNumberSelectorStr);
+      fieldHandle.value = cardDetailsObj.cardNumber;
+    }, { creditCardNumberSelector, cardDetails });
     await page.waitForTimeout(2000);
 
+    await frame.click(creditCardNumberSelector);
+    await page.waitForTimeout(2000);
+
+    await frame.click(creditCardExpirationDateSelector);
+    await page.waitForTimeout(2000);
     await frame.type(
       creditCardExpirationDateSelector,
       String(cardDetails.expirationMonth).concat(cardDetails.expirationYear),
