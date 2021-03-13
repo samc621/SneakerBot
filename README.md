@@ -73,6 +73,12 @@ For each API, view the docs and try the requests in Postman.
 - [Proxies](https://documenter.getpostman.com/view/5027621/TVt2c3ee)
 - [Tasks](https://documenter.getpostman.com/view/5027621/TVt2c3ed)
 
+## Starting a Task
+
+You may start a task via `POST /v1/tasks/:id/start` or use the `start-task.js` script like:
+
+`$ TASK_ID=<TASK_ID> CARD_FRIENDLY_NAME=<CARD_FRIENDLY_NAME> node ./scripts/start-task.js`
+
 ## Captcha Solving
 
 This bot enables manual and automatic (via [2Captcha](https://2captcha.com)) solving of captchas.
