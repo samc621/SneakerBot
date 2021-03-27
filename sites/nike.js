@@ -219,7 +219,7 @@ exports.guestCheckout = async ({
       }
 
       const sizesSelector = 'div.mt2-sm div input';
-      await page.waitForSelector(sizesSelector);
+      await page.waitForSelector(sizesSelector, { timeout: 0 });
       await page.evaluate((sizesSelectorText, sizeValue) => {
         const sizes = Array.from(document.querySelectorAll(sizesSelectorText));
         const matchingSize = sizes.find((sz) => sz.value.endsWith(sizeValue));

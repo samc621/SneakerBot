@@ -319,7 +319,7 @@ exports.guestCheckout = async ({
       }
 
       const atcButtonSelector = 'button.Button.Button.ProductDetails-form__action';
-      await page.waitForSelector(atcButtonSelector);
+      await page.waitForSelector(atcButtonSelector, { timeout: 0 });
       await page.click(atcButtonSelector);
       await page.waitForTimeout(2000);
 
