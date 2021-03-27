@@ -1,3 +1,5 @@
+const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { Cluster } = require('puppeteer-cluster');
 
 const Task = require('../api/Tasks/model');
@@ -10,9 +12,12 @@ const Logger = require('./logger');
 
 const sites = require('../sites');
 
+puppeteer.use(StealthPlugin());
+
 class PuppeteerCluster {
   static async build() {
     const cluster = await Cluster.launch({
+      puppeteer,
       concurrency: Cluster.CONCURRENCY_BROWSER,
       maxConcurrency: parseInt(process.env.PARALLEL_TASKS) || 1,
       timeout: 5 * 60 * 1000,
