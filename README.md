@@ -19,10 +19,6 @@ Install the following on your machine:
 
 Make a copy of the `.env.example` file, replacing `example` with the name of your `NODE_ENV` e.g. `local` or `development`.
 
-Then, make a copy of the `credit-cards-example.json` file, and remove the `-example` so it is just `credit-cards.json`.
-
-These files are intentionally ignored from source control to avoid you accidentally committing sensitive data.
-
 When you're ready, declare the environment name with:
 
 `$ export NODE_ENV=local`
@@ -33,7 +29,7 @@ The `.env` file that you configure is set up for a single credit card.
 
 However, if you want to specify multiple credit cards, populate `credit-cards.json` using the example from `credit-cards-example.json`.
 
-If you prefer not to use this method, you can simply leave this JSON file as an empty array `[]`.
+If you prefer not to use this method, you can simply leave this JSON file as-is.
 
 When starting a task, you can optionally specify the card you want to use via its `friendlyName`, otherwise the card from the `.env` file will be used.
 

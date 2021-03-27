@@ -2,4 +2,3 @@ node_modules
 .env*
 !.env.example
 logs
-credit-cards.json
