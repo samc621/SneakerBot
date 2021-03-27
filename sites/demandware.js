@@ -44,9 +44,13 @@ async function enterAddressDetails({ page, address, type }) {
     });
     await page.waitForTimeout(2000);
 
-    await page.waitForSelector(stateSelector);
-    await page.select(stateSelector, getStateNameFromAbbreviation(address.state));
-    await page.waitForTimeout(2000);
+    try {
+      await page.waitForSelector(stateSelector);
+      await page.select(stateSelector, getStateNameFromAbbreviation(address.state));
+      await page.waitForTimeout(2000);
+    } catch (err) {
+      // no op if timeout waiting for state selector
+    }
 
     await page.waitForSelector(postalCodeSelector);
     await page.type(postalCodeSelector, address.postal_code, {
