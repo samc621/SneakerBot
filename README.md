@@ -101,4 +101,6 @@ I am open sourcing this repo now, since I no longer operate the business, but al
 
 Feel free to open a Pull Request to contribute to this proejct and help make it better! I will continue to support more websites and add more features as I can.
 
+Also feel free to open an Issue or contact me via Telegram @samc621 if you have any trouble.
+
 If you appreciate this, consider [buying me a coffee](https://www.buymeacoffee.com/samc621).
