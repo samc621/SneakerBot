@@ -7,7 +7,7 @@ module.exports = {
       first_name: Joi.string().required(),
       last_name: Joi.string().required(),
       address_line_1: Joi.string().required(),
-      address_line_2: Joi.string().required(),
+      address_line_2: Joi.string().optional(),
       city: Joi.string().required(),
       state: Joi.string().required(),
       postal_code: Joi.string().required(),
