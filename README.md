@@ -15,6 +15,10 @@ Install the following on your machine:
 1. [Node.js](https://nodejs.org/en/download/) (comes with npm)
 2. [PostgreSQL](https://www.postgresql.org/download/)
 
+## Set up PostgreSQL
+
+View the [documentation](https://www.postgresql.org/docs/9.0/sql-createdatabase.html) for creating a user and database.
+
 ## Configure environment variables
 
 Make a copy of the `.env.example` file, replacing `example` with the name of your `NODE_ENV` e.g. `local` or `development`.
