@@ -75,13 +75,13 @@ When you're ready, start the server with:
 
 This may be particularly useful for Linux users who have reported issues with Puppeteer and Chromium.
 
-You will need to have [`Docker Compose`](https://docs.docker.com/compose/install/) and/or [`Docker`](https://docs.docker.com/get-docker/) installed to use this.
+You will need to have [Docker Compose](https://docs.docker.com/compose/install/) and/or [Docker](https://docs.docker.com/get-docker/) installed to use this.
 
 A Docker image is available for the server code [here](https://hub.docker.com/repository/docker/samc621/sneakerbot).
 
-This Docker image is built from `node:12` and uses [`xvfb`](https://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml) with [`x11vnc`](https://github.com/LibVNC/x11vnc) to provide access to a GUI.
+This Docker image is built from `node:12` and uses [xvfb](https://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml) with [x11vnc](https://github.com/LibVNC/x11vnc) to provide access to a GUI.
 
-You can use [`vncviewer`](https://www.realvnc.com/en/connect/download/viewer/) to connect to the VNC server running in the container.
+You can use [vncviewer](https://www.realvnc.com/en/connect/download/viewer/) to connect to the VNC server running in the container.
 
 You may also opt to run Postgres via Docker, in which case you can make use of the `docker-compose.yml` file. Simply run:
 
