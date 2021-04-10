@@ -1,8 +1,8 @@
 name: build, lint, deploy
 on: push
 jobs:
-  build:
-    name: Build node app
+  build-and-lint:
+    name: Build and lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -13,18 +13,8 @@ jobs:
           node-version: 12.6.0
       - name: Install modules
         run: npm install
-  lint:
-    name: Lint code
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Setup Node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12.6.0
       - name: Run ESLint
-        run: npm run lint
+        run: npm run lint  
   deploy:
     if: github.ref == 'refs/heads/master'
     name: Push Docker image to Docker Hub
