@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node ./app.js",
     "lint": "eslint .",
-    "lint-fix": "eslint --fix ."
+    "lint-fix": "eslint --fix .",
+    "knex": "knex"
   },
   "repository": {
     "type": "git",

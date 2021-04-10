@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: 'postgres:alpine'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_DB=sneakerbot
+      - POSTGRES_USER=sneakerbot
+      - POSTGRES_PASSWORD=A6aqvt7>8E,bd@RH
+  server:
+    build: ./
+    image: samc621/sneakerbot
+    ports:
+      - '8000:8000'
+      - '5900:5900'
+    depends_on:
+      - postgres
+    environment:
+      - NODE_ENV=docker
+    env_file:
+      - .env.docker
+
+volumes:
+  db-data:

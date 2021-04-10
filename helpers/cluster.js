@@ -16,20 +16,26 @@ puppeteer.use(StealthPlugin());
 
 class PuppeteerCluster {
   static async build() {
+    const puppeteerOptions = {
+      headless: false,
+      defaultViewport: null,
+      args: [
+        '--start-maximized',
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-web-security',
+        '--disable-features=IsolateOrigins,site-per-process'
+      ]
+    };
+    if (process.env.NODE_ENV === 'docker') {
+      puppeteerOptions.executablePath = '/usr/bin/google-chrome-stable';
+    }
     const cluster = await Cluster.launch({
       puppeteer,
       concurrency: Cluster.CONCURRENCY_BROWSER,
       maxConcurrency: parseInt(process.env.PARALLEL_TASKS) || 1,
       timeout: 5 * 60 * 1000,
-      puppeteerOptions: {
-        headless: false,
-        defaultViewport: null,
-        args: [
-          '--start-maximized',
-          '--disable-web-security',
-          '--disable-features=IsolateOrigins,site-per-process'
-        ]
-      }
+      puppeteerOptions
     });
 
     cluster.task(async ({ page, data: { taskId, cardFriendlyName } }) => {
