@@ -17,6 +17,12 @@ jobs:
     name: Lint code
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.6.0
       - name: Run ESLint
         run: npm run lint
   deploy:
