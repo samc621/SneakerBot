@@ -10,7 +10,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
-          node-version: 12.6.0å
+          node-version: 12.6.0
       - name: Install modules
         run: npm install
   lint:
