@@ -298,7 +298,7 @@ exports.guestCheckout = async ({
 
     while (!isInCart && !hasCaptcha) {
       if (page.url() !== url) {
-        await page.goto(url, { waitUntil: 'domcontentloaded' });
+        await page.goto(url, { waitUntil: ['load', 'domcontentloaded'] });
       }
 
       const stylesSelector = 'div.c-form-field.c-form-field--radio.SelectStyle.col';
@@ -309,10 +309,10 @@ exports.guestCheckout = async ({
       const sizesSelector = 'div.c-form-field.c-form-field--radio.ProductSize';
       await page.waitForSelector(sizesSelector);
       const sizes = await page.$$(sizesSelector);
-      for (let i = 0; i < sizes.length; i + 1) {
+      for (let i = 0; i < sizes.length; i += 1) {
         const sizeValue = await sizes[i].$eval('input', (el) => el.getAttribute('value'));
         const parsedSize = Number.isNaN(size) ? sizeValue : Number(sizeValue);
-        if (parsedSize === Number.isNaN(size) ? size : Number(size)) {
+        if (parsedSize === (Number.isNaN(size) ? size : Number(size))) {
           await sizes[i].click();
           break;
         }
