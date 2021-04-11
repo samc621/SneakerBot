@@ -86,6 +86,7 @@ You can use [vncviewer](https://www.realvnc.com/en/connect/download/viewer/) to 
 You may also opt to run Postgres via Docker, in which case you can make use of the `docker-compose.yml` file. Simply run:
 
 `$ docker-compose build`
+
 `$ docker-compose up`
 
 ## API
