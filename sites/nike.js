@@ -214,6 +214,7 @@ exports.guestCheckout = async ({
         await page.waitForSelector(stylesSelector);
         const styles = await page.$$(stylesSelector);
         await styles[styleIndex].click();
+        await page.waitForTimeout(2000);
       } catch (err) {
         // no op if timeout waiting for style selector
       }
