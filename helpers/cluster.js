@@ -20,7 +20,6 @@ class PuppeteerCluster {
       headless: false,
       defaultViewport: null,
       args: [
-        '--start-maximized',
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-web-security',
