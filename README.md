@@ -85,7 +85,7 @@ A Docker image is available for the server code [here](https://hub.docker.com/re
 
 Then run it and specify the env file with:
 
-`docker run -p 5900:5900 -p 8000:8000 --env-file .env.docker sneakerbot` (replace `8000` with whatever `PORT` you specified in `.env.docker`)
+`docker run -p 5900:5900 -p 8000:8000 --env NODE_ENV=docker --env-file .env.docker sneakerbot` (replace `8000` with whatever `PORT` you specified in `.env.docker`)
 
 This Docker image is built from `node:12` and uses [xvfb](https://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml) with [x11vnc](https://github.com/LibVNC/x11vnc) to provide access to a GUI.
 
