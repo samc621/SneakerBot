@@ -114,7 +114,7 @@ async function checkout({
 
     const captchaSelector = 'div#g-recaptcha';
     try {
-      hasCaptcha = await page.waitForSelector(captchaSelector, {timeout: 5000});
+      hasCaptcha = await page.waitForSelector(captchaSelector, { timeout: 5000 });
     } catch (err) {
       // no-op if timeout occurs
     }
