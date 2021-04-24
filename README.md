@@ -27,6 +27,17 @@ When you're ready, declare the environment name with:
 
 `$ export NODE_ENV=local`
 
+### How to populate the .env file
+
+1. `PORT` is the port that the Node/Express API server will run on. You can use any TCP/UDP port (0-65535) that is unused by another service e.g. Postgres on 5432.
+2. `DB_USERNAME` and `DB_PASSWORD` is the username/password combo for the Postgres user you created (see documentation above for assistance).
+3. `DB_NAME` is the name of the Postgres database you created.
+4. `DB_PORT` and `DB_HOST` are the Postgres defaults, `5432` and `localhost`, respectively.
+5. `EMAIL_HOST` and `EMAIL_PORT` are the SMTP details for your email provider e.g. `smtp.gmail.com` and `587`, respectively, for Gmail.
+6. `EMAIL_USERNAME` and `EMAIL_PASSWORD` are your actual email credentials. We use the SMTP server to send email notifications about things like checkout errors or completions.
+7. `CARD_NUMBER`, `NAME_ON_CARD`, `EXPIRATION_MONTH`, `EXPIRATION_YEAR`, and `SECURITY_CODE` are your actual credit/debit card details.
+8. `API_KEY_2CAPTCHA` is your API key provided by `2Captcha` if you so desire to use their service. This can be left blank if not.
+
 ## Optional: Configure credit cards
 
 The `.env` file that you configure is set up for a single credit card.
