@@ -122,11 +122,13 @@ You may also opt to run Postgres via Docker, in which case you can make use of t
 
 ## API
 
+This bot exposes a Node/Express API server for managing addresses, proxies, and tasks. I would eventually like to see a UI, which integrates these APIs, built.
+
 For each API, view the docs and try the requests in Postman.
 
-- [Addresses](https://documenter.getpostman.com/view/5027621/TVt2c3ef)
-- [Proxies](https://documenter.getpostman.com/view/5027621/TVt2c3ee)
-- [Tasks](https://documenter.getpostman.com/view/5027621/TVt2c3ed)
+- [Addresses](https://documenter.getpostman.com/view/5027621/TVt2c3ef) - this is how you can pre-store billing and shipping addresses applied to tasks, and more specifically used at checkout time.
+- [Proxies](https://documenter.getpostman.com/view/5027621/TVt2c3ee) - this is how you can pre-store proxies that the bot will use when launching a task. Proxies are rotated so that they are never reused. In the future, this bot may include an integration with a proxy service like [Bright Data (formerly Luminati)](https://brightdata.com/).
+- [Tasks](https://documenter.getpostman.com/view/5027621/TVt2c3ed) - this is how you can pre-store, and then start checkout tasks.
 
 ## Starting a Task
 
