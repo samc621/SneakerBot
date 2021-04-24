@@ -219,7 +219,8 @@ exports.guestCheckout = async ({
         // no op if timeout waiting for style selector
       }
 
-      const sizesSelector = 'div.mt2-sm div input';
+      // sizes on Nike must be entered in US size, even if on a international site e.g. Nike EU
+      const sizesSelector = 'div.mt2-sm div input, div.mt4 div input';
       await page.waitForSelector(sizesSelector, { timeout: 0 });
       await page.evaluate((sizesSelectorText, sizeValue) => {
         const sizes = Array.from(document.querySelectorAll(sizesSelectorText));
@@ -229,11 +230,10 @@ exports.guestCheckout = async ({
         }
       }, sizesSelector, size);
 
-      const atcButtonSelector = 'button.ncss-btn-primary-dark.btn-lg.add-to-cart-btn';
+      const atcButtonSelector = 'button.add-to-cart-btn';
       await page.waitForSelector(atcButtonSelector);
       await page.evaluate((atcButtonSelectorText) => {
-        const buttons = Array.from(document.querySelectorAll(atcButtonSelectorText));
-        const button = buttons.find((btn) => btn.innerText === 'Add to Bag');
+        const button = document.querySelector(atcButtonSelectorText);
         if (button) {
           button.click();
         }
