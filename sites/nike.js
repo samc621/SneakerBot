@@ -221,6 +221,7 @@ exports.guestCheckout = async ({
 
       // sizes on Nike must be entered in US size, even if on a international site e.g. Nike EU
       const sizesSelector = 'div.mt2-sm div input, div.mt4 div input';
+      // using timeout 0 in case we are waiting for product drop and then sizes are enabled
       await page.waitForSelector(sizesSelector, { timeout: 0 });
       await page.evaluate((sizesSelectorText, sizeValue) => {
         const sizes = Array.from(document.querySelectorAll(sizesSelectorText));

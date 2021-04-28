@@ -301,8 +301,9 @@ exports.guestCheckout = async ({
         await page.goto(url, { waitUntil: ['load', 'domcontentloaded'] });
       }
 
+      // using timeout 0 in case we are caught in queue...will wait for the selector to appear
       const stylesSelector = 'div.c-form-field.c-form-field--radio.SelectStyle.col';
-      await page.waitForSelector(stylesSelector);
+      await page.waitForSelector(stylesSelector, { timeout: 0 });
       const styles = await page.$$(stylesSelector);
       await styles[styleIndex].click();
 
