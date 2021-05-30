@@ -130,6 +130,18 @@ For each API, view the docs and try the requests in Postman.
 - [Proxies](https://documenter.getpostman.com/view/5027621/TVt2c3ee) - this is how you can pre-store proxies that the bot will use when launching a task. Proxies are rotated so that they are never reused. In the future, this bot may include an integration with a proxy service like [Bright Data (formerly Luminati)](https://brightdata.com/).
 - [Tasks](https://documenter.getpostman.com/view/5027621/TVt2c3ed) - this is how you can pre-store, and then start checkout tasks.
 
+### UPDATE (as of 05/30/2021)
+
+You can now specify a `product_code` on tasks. You will still need to provide the `url` e.g. https://nike.com but can also provide a `product_code` e.g. "DA3130-100".
+
+If a `product_code` is specified, the bot will iteratively search the desired site until there is a search result, click it, and then proceed as usual.
+
+This will work with the `nike.com`, `footsites`, and `demandware` sites.
+
+If using with adidas.com, be sure to include the full site path e.g. https://www.adidas.com/us.
+
+Feel free to check the new [example](https://documenter.getpostman.com/view/5027621/TVt2c3ed#d55d7ad1-7126-4663-9fa1-fdc2220615d4) "with product code" under the POST /tasks API.
+
 ## Starting a Task
 
 You may start a task via `POST /v1/tasks/:id/start` or use the `start-task.js` script like:
