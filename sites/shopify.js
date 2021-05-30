@@ -126,6 +126,7 @@ async function checkout({
         });
         if (solved) hasCaptcha = false;
       } else {
+        taskLogger.info('Detected captcha for manual solving');
         const recipient = notificationEmailAddress;
         const subject = 'Checkout task unsuccessful';
         const text = `The checkout task for ${url} size ${size} has a captcha. Please open the browser and complete it within 5 minutes.`;
