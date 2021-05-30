@@ -211,10 +211,54 @@ async function checkout({
   }
 }
 
+async function closeModal({ taskLogger, page }) {
+  try {
+    const modalCloseButtonSelector = 'button.gl-modal__close';
+    await page.waitForSelector(modalCloseButtonSelector, { visible: true });
+    taskLogger.info('Closing modal');
+    await page.click(modalCloseButtonSelector);
+  } catch (err) {
+    // no-op
+  }
+}
+
+async function searchByProductCode({
+  taskLogger,
+  page,
+  productCode,
+  domain
+}) {
+  taskLogger.info('Searching for product by product code');
+  let searchResult;
+  while (!searchResult) {
+    await page.goto(`${domain}/search?q=${productCode}`, { waitUntil: 'domcontentloaded' });
+    await Promise.all([
+      (async () => {
+        try {
+          searchResult = await page.waitForSelector('div[class*="grid-item"] a[data-auto-id="glass-hockeycard-link"]', { timeout: 5 * 1000 });
+          taskLogger.info('Found search result, clicking');
+          await searchResult.click();
+        } catch (err) {
+          // no-op
+        }
+      })(),
+      (async () => {
+        try {
+          searchResult = await page.waitForSelector('div[class*="product-description"]', { timeout: 5 * 1000 });
+          taskLogger.info('Navigated to product details page');
+        } catch (err) {
+          // no-op
+        }
+      })()
+    ]);
+  }
+}
+
 exports.guestCheckout = async ({
   taskLogger,
   page,
   url,
+  productCode,
   proxyString,
   size,
   shippingAddress,
@@ -227,24 +271,43 @@ exports.guestCheckout = async ({
     const sitePath = splitDomain[3];
     const domain = splitDomain.join('/');
 
-    let responseJson;
     await page.setRequestInterception(true);
-    page.on('response', async (response) => {
-      if (response.url().includes('availability')) {
-        responseJson = await response.json();
-      }
+    const availablityPromise = new Promise((resolve) => {
+      page.on('response', async (response) => {
+        if (new URL(response.url()).pathname.endsWith('/availability')) {
+          const responseJson = await response.json();
+          resolve(responseJson);
+        }
+      });
     });
+
     await useProxy(page, proxyString);
 
-    taskLogger.info('Navigating to URL');
-    await page.goto(url, { waitUntil: 'networkidle2' });
+    closeModal({ taskLogger, page });
 
+    if (productCode) {
+      await searchByProductCode({
+        taskLogger,
+        page,
+        productCode,
+        domain
+      });
+    } else {
+      taskLogger.info('No product code supplied, navigating to URL');
+      await page.goto(url, { waitUntil: 'domcontentloaded' });
+    }
+
+    const responseJson = await availablityPromise;
+    taskLogger.info('Found product availability');
     const product_id = responseJson.id;
     const sizes = responseJson.variation_list;
     const product_variation_sku = sizes.find((sizeObj) => sizeObj.size === size).sku;
 
+    await page.waitForTimeout(15 * 1000);
+
     let isInCart = false;
     while (!isInCart) {
+      taskLogger.info('Attempting to add product to cart');
       isInCart = await page.evaluate(async ({
         productId, productVariationSku, sizeStr, sitePathStr
       }) => {
@@ -259,16 +322,42 @@ exports.guestCheckout = async ({
             quantity: 1,
             product_variation_sku: productVariationSku,
             productId: productVariationSku,
-            size: sizeStr
+            size: sizeStr,
+            displaySize: sizeStr
           })
         };
-
-        const response = await fetch(`/api/baskets/-/items?sitePath=${sitePathStr}`, data);
-        if (response.status === 200) return true;
-        return false;
+        const response = await fetch(`/api/chk/baskets/-/items?sitePath=${sitePathStr}`, data);
+        return response.ok;
       }, {
         productId: product_id, productVariationSku: product_variation_sku, sizeStr: size, sitePathStr: sitePath
       });
+
+      if (!isInCart) {
+        taskLogger.info('Got error while adding to cart from API, falling back to DOM');
+
+        const selectedSize = await page.evaluate((sizeStr) => {
+          const sizeButtons = Array.from(document.querySelectorAll('div[data-auto-id="size-selector"] button'));
+          const sizeButton = sizeButtons.find((button) => button.innerText === sizeStr);
+          if (sizeButton) {
+            sizeButton.click();
+            return true;
+          }
+          return false;
+        }, size);
+
+        if (selectedSize) {
+          await page.waitForTimeout(2 * 1000);
+
+          const atcButtonSelector = 'button[title="Add To Bag"]';
+          await page.waitForSelector(atcButtonSelector);
+          await page.click(atcButtonSelector);
+          taskLogger.info('Selected size from DOM');
+
+          const modal = await page.waitForSelector('div.gl-modal', { visible: true });
+          isInCart = await modal.$eval('h5', (heading) => /SUCCESSFULLY ADDED TO BAG!/i.test(heading.innerText));
+          taskLogger.info('Found success modal, continuing to checkout');
+        }
+      }
     }
 
     let checkoutComplete = false;

@@ -189,10 +189,26 @@ async function checkout({
   }
 }
 
+async function searchByProductCode({ taskLogger, page, productCode }) {
+  taskLogger.info('Searching for product by product code');
+  let searchResult;
+  while (!searchResult) {
+    await page.goto(`https://www.nike.com/w?q=${productCode}&vst=${productCode}`, { waitUntil: 'domcontentloaded' });
+    try {
+      searchResult = await page.waitForSelector('.product-grid .product-card__link-overlay', { timeout: 5 * 1000 });
+    } catch (err) {
+      // no-op
+    }
+  }
+  taskLogger.info('Found search result, clicking');
+  await searchResult.click();
+}
+
 exports.guestCheckout = async ({
   taskLogger,
   page,
   url,
+  productCode,
   proxyString,
   styleIndex,
   size,
@@ -203,8 +219,13 @@ exports.guestCheckout = async ({
 }) => {
   try {
     await useProxy(page, proxyString);
-    taskLogger.info('Navigating to URL');
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
+
+    if (productCode) {
+      await searchByProductCode({ taskLogger, page, productCode });
+    } else {
+      taskLogger.info('No product code supplied, navigating to URL');
+      await page.goto(url, { waitUntil: 'domcontentloaded' });
+    }
 
     let isInCart = false;
     let checkoutComplete = false;

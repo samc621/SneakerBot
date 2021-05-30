@@ -263,10 +263,43 @@ async function closeModal({ taskLogger, page }) {
   }
 }
 
+async function searchByProductCode({
+  taskLogger,
+  page,
+  productCode,
+  domain
+}) {
+  taskLogger.info('Searching for product by product code');
+  let searchResult;
+  while (!searchResult) {
+    await page.goto(`${domain}/search?query=${productCode}`, { waitUntil: 'domcontentloaded' });
+    await Promise.all([
+      (async () => {
+        try {
+          searchResult = await page.waitForSelector('.SearchResults .ProductCard a.ProductCard-link', { timeout: 5 * 1000 });
+          taskLogger.info('Found search result, clicking');
+          await searchResult.click();
+        } catch (err) {
+          // no-op
+        }
+      })(),
+      (async () => {
+        try {
+          searchResult = await page.waitForSelector('#ProductDetails', { timeout: 5 * 1000 });
+          taskLogger.info('Navigated to product details page');
+        } catch (err) {
+          // no-op
+        }
+      })()
+    ]);
+  }
+}
+
 exports.guestCheckout = async ({
   taskLogger,
   page,
   url,
+  productCode,
   proxyString,
   styleIndex,
   size,
@@ -284,17 +317,21 @@ exports.guestCheckout = async ({
     let hasCaptcha = false;
     let checkoutComplete = false;
 
-    taskLogger.info('Navigating to URL');
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    const domain = url.split('/').slice(0, 3).join('/');
 
-    await Promise.race([
-      async () => {
-        await page.waitForTimeout(7000);
-        taskLogger.info('Refreshing page');
-        await page.reload({ waitUntil: ['domcontentloaded'] });
-      },
-      await closeModal({ taskLogger, page })
-    ]);
+    closeModal({ taskLogger, page });
+
+    if (productCode) {
+      await searchByProductCode({
+        taskLogger,
+        page,
+        productCode,
+        domain
+      });
+    } else {
+      taskLogger.info('No product code supplied, navigating to URL');
+      await page.goto(url, { waitUntil: 'domcontentloaded' });
+    }
 
     while (!isInCart && !hasCaptcha) {
       if (page.url() !== url) {
@@ -326,11 +363,36 @@ exports.guestCheckout = async ({
 
       const captchaIframeSelector = 'iframe#dataDomeCaptcha';
       const captchaSelector = 'div.g-recaptcha';
-      try {
-        hasCaptcha = await page.waitForSelector(captchaIframeSelector);
-      } catch (err) {
-        // no-op if timeout occurs
-      }
+      const cartSelector = 'span.CartCount-badge';
+
+      await Promise.race([
+        (async () => {
+          try {
+            hasCaptcha = await page.waitForSelector(captchaIframeSelector, { timeout: 10 * 1000 });
+          } catch (err) {
+            // no-op if timeout occurs
+          }
+        })(),
+        (async () => {
+          try {
+            await page.waitForSelector(cartSelector, { timeout: 5 * 1000 });
+          } catch (err) {
+            taskLogger.info('Retrying clicking ATC button');
+            await page.click(atcButtonSelector);
+            await page.waitForTimeout(2000);
+          }
+
+          taskLogger.info('Checking if ATC was successful');
+          const cartCount = await page.evaluate((cartTextSelector) => {
+            const elem = document.querySelector(cartTextSelector);
+            return (elem && elem.innerText) || '0';
+          }, cartSelector);
+
+          if (parseInt(cartCount) === 1) {
+            isInCart = true;
+          }
+        })()
+      ]);
 
       if (hasCaptcha) {
         if (autoSolveCaptchas) {
@@ -339,6 +401,7 @@ exports.guestCheckout = async ({
           });
           if (solved) hasCaptcha = false;
         } else {
+          taskLogger.info('Detected captcha for manual solving');
           const recipient = notificationEmailAddress;
           const subject = 'Checkout task unsuccessful';
           const text = `The checkout task for ${url} size ${size} has a captcha. Please open the browser and complete it within 5 minutes.`;
@@ -358,17 +421,6 @@ exports.guestCheckout = async ({
 
         await page.waitForTimeout(2000);
         taskLogger.info('Need to restart task');
-        continue;
-      }
-
-      const cartSelector = 'span.CartCount-badge';
-      await page.waitForSelector(cartSelector);
-      const cartCount = await page.evaluate((cartTextSelector) => {
-        return document.querySelector(cartTextSelector).innerText;
-      }, cartSelector);
-
-      if (parseInt(cartCount) === 1) {
-        isInCart = true;
       }
     }
 

@@ -5,6 +5,7 @@ module.exports = {
     body: Joi.object({
       site_id: Joi.number().integer().required(),
       url: Joi.string().required(),
+      product_code: Joi.string().allow(null).optional(),
       style_index: Joi.number().integer().allow(null).optional(),
       size: Joi.string().allow(null).optional(),
       shipping_speed_index: Joi.number().integer().allow(null).optional(),
@@ -35,6 +36,7 @@ module.exports = {
     body: Joi.object({
       site_id: Joi.number().integer().optional(),
       url: Joi.string().optional(),
+      product_code: Joi.string().optional(),
       style_index: Joi.number().integer().allow(null).optional(),
       size: Joi.string().allow(null).optional(),
       shipping_speed_index: Joi.number().integer().allow(null).optional(),
