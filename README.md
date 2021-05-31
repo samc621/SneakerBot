@@ -8,17 +8,11 @@ This bot uses Node.js and Puppeteer to automate the checkout on various sneaker 
 4. Nike.com
 5. Supreme
 
-## Project Status
+## About this project
 
 This bot was made by developers, for developers. It is not a commercial product, it is a free and open source software. Thus, it may not be suitable for those with little or no software engineering experience.
 
 The developers of this software should not be held liable for any lost opportunities resulting from its usage.
-
-At this time, I would consider the software stable, but in need of some specific feature development. It can perform an add to cart and checkout task on the aforementioned sites, including automatic bypassing of captchas, however it does not handle link-monitoring or site-specific queues. These are features that are in research & development, and I would also like to receive intel and possibly even code contributions on.
-
-Essentially, each task the bot runs requires a product URL, so if you are unable to obtain the URL until release time, you may not be able to start the task in time.
-
-Please feel free to contact me about this using my Telegram below. You may open an Issue or contact me about any other concerns, but please carefully read below before doing so.
 
 ## Prerequisites
 
