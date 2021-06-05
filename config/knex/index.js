@@ -1,6 +1,6 @@
 let knex = require('knex');
 
-const environment = process.env.NODE_ENV || 'development';
+const environment = process.env.NODE_ENV || 'local';
 const configuration = require('../../knexfile')[environment];
 knex = require('knex')(configuration);
 
