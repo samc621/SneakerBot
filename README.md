@@ -27,7 +27,7 @@ View the [documentation](https://www.postgresql.org/docs/9.0/sql-createdatabase.
 
 ## Configure environment variables
 
-Make a copy of the `.env.example` file, replacing `example` with the name of your `NODE_ENV` e.g. `local` or `development`.
+Make a copy of the `.env.example` file, replacing `example` with the name of your `NODE_ENV` e.g. `.env.local` or `.env.development`.
 
 When you're ready, declare the environment name with:
 
@@ -35,7 +35,7 @@ When you're ready, declare the environment name with:
 
 ### How to populate the .env file
 
-1. `PORT` is the port that the Node/Express API server will run on. You can use any TCP/UDP port (0-65535) that is unused by another service e.g. Postgres on 5432.
+1. `PORT` is the port that the Node/Express API server will run on, *defaults to 8080*. You can use any TCP/UDP port (0-65535) that is unused by another service e.g. Postgres on 5432.
 2. `DB_USERNAME` and `DB_PASSWORD` is the username/password combo for the Postgres user you created (see documentation above for assistance).
 3. `DB_NAME` is the name of the Postgres database you created.
 4. `DB_PORT` and `DB_HOST` are the Postgres defaults, `5432` and `localhost`, respectively.
@@ -59,6 +59,8 @@ When starting a task, you can optionally specify the card you want to use via it
 `$ npm install`
 
 ## Run the DB migrations
+
+> You may need to include `npx` at the start of the commands
 
 `$ knex migrate:latest`
 
