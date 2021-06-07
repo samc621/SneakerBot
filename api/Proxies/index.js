@@ -1,5 +1,6 @@
 const express = require('express');
 const { validate } = require('express-validation');
+const { validationRules, validationHandler } = require('./validation');
 
 const router = express.Router();
 
@@ -16,17 +17,17 @@ const {
   findAll,
   update,
   deleted
-} = require('./validation');
+} = validationRules;
 
 router
   .route('/')
-  .post(validate(create), createProxy)
-  .get(validate(findAll), getProxies);
+  .post(validate(create), createProxy, validationHandler)
+  .get(validate(findAll), getProxies, validationHandler);
 
 router
   .route('/:id')
-  .get(validate(findOne), getProxy)
-  .patch(validate(update), updateProxy)
-  .delete(validate(deleted), deleteProxy);
+  .get(validate(findOne), getProxy, validationHandler)
+  .patch(validate(update), updateProxy, validationHandler)
+  .delete(validate(deleted), deleteProxy, validationHandler);
 
 module.exports = router;
