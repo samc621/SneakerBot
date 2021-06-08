@@ -21,13 +21,13 @@ const {
 
 router
   .route('/')
-  .post(validate(create), createProxy, validationHandler)
-  .get(validate(findAll), getProxies, validationHandler);
+  .post(validate(create), validationHandler, createProxy)
+  .get(validate(findAll), validationHandler, getProxies);
 
 router
   .route('/:id')
-  .get(validate(findOne), getProxy, validationHandler)
-  .patch(validate(update), updateProxy, validationHandler)
-  .delete(validate(deleted), deleteProxy, validationHandler);
+  .get(validate(findOne), validationHandler, getProxy)
+  .patch(validate(update), validationHandler, updateProxy)
+  .delete(validate(deleted), validationHandler, deleteProxy);
 
 module.exports = router;

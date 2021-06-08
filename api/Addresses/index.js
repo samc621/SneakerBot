@@ -21,13 +21,13 @@ const {
 
 router
   .route('/')
-  .post(validate(create), createAddress, validationHandler)
-  .get(validate(findAll), getAddresses, validationHandler);
+  .post(validate(create), validationHandler, createAddress)
+  .get(validate(findAll), validationHandler, getAddresses);
 
 router
   .route('/:id')
-  .get(validate(findOne), getAddress, validationHandler)
-  .patch(validate(update), updateAddress, validationHandler)
-  .delete(validate(deleted), deleteAddress, validationHandler);
+  .get(validate(findOne), validationHandler, getAddress)
+  .patch(validate(update), validationHandler, updateAddress)
+  .delete(validate(deleted), validationHandler, deleteAddress);
 
 module.exports = router;

@@ -23,17 +23,17 @@ const {
 
 router
   .route('/')
-  .post(validate(create), createTask, validationHandler)
-  .get(validate(findAll), getTasks, validationHandler);
+  .post(validate(create), validationHandler, createTask)
+  .get(validate(findAll), validationHandler, getTasks);
 
 router
   .route('/:id/start')
-  .post(validate(start), startTask, validationHandler);
+  .post(validate(start), validationHandler, startTask);
 
 router
   .route('/:id')
-  .get(validate(findOne), getTask, validationHandler)
-  .patch(validate(update), updateTask, validationHandler)
-  .delete(validate(deleted), deleteTask, validationHandler);
+  .get(validate(findOne), validationHandler, getTask)
+  .patch(validate(update), validationHandler, updateTask)
+  .delete(validate(deleted), validationHandler, deleteTask);
 
 module.exports = router;
