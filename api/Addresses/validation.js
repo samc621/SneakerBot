@@ -1,17 +1,8 @@
 const { ValidationError, Joi } = require('express-validation');
-const response = require('../../helpers/server-response');
-
-const validationHandler = (err, req, res, next) => {
-  console.error(JSON.stringify(err));
-  if (err instanceof ValidationError) {
-    return response.BadRequest(res, err.message, err.details);
-  }
-
-  return response.InternalServerError(res, err.message);
-};
+const { genericValidationHandler } = require('../../helpers/validation-handler');
 
 module.exports = {
-  validationHandler,
+  validationHandler: genericValidationHandler,
   validationRules: {
     create: {
       body: Joi.object({
