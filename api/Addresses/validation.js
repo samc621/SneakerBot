@@ -1,4 +1,4 @@
-const { ValidationError, Joi } = require('express-validation');
+const { Joi } = require('express-validation');
 const { genericValidationHandler } = require('../../helpers/validation-handler');
 
 module.exports = {
