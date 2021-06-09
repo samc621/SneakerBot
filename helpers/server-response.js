@@ -1,6 +1,6 @@
 exports.Ok = (res, message, data) => res.status(200).json({ success: true, message, data });
 
-exports.BadRequest = (res, message) => res.status(400).json({ success: false, message, data: {} });
+exports.BadRequest = (res, message, data) => res.status(400).json({ success: false, message, data });
 
 exports.Unauthorized = (res, message) => res.status(401).json({ success: false, message, data: {} });
 
