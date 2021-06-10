@@ -7,7 +7,8 @@
     "start": "node ./app.js",
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
-    "knex": "knex"
+    "knex": "knex",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -38,5 +39,8 @@
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
     "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "jest": "^27.0.4"
   }
 }
