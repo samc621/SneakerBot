@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
     "knex": "knex",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "repository": {
     "type": "git",
