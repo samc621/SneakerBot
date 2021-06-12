@@ -8,9 +8,8 @@ function connectToDB(retries = 5) {
   if (retries > 0) {
     knex.raw('select 1+1 as result').catch((err) => {
       console.error("Couldn't connect to DB", err);
-      retries -= 1;
       console.error(`Retries left: ${retries}`);
-      setTimeout(connectToDB, 5000, retries);
+      setTimeout(connectToDB, 5000, retries - 1);
     });
   }
 }

@@ -1,7 +1,7 @@
 const { ValidationError } = require('express-validation');
-const { BadRequest, InternalServerError } = require('../helpers/server-response');
+const { BadRequest, InternalServerError } = require('./server-response');
 
-const genericValidationHandler = (err, req, res, next) => {
+const genericValidationHandler = (err, req, res) => {
   console.error(JSON.stringify(err));
   if (err instanceof ValidationError) {
     return BadRequest(res, err.message, err.details);
@@ -12,4 +12,4 @@ const genericValidationHandler = (err, req, res, next) => {
 
 module.exports = {
   genericValidationHandler
-}
+};
