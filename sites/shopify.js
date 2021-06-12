@@ -1,4 +1,3 @@
-const useProxy = require('puppeteer-page-proxy');
 const { solveCaptcha } = require('../helpers/captcha');
 const { sendEmail } = require('../helpers/email');
 const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
@@ -261,7 +260,6 @@ exports.guestCheckout = async ({
   taskLogger,
   page,
   url,
-  proxyString,
   size,
   shippingAddress,
   shippingSpeedIndex,
@@ -273,7 +271,6 @@ exports.guestCheckout = async ({
   try {
     const domain = url.split('/').slice(0, 3).join('/');
 
-    await useProxy(page, proxyString);
     taskLogger.info('Navigating to URL');
     await page.goto(url, { waitUntil: 'domcontentloaded' });
 

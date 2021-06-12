@@ -1,4 +1,3 @@
-const useProxy = require('puppeteer-page-proxy');
 const { solveCaptcha } = require('../helpers/captcha');
 const { sendEmail } = require('../helpers/email');
 const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
@@ -300,7 +299,6 @@ exports.guestCheckout = async ({
   page,
   url,
   productCode,
-  proxyString,
   styleIndex,
   size,
   shippingAddress,
@@ -311,8 +309,6 @@ exports.guestCheckout = async ({
   cardFriendlyName
 }) => {
   try {
-    await useProxy(page, proxyString);
-
     let isInCart = false;
     let hasCaptcha = false;
     let checkoutComplete = false;
