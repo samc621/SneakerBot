@@ -1,4 +1,3 @@
-const useProxy = require('puppeteer-page-proxy');
 const { solveCaptcha } = require('../helpers/captcha');
 const { sendEmail } = require('../helpers/email');
 const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
@@ -74,6 +73,7 @@ async function enterAddressDetails({ page, address }) {
 async function checkout({
   taskLogger,
   page,
+  domain,
   shippingAddress,
   shippingSpeedIndex,
   billingAddress,
@@ -92,7 +92,7 @@ async function checkout({
     }
 
     taskLogger.info('Navigating to checkout page');
-    await page.goto('https://footlocker.com/checkout', { waitUntil: 'domcontentloaded' });
+    await page.goto(`${domain}/checkout`, { waitUntil: 'domcontentloaded' });
 
     const firstNameSelector = 'input[name="firstName"]';
     const lastNameSelector = 'input[name="lastName"]';
@@ -300,7 +300,6 @@ exports.guestCheckout = async ({
   page,
   url,
   productCode,
-  proxyString,
   styleIndex,
   size,
   shippingAddress,
@@ -311,8 +310,6 @@ exports.guestCheckout = async ({
   cardFriendlyName
 }) => {
   try {
-    await useProxy(page, proxyString);
-
     let isInCart = false;
     let hasCaptcha = false;
     let checkoutComplete = false;
@@ -339,22 +336,29 @@ exports.guestCheckout = async ({
       }
 
       // using timeout 0 in case we are caught in queue...will wait for the selector to appear
+      taskLogger.info('Selecting style');
       const stylesSelector = 'div.c-form-field.c-form-field--radio.SelectStyle.col';
       await page.waitForSelector(stylesSelector, { timeout: 0 });
       const styles = await page.$$(stylesSelector);
       await styles[styleIndex].click();
+      taskLogger.info('Selected style');
+      await page.waitForTimeout(2000);
 
+      taskLogger.info('Selecting size');
       const sizesSelector = 'div.c-form-field.c-form-field--radio.ProductSize';
       await page.waitForSelector(sizesSelector);
-      const sizes = await page.$$(sizesSelector);
-      for (let i = 0; i < sizes.length; i += 1) {
-        const sizeValue = await sizes[i].$eval('input', (el) => el.getAttribute('value'));
-        const parsedSize = Number.isNaN(size) ? sizeValue : Number(sizeValue);
-        if (parsedSize === (Number.isNaN(size) ? size : Number(size))) {
-          await sizes[i].click();
-          break;
+      await page.waitForFunction(({ selector, sizeStr }) => {
+        const sizeDivs = Array.from(document.querySelectorAll(selector));
+        const matchingSizeDiv = sizeDivs.find((el) => new RegExp(sizeStr, 'i').test(el.innerText));
+        const matchingSizeInput = matchingSizeDiv && matchingSizeDiv.querySelector('input');
+        if (matchingSizeInput) {
+          matchingSizeInput.click();
+          return true;
         }
-      }
+        return false;
+      }, {}, { selector: sizesSelector, sizeStr: size });
+      taskLogger.info('Selected size');
+      await page.waitForTimeout(2000);
 
       const atcButtonSelector = 'button.Button.Button.ProductDetails-form__action';
       await page.waitForSelector(atcButtonSelector, { timeout: 0 });
@@ -426,7 +430,7 @@ exports.guestCheckout = async ({
 
     if (isInCart) {
       await checkout({
-        taskLogger, page, shippingAddress, shippingSpeedIndex, billingAddress, cardFriendlyName
+        taskLogger, page, domain, shippingAddress, shippingSpeedIndex, billingAddress, cardFriendlyName
       });
 
       const cartSelector = 'span.CartCount-badge';

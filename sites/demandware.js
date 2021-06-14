@@ -1,4 +1,3 @@
-const useProxy = require('puppeteer-page-proxy');
 const { getStateNameFromAbbreviation } = require('../helpers/states');
 const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
 
@@ -259,7 +258,6 @@ exports.guestCheckout = async ({
   page,
   url,
   productCode,
-  proxyString,
   size,
   shippingAddress,
   shippingSpeedIndex,
@@ -280,8 +278,6 @@ exports.guestCheckout = async ({
         }
       });
     });
-
-    await useProxy(page, proxyString);
 
     closeModal({ taskLogger, page });
 

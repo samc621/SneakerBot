@@ -1,4 +1,3 @@
-const useProxy = require('puppeteer-page-proxy');
 const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
 
 async function enterAddressDetails({ page, address }) {
@@ -209,7 +208,6 @@ exports.guestCheckout = async ({
   page,
   url,
   productCode,
-  proxyString,
   styleIndex,
   size,
   shippingAddress,
@@ -218,8 +216,6 @@ exports.guestCheckout = async ({
   cardFriendlyName
 }) => {
   try {
-    await useProxy(page, proxyString);
-
     if (productCode) {
       await searchByProductCode({ taskLogger, page, productCode });
     } else {
@@ -230,15 +226,59 @@ exports.guestCheckout = async ({
     let isInCart = false;
     let checkoutComplete = false;
     while (!isInCart) {
+      // const productsPromise = new Promise((resolve) => {
+      //   page.on('response', async (response) => {
+      //     if (response.request().method() === 'POST' && new URL(response.url()).pathname.endsWith('/products')) {
+      //       const responseJson = await response.json();
+      //       if (responseJson && responseJson.products) {
+      //         resolve(responseJson);
+      //       }
+      //     }
+      //   });
+      // });
+
       try {
         const stylesSelector = 'a.colorway-product-overlay';
         await page.waitForSelector(stylesSelector);
         const styles = await page.$$(stylesSelector);
         await styles[styleIndex].click();
+        taskLogger.info('Selected style by index');
         await page.waitForTimeout(2000);
       } catch (err) {
         // no op if timeout waiting for style selector
       }
+
+      // taskLogger.info('Waiting for products response');
+      // const responseJson = await productsPromise;
+      // taskLogger.info('Found products response');
+      // const skuObj = responseJson.products[0].skuData.find((data) => data.size === size);
+      // const { sku } = skuObj;
+
+      // taskLogger.info('Attempting to add product to cart');
+      // isInCart = await page.evaluate(async ({
+      //   pathname, skuId
+      // }) => {
+      //   const data = {
+      //     method: 'PATCH',
+      //     headers: {
+      //       Accept: 'application/json',
+      //       'Content-Type': 'application/json'
+      //     },
+      //     body: JSON.stringify([{
+      //       op: 'add',
+      //       path: '/items',
+      //       value: {
+      //         itemData: { url: pathname },
+      //         quantity: 1,
+      //         skuId
+      //       }
+      //     }])
+      //   };
+      //   const response = await fetch('https://api.nike.com/buy/carts/v2/US/NIKE/NIKECOM?modifiers=VALIDATELIMITS,VALIDATEAVAILABILITY', data);
+      //   return response.ok;
+      // }, {
+      //   pathname: new URL(page.url()).pathname, skuId: sku
+      // });
 
       // sizes on Nike must be entered in US size, even if on a international site e.g. Nike EU
       const sizesSelector = 'div.mt2-sm div input, div.mt4 div input';

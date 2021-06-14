@@ -16,6 +16,17 @@ puppeteer.use(StealthPlugin());
 
 class PuppeteerCluster {
   static async build() {
+    const proxies = await new Proxy().find({ has_been_used: false });
+    const validProxy = proxies.find(async (proxy) => {
+      const proxyString = createProxyString(proxy);
+      if (await testProxy(proxyString)) {
+        await new Proxy(proxy.id).update({ has_been_used: true });
+        return true;
+      }
+      return false;
+    });
+    const proxy = validProxy ? createProxyString(validProxy) : null;
+
     const puppeteerOptions = {
       headless: false,
       defaultViewport: null,
@@ -28,6 +39,9 @@ class PuppeteerCluster {
     };
     if (process.env.NODE_ENV === 'docker') {
       puppeteerOptions.executablePath = '/usr/bin/google-chrome-stable';
+    }
+    if (proxy) {
+      puppeteerOptions.args.push(`--proxy-server=${proxy}`);
     }
     const cluster = await Cluster.launch({
       puppeteer,
@@ -60,19 +74,14 @@ class PuppeteerCluster {
 
         taskLogger = new Logger().startTaskLogger(id);
 
-        const proxies = await new Proxy().find({ has_been_used: false });
-
-        const validProxy = proxies.find(async (proxy) => {
-          const proxyString = createProxyString(proxy);
-          if (await testProxy(proxyString)) {
-            await new Proxy(proxy.id).update({ has_been_used: true });
-            return true;
-          }
-          return false;
-        });
-        const proxy = validProxy ? createProxyString(validProxy) : null;
         if (proxy) {
-          taskLogger.info('Using proxy', proxy);
+          const { username, password } = validProxy;
+          let credentials = null;
+          if (username || password) {
+            credentials = { username, password };
+          }
+          await page.authenticate(credentials);
+          taskLogger.info(`Using proxy: ${proxy}`);
         }
 
         const shippingAddress = await new Address().findOne({
