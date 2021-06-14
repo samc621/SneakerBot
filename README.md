@@ -31,7 +31,11 @@ Make a copy of the `.env.example` file, replacing `example` with the name of you
 
 When you're ready, declare the environment name with:
 
+### Linux/Mac
 `$ export NODE_ENV=local`
+
+### Windows
+`$ set NODE_ENV=local`
 
 ### How to populate the .env file
 
