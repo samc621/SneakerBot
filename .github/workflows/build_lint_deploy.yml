@@ -15,8 +15,6 @@ jobs:
         run: npm install
       - name: Run ESLint
         run: npm run lint
-      - name: Set NODE_ENV
-        run: export NODE_ENV=local
       - name: Run tests
         run: npm test       
   deploy:
