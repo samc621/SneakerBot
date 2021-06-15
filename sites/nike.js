@@ -284,6 +284,7 @@ exports.guestCheckout = async ({
       const sizesSelector = 'div.mt2-sm div input, div.mt4 div input';
       // using timeout 0 in case we are waiting for product drop and then sizes are enabled
       await page.waitForSelector(sizesSelector, { timeout: 0 });
+      taskLogger.info('Selecting size');
       await page.evaluate((sizesSelectorText, sizeValue) => {
         const sizes = Array.from(document.querySelectorAll(sizesSelectorText));
         const matchingSize = sizes.find((sz) => sz.value.endsWith(sizeValue));
@@ -294,6 +295,7 @@ exports.guestCheckout = async ({
 
       const atcButtonSelector = 'button.add-to-cart-btn';
       await page.waitForSelector(atcButtonSelector);
+      taskLogger.info('Clicking add to cart button');
       await page.evaluate((atcButtonSelectorText) => {
         const button = document.querySelector(atcButtonSelectorText);
         if (button) {

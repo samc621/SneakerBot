@@ -143,6 +143,7 @@ async function checkout({
     await page.click(orderTermsCheckboxSelector);
     await page.waitForTimeout(5000);
 
+    taskLogger.info('Clicking submit order button');
     await page.waitForSelector(submitButtonsSelector);
     await page.click(submitButtonsSelector);
     await page.waitForTimeout(5000);
@@ -223,6 +224,7 @@ exports.guestCheckout = async ({
 
     let isInCart = false;
     while (!isInCart) {
+      taskLogger.info('Attempting to add product to cart');
       await page.evaluate((sizeStr) => {
         const form = document.querySelector('div#cctrl form#cart-addf');
 

@@ -195,6 +195,7 @@ async function checkout({
     });
     await page.waitForTimeout(2000);
 
+    taskLogger.info('Clicking place order button');
     await page.waitForSelector(placeOrderButtonsSelector);
     await page.click(placeOrderButtonsSelector);
     await page.waitForTimeout(5000);

@@ -241,6 +241,7 @@ async function checkout({
       // no-op if timeout occurs
     }
 
+    taskLogger.info('Clicking submit order button');
     await page.waitForSelector(submitButtonsSelector);
     await page.click(submitButtonsSelector);
     await page.waitForTimeout(5000);
@@ -281,6 +282,7 @@ exports.guestCheckout = async ({
 
     let isInCart = false;
     while (!isInCart) {
+      taskLogger.info('Attempting to add product to cart');
       isInCart = await page.evaluate(async (id) => {
         const item = { id, quantity: 1 };
 

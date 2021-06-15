@@ -241,6 +241,7 @@ async function checkout({
     await billingAddressSubmitButtonSelector[4].click();
     await page.waitForTimeout(2000);
 
+    taskLogger.info('Clicking order submit button');
     const orderSubmitButtonSelector = await page.$$(submitButtonsSelector);
     await orderSubmitButtonSelector[2].click();
     await page.waitForTimeout(5000);
