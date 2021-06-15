@@ -1,7 +1,7 @@
-name: build, lint, deploy
+name: build, lint, test, deploy
 on: push
 jobs:
-  build-and-lint:
+  build-lint-test:
     name: Build and lint
     runs-on: ubuntu-latest
     steps:
@@ -14,7 +14,11 @@ jobs:
       - name: Install modules
         run: npm install
       - name: Run ESLint
-        run: npm run lint  
+        run: npm run lint
+      - name: Set NODE_ENV
+        run: export NODE_ENV=local
+      - name: Run tests
+        run: npm test       
   deploy:
     if: github.ref == 'refs/heads/master'
     name: Push Docker image to Docker Hub
