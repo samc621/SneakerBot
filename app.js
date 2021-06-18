@@ -3,7 +3,6 @@ const pg = require('pg');
 
 const app = express();
 const routes = require('./routes');
-require('dotenv-flow').config();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
