@@ -2,7 +2,8 @@ let knex = require('knex');
 
 const environment = process.env.NODE_ENV || 'local';
 const configuration = require('../../knexfile')[environment];
-knex = require('knex')(configuration);
+
+knex = knex(configuration);
 
 function connectToDB(retries = 5) {
   if (retries > 0) {
