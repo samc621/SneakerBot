@@ -10,7 +10,8 @@ const {
   getTasks,
   updateTask,
   deleteTask,
-  startTask
+  startTask,
+  stopTask
 } = require('./controller');
 
 const {
@@ -19,7 +20,8 @@ const {
   findAll,
   update,
   deleted,
-  start
+  start,
+  stop
 } = validationRules;
 
 router
@@ -30,6 +32,10 @@ router
 router
   .route('/:id/start')
   .post(validate(start), validationHandler, startTask);
+
+router
+  .route('/:id/stop')
+  .post(validate(stop), validationHandler, stopTask);
 
 router
   .route('/:id')

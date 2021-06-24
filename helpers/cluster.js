@@ -10,6 +10,7 @@ const { testProxy, createProxyString } = require('./proxies');
 const { sendEmail } = require('./email');
 const { sendWebhookEvent } = require('./webhook');
 const Logger = require('./logger');
+const { storePageInTaskCache } = require('./task-cache');
 
 const sites = require('../sites');
 
@@ -74,6 +75,7 @@ class PuppeteerCluster {
         } = task;
 
         taskLogger = new Logger().startTaskLogger(id);
+        storePageInTaskCache({ taskId, page });
 
         if (proxy) {
           const { username, password } = validProxy;

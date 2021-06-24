@@ -1,6 +1,7 @@
 const Task = require('./model');
 const PuppeteerCluster = require('../../helpers/cluster');
 const response = require('../../helpers/server-response');
+const { removePageFromTaskCache } = require('../../helpers/task-cache');
 
 let cluster;
 (async () => {
@@ -74,6 +75,18 @@ exports.startTask = async (req, res) => {
     const task = cluster.queue({ taskId: id, cardFriendlyName: card_friendly_name });
 
     return response.Ok(res, 'Task successfully started', task);
+  } catch (err) {
+    console.error(err.message);
+    return response.InternalServerError(res, err.message);
+  }
+};
+
+exports.stopTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await removePageFromTaskCache({ taskId: id });
+
+    return response.Ok(res, 'Task successfully stopped', {});
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);

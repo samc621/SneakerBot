@@ -164,6 +164,10 @@ You may start a task via `POST /v1/tasks/:id/start` or use the `start-task.js` s
 
 `$ TASK_ID=<TASK_ID> CARD_FRIENDLY_NAME=<CARD_FRIENDLY_NAME> node ./scripts/start-task.js`
 
+## Stop a Task
+
+You may stop a task that has run too long via `POST /v1/tasks/:id/stop`
+
 ## Captcha Solving
 
 This bot enables manual and automatic (via [2Captcha](https://2captcha.com)) solving of captchas.
