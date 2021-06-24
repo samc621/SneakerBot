@@ -164,7 +164,7 @@ You may start a task via `POST /v1/tasks/:id/start` or use the `start-task.js` s
 
 `$ TASK_ID=<TASK_ID> CARD_FRIENDLY_NAME=<CARD_FRIENDLY_NAME> node ./scripts/start-task.js`
 
-## Stop a Task
+## Stopping a Task
 
 You may stop a task that has run too long via `POST /v1/tasks/:id/stop`
 
