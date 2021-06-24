@@ -6,7 +6,7 @@ exports.storePageInTaskCache = ({ taskId, page }) => {
 
 exports.retrievePageFromTaskCache = ({ taskId }) => {
   const page = taskCache[taskId];
-  return page || {};
+  return page || undefined;
 };
 
 exports.removePageFromTaskCache = async ({ taskId }) => {
