@@ -8,7 +8,9 @@ const Address = require('../api/Addresses/model');
 
 const { testProxy, createProxyString } = require('./proxies');
 const { sendEmail } = require('./email');
+const { sendWebhookEvent } = require('./webhook');
 const Logger = require('./logger');
+const { storePageInTaskCache } = require('./task-cache');
 
 const sites = require('../sites');
 
@@ -73,6 +75,7 @@ class PuppeteerCluster {
         } = task;
 
         taskLogger = new Logger().startTaskLogger(id);
+        storePageInTaskCache({ taskId, page });
 
         if (proxy) {
           const { username, password } = validProxy;
@@ -121,6 +124,14 @@ class PuppeteerCluster {
           text = `The checkout task for ${url} size ${size} has completed.`;
         }
         await sendEmail({ recipient, subject, text });
+
+        const webhookPayload = {
+          taskId,
+          checkoutComplete,
+          message: text
+        };
+        await sendWebhookEvent(webhookPayload);
+
         taskLogger.info(text);
 
         if (!checkoutComplete) {

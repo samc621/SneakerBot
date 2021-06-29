@@ -32,14 +32,16 @@ Make a copy of the `.env.example` file, replacing `example` with the name of you
 When you're ready, declare the environment name with:
 
 ### Linux/Mac
+
 `$ export NODE_ENV=local`
 
 ### Windows
+
 `$ set NODE_ENV=local`
 
 ### How to populate the .env file
 
-1. `PORT` is the port that the Node/Express API server will run on, *defaults to 8080*. You can use any TCP/UDP port (0-65535) that is unused by another service e.g. Postgres on 5432.
+1. `PORT` is the port that the Node/Express API server will run on, _defaults to 8080_. You can use any TCP/UDP port (0-65535) that is unused by another service e.g. Postgres on 5432.
 2. `DB_USERNAME` and `DB_PASSWORD` is the username/password combo for the Postgres user you created (see documentation above for assistance).
 3. `DB_NAME` is the name of the Postgres database you created.
 4. `DB_PORT` and `DB_HOST` are the Postgres defaults, `5432` and `localhost`, respectively.
@@ -142,11 +144,29 @@ If using with adidas.com, be sure to include the full site path e.g. https://www
 
 Feel free to check the new [example](https://documenter.getpostman.com/view/5027621/TVt2c3ed#d55d7ad1-7126-4663-9fa1-fdc2220615d4) "with product code" under the POST /tasks API.
 
+### UPDATE (as of 06/24/2021)
+
+You can now specify a `WEBHOOK_ENDPOINT` in your `.env` file for receiving webhook events (over HTTP/HTTPS) about task status.
+
+When a task is done processing, a `POST` request will be sent to the supplied URL with the following data:
+
+```
+{
+    taskId: integer,
+    checkoutComplete: true/false,
+    message: Some text about the task status, the same message is sent via email
+}
+```
+
 ## Starting a Task
 
 You may start a task via `POST /v1/tasks/:id/start` or use the `start-task.js` script like:
 
 `$ TASK_ID=<TASK_ID> CARD_FRIENDLY_NAME=<CARD_FRIENDLY_NAME> node ./scripts/start-task.js`
+
+## Stopping a Task
+
+You may stop a task that has run too long via `POST /v1/tasks/:id/stop`
 
 ## Captcha Solving
 
