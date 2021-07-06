@@ -35,9 +35,11 @@
     "puppeteer": "^10.0.0",
     "puppeteer-cluster": "^0.22.0",
     "puppeteer-extra": "^3.1.18",
+    "puppeteer-extra-plugin-anonymize-ua": "^2.2.17",
     "puppeteer-extra-plugin-stealth": "^2.7.8",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
+    "user-agents": "^1.0.705",
     "winston": "^3.3.3"
   },
   "devDependencies": {
