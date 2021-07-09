@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { Cluster } = require('puppeteer-cluster');
+const proxyChain = require('proxy-chain');
 
 const Task = require('../api/Tasks/model');
 const Proxy = require('../api/Proxies/model');
@@ -28,6 +29,10 @@ class PuppeteerCluster {
       return false;
     });
     const proxy = validProxy ? createProxyString(validProxy) : null;
+    let newProxyUrl;
+    if (proxy) {
+      newProxyUrl = await proxyChain.anonymizeProxy(proxy);
+    }
 
     const puppeteerOptions = {
       headless: false,
@@ -42,8 +47,8 @@ class PuppeteerCluster {
     if (process.env.NODE_ENV === 'docker') {
       puppeteerOptions.executablePath = '/usr/bin/google-chrome-stable';
     }
-    if (proxy) {
-      puppeteerOptions.args.push(`--proxy-server=${proxy}`);
+    if (newProxyUrl) {
+      puppeteerOptions.args.push(`--proxy-server=${newProxyUrl}`);
     }
     const cluster = await Cluster.launch({
       puppeteer,
@@ -77,14 +82,8 @@ class PuppeteerCluster {
         taskLogger = new Logger().startTaskLogger(id);
         storePageInTaskCache({ taskId, page });
 
-        if (proxy) {
-          const { username, password } = validProxy;
-          let credentials = null;
-          if (username || password) {
-            credentials = { username, password };
-          }
-          await page.authenticate(credentials);
-          taskLogger.info(`Using proxy: ${proxy}`);
+        if (newProxyUrl) {
+          taskLogger.info(`Using anonymized proxy URL: ${newProxyUrl}`);
         }
 
         const shippingAddress = await new Address().findOne({
@@ -99,7 +98,7 @@ class PuppeteerCluster {
           page,
           url,
           productCode: product_code,
-          proxy,
+          proxy: newProxyUrl,
           styleIndex: style_index,
           size,
           shippingAddress,
