@@ -21,7 +21,6 @@ const userAgent = new UserAgent();
 puppeteer.use(StealthPlugin());
 puppeteer.use(Ua());
 
-
 class PuppeteerCluster {
   static async build() {
     const proxies = await new Proxy().find({ has_been_used: false });
