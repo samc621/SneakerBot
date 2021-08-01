@@ -1,0 +1,468 @@
+swagger: "2.0"
+info:
+  description: "This is the api description for the SneakerBot by samc621"
+  version: "1.0.0"
+  title: "SneakerBot"
+host: "localhost"
+basePath: "/v1"
+tags:
+- name: "address"
+  description: "Everything about your addresses"
+- name: "proxies"
+  description: "Everything about your proxies"
+- name: "tasks"
+  description: "Everything about your tasks"
+schemes:
+- "https"
+paths:
+  /addresses:
+    post:
+      tags:
+      - "address"
+      summary: "Add a new address"
+      description: ""
+      operationId: "createAddress"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "The address object that needs to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/Address"
+      responses:
+        "200":
+          description: "Address successfully created"
+        "405":
+          description: "Invalid input"
+    get:
+      tags:
+      - "address"
+      summary: "Get all address"
+      description: ""
+      operationId: "getAddresses"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "Addresses successfully found"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Address"
+  /addresses/{addressId}:
+    get:
+      tags:
+      - "address"
+      summary: "Find address by ID"
+      description: "Returns a single address"
+      operationId: "getAddress"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "addressId"
+        in: "path"
+        description: "ID of address to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "Address successfully found"
+          schema:
+            $ref: "#/definitions/Address"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Address not found"
+    patch:
+      tags:
+      - "address"
+      summary: "Update an address"
+      description: ""
+      operationId: "updateAddress"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "addressId"
+        in: "path"
+        description: "ID of address to update"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        description: "The address object that needs to be updated"
+        required: true
+        schema:
+          $ref: "#/definitions/Address"
+      responses:
+        "200":
+          description: "Address successfully updated"
+        "405":
+          description: "Invalid input"
+    delete:
+      tags:
+      - "address"
+      summary: "Delete an address"
+      description: ""
+      operationId: "deleteAddress"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "addressId"
+        in: "path"
+        description: "ID of the address to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "Address successfully deleted"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Address not found"
+  /proxies:
+    post:
+      tags:
+      - "proxies"
+      summary: "Add a new proxy"
+      description: ""
+      operationId: "createProxy"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "The proxy object that needs to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/Proxy"
+      responses:
+        "200":
+          description: "Proxy successfully created"
+        "405":
+          description: "Invalid input"
+    get:
+      tags:
+      - "proxies"
+      summary: "Get all proxies"
+      description: ""
+      operationId: "getProxies"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "Proxies successfully found"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Proxy"
+  /proxies/{proxyId}:
+    get:
+      tags:
+      - "proxies"
+      summary: "Find proxy by ID"
+      description: "Returns a single proxy"
+      operationId: "getProxyById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "proxyId"
+        in: "path"
+        description: "ID of the proxy to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "Proxy successfully found"
+          schema:
+            $ref: "#/definitions/Proxy"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Proxy not found"
+    patch:
+      tags:
+      - "proxies"
+      summary: "Update a proxy"
+      description: ""
+      operationId: "updateProxy"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "proxyId"
+        in: "path"
+        description: "ID of the proxy to update"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        description: "The proxy object that needs to be updated"
+        required: true
+        schema:
+          $ref: "#/definitions/Proxy"
+      responses:
+        "200":
+          description: "Proxy successfully updated"
+        "405":
+          description: "Invalid input"
+    delete:
+      tags:
+      - "proxies"
+      summary: "Delete a proxy"
+      description: ""
+      operationId: "deleteProxy"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "proxyId"
+        in: "path"
+        description: "ID of the proxy to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "Proxy successfully deleted"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Proxy not found"
+  /tasks:
+    post:
+      tags:
+      - "tasks"
+      summary: "Add a new task"
+      description: ""
+      operationId: "createTask"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "The task object that needs to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/Task"
+      responses:
+        "200":
+          description: "Task successfully created"
+        "405":
+          description: "Invalid input"
+    get:
+      tags:
+      - "tasks"
+      summary: "Get all tasks"
+      description: ""
+      operationId: "getTasks"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "Tasks successfully found"
+          schema:
+            $ref: "#/definitions/Task"
+  /tasks/{taskId}:
+    get:
+      tags:
+      - "tasks"
+      summary: "Find a task by ID"
+      description: "Returns a single task"
+      operationId: "getTaskById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        description: "ID of the task to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "Task successfully found"
+          schema:
+            $ref: "#/definitions/Task"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Task not found"
+    patch:
+      tags:
+      - "tasks"
+      summary: "Update a task"
+      description: ""
+      operationId: "updateTask"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        description: "ID of the task to update"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        description: "The task object that needs to be updated"
+        required: true
+        schema:
+          $ref: "#/definitions/Task"
+      responses:
+        "200":
+          description: "Task successfully updated"
+        "405":
+          description: "Invalid input"
+    delete:
+      tags:
+      - "tasks"
+      summary: "Delete a task"
+      description: ""
+      operationId: "deleteTask"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        description: "ID of the task to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "Task successfully deleted"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Task not found"
+  /tasks/{taskId}/start:
+    post:
+      tags:
+      - "tasks"
+      summary: "Start a task"
+      description: ""
+      operationId: "startTask"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        description: "ID of the task to start"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        description: "The card that should be used"
+        required: true
+        schema:
+          type: object
+          properties:
+            card_friendly_name:
+              type: string
+      responses:
+        "200":
+          description: "Task successfully started"
+        "405":
+          description: "Invalid input"
+  /tasks/{taskId}/stop:
+    post:
+      tags:
+      - "tasks"
+      summary: "Stop a task"
+      description: ""
+      operationId: "stopTask"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        description: "ID of the task to stop"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "Task successfully stopped"
+definitions:
+  Address:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+      first_name:
+        type: "string"
+      last_name:
+        type: "string"
+      address_line_1:
+        type: "string"
+      address_line_2:
+        type: "string"
+      city:
+        type: "string"
+      state:
+        type: "string"
+      postal_code:
+        type: "integer"
+      country:
+        type: "string"
+      email_address:
+        type: "string"
+      phone_number:
+        type: "string"
+  Proxy:
+    type: "object"
+    properties:
+      ip_address:
+        type: "string"
+      port:
+        type: "integer"
+      protocol:
+        type: "string"
+      username:
+        type: "string"
+      password:
+        type: "string"
+  Task:
+    type: "object"
+    properties:
+      site_id:
+        type: "integer"
+      url:
+        type: "string"
+      product_code:
+        type: "string"
+      style_index:
+        type: "integer"
+      size:
+        type: "number"
+        format: "double"
+      shipping_speed_index:
+        type: "integer"
+      billing_address_id:
+        type: "integer"
+      shipping_address_id:
+        type: "integer"
+      notification_email_address:
+        type: "string"
