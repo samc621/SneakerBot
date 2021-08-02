@@ -819,7 +819,6 @@ components:
       properties:
         success:
           type: boolean
-          format: int32
         message:
           type: string
         data:
