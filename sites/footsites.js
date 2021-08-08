@@ -1,4 +1,4 @@
-const { solveCaptcha } = require('../helpers/captcha');
+const { solveGeeTest } = require('../helpers/captcha');
 const { sendEmail } = require('../helpers/email');
 const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
 
@@ -253,7 +253,7 @@ async function checkout({
 async function closeModal({ taskLogger, page }) {
   try {
     const modalSelector = 'div#bluecoreActionScreen';
-    await page.waitForSelector(modalSelector, { visible: true });
+    await page.waitForSelector(modalSelector, { visible: true, timeout: 0 });
     const modal = await page.$(modalSelector);
     taskLogger.info('Closing modal');
     await modal.evaluate(() => {
@@ -364,45 +364,49 @@ exports.guestCheckout = async ({
       const atcButtonSelector = 'button.Button.Button.ProductDetails-form__action';
       await page.waitForSelector(atcButtonSelector, { timeout: 0 });
       await page.click(atcButtonSelector);
+      taskLogger.info('Clicked ATC button');
       await page.waitForTimeout(2000);
 
       const captchaIframeSelector = 'iframe#dataDomeCaptcha';
-      const captchaSelector = 'div.g-recaptcha';
       const cartSelector = 'span.CartCount-badge';
 
       await Promise.race([
         (async () => {
           try {
-            hasCaptcha = await page.waitForSelector(captchaIframeSelector, { timeout: 10 * 1000 });
+            hasCaptcha = await page.waitForSelector(captchaIframeSelector);
           } catch (err) {
             // no-op if timeout occurs
           }
         })(),
         (async () => {
           try {
-            await page.waitForSelector(cartSelector, { timeout: 5 * 1000 });
+            await page.waitForSelector(cartSelector);
           } catch (err) {
-            taskLogger.info('Retrying clicking ATC button');
-            await page.click(atcButtonSelector);
-            await page.waitForTimeout(2000);
+            if (!hasCaptcha) {
+              taskLogger.info('Retrying clicking ATC button');
+              await page.click(atcButtonSelector);
+              await page.waitForTimeout(2000);
+            }
           }
 
-          taskLogger.info('Checking if ATC was successful');
-          const cartCount = await page.evaluate((cartTextSelector) => {
-            const elem = document.querySelector(cartTextSelector);
-            return (elem && elem.innerText) || '0';
-          }, cartSelector);
+          if (!hasCaptcha) {
+            taskLogger.info('Checking if ATC was successful');
+            const cartCount = await page.evaluate((cartTextSelector) => {
+              const elem = document.querySelector(cartTextSelector);
+              return (elem && elem.innerText) || '0';
+            }, cartSelector);
 
-          if (parseInt(cartCount) === 1) {
-            isInCart = true;
+            if (parseInt(cartCount) === 1) {
+              isInCart = true;
+            }
           }
         })()
       ]);
 
       if (hasCaptcha) {
         if (autoSolveCaptchas) {
-          const solved = await solveCaptcha({
-            taskLogger, page, captchaSelector, captchaIframeSelector
+          const solved = await solveGeeTest({
+            taskLogger, page, captchaIframeSelector
           });
           if (solved) hasCaptcha = false;
         } else {
@@ -410,7 +414,7 @@ exports.guestCheckout = async ({
           const recipient = notificationEmailAddress;
           const subject = 'Checkout task unsuccessful';
           const text = `The checkout task for ${url} size ${size} has a captcha. Please open the browser and complete it within 5 minutes.`;
-          await sendEmail(recipient, subject, text);
+          await sendEmail({ recipient, subject, text });
           taskLogger.info(text);
 
           try {
