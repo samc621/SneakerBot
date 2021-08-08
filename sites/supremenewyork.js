@@ -1,4 +1,4 @@
-const { solveCaptcha } = require('../helpers/captcha');
+const { solveReCAPTCHAV2 } = require('../helpers/captcha');
 const { sendEmail } = require('../helpers/email');
 const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
 
@@ -157,7 +157,7 @@ async function checkout({
 
     if (hasCaptcha) {
       if (autoSolveCaptchas) {
-        const solved = await solveCaptcha({
+        const solved = await solveReCAPTCHAV2({
           taskLogger, page, captchaSelector
         });
         if (solved) hasCaptcha = false;
