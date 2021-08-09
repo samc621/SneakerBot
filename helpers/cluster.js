@@ -2,6 +2,8 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { Cluster } = require('puppeteer-cluster');
 const proxyChain = require('proxy-chain');
+const Ua = require('puppeteer-extra-plugin-anonymize-ua');
+const UserAgent = require('user-agents');
 
 const Task = require('../api/Tasks/model');
 const Proxy = require('../api/Proxies/model');
@@ -15,7 +17,10 @@ const { storePageInTaskCache } = require('./task-cache');
 
 const sites = require('../sites');
 
+const userAgent = new UserAgent();
+
 puppeteer.use(StealthPlugin());
+puppeteer.use(Ua());
 
 class PuppeteerCluster {
   static async build() {
@@ -41,7 +46,8 @@ class PuppeteerCluster {
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-web-security',
-        '--disable-features=IsolateOrigins,site-per-process'
+        '--disable-features=IsolateOrigins,site-per-process',
+        `--user-agent=${userAgent}`
       ]
     };
     if (process.env.NODE_ENV === 'docker') {

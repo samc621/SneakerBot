@@ -257,7 +257,7 @@ async function closeModal({ taskLogger, page }) {
     const modal = await page.$(modalSelector);
     taskLogger.info('Closing modal');
     await modal.evaluate(() => {
-      document.querySelector('button.closeButtonWhite').click();
+      document.querySelector('button.closeButtonWhite, button[name="bluecoreCloseButton"]').click();
     });
   } catch (err) {
     throw err;
