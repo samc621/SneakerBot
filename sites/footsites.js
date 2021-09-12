@@ -410,7 +410,7 @@ exports.guestCheckout = async ({
           const recipient = notificationEmailAddress;
           const subject = 'Checkout task unsuccessful';
           const text = `The checkout task for ${url} size ${size} has a captcha. Please open the browser and complete it within 5 minutes.`;
-          await sendEmail(recipient, subject, text);
+          await sendEmail({ recipient, subject, text });
           taskLogger.info(text);
 
           try {
