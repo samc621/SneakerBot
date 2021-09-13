@@ -253,7 +253,7 @@ async function checkout({
 async function closeModal({ taskLogger, page }) {
   try {
     const modalSelector = 'div#bluecoreActionScreen';
-    await page.waitForSelector(modalSelector, { visible: true });
+    await page.waitForSelector(modalSelector, { visible: true, timeout: 0 });
     const modal = await page.$(modalSelector);
     taskLogger.info('Closing modal');
     await modal.evaluate(() => {
