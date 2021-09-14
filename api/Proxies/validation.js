@@ -1,5 +1,5 @@
 const { Joi } = require('express-validation');
-const { genericValidationHandler } = require('../../helpers/validation-handler');
+const genericValidationHandler = require('../../helpers/validation-handler');
 
 module.exports = {
   validationHandler: genericValidationHandler,
