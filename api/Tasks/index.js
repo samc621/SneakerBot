@@ -26,21 +26,23 @@ const {
 
 router
   .route('/')
-  .post(validate(create), validationHandler, createTask)
-  .get(validate(findAll), validationHandler, getTasks);
+  .post(validate(create), createTask)
+  .get(validate(findAll), getTasks);
 
 router
   .route('/:id/start')
-  .post(validate(start), validationHandler, startTask);
+  .post(validate(start), startTask);
 
 router
   .route('/:id/stop')
-  .post(validate(stop), validationHandler, stopTask);
+  .post(validate(stop), stopTask);
 
 router
   .route('/:id')
-  .get(validate(findOne), validationHandler, getTask)
-  .patch(validate(update), validationHandler, updateTask)
-  .delete(validate(deleted), validationHandler, deleteTask);
+  .get(validate(findOne), getTask)
+  .patch(validate(update), updateTask)
+  .delete(validate(deleted), deleteTask);
+
+router.use(validationHandler);
 
 module.exports = router;

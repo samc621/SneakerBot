@@ -22,13 +22,15 @@ const {
 
 router
   .route('/')
-  .post(validate(create), validationHandler, createAddress)
-  .get(validate(findAll), validationHandler, getAddresses);
+  .post(validate(create), createAddress)
+  .get(validate(findAll), getAddresses);
 
 router
   .route('/:id')
-  .get(validate(findOne), validationHandler, getAddress)
-  .patch(validate(update), validationHandler, updateAddress)
-  .delete(validate(deleted), validationHandler, deleteAddress);
+  .get(validate(findOne), getAddress)
+  .patch(validate(update), updateAddress)
+  .delete(validate(deleted), deleteAddress);
+
+router.use(validationHandler);
 
 module.exports = router;

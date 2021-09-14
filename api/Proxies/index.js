@@ -22,13 +22,15 @@ const {
 
 router
   .route('/')
-  .post(validate(create), validationHandler, createProxy)
-  .get(validate(findAll), validationHandler, getProxies);
+  .post(validate(create), createProxy)
+  .get(validate(findAll), getProxies);
 
 router
   .route('/:id')
-  .get(validate(findOne), validationHandler, getProxy)
-  .patch(validate(update), validationHandler, updateProxy)
-  .delete(validate(deleted), validationHandler, deleteProxy);
+  .get(validate(findOne), getProxy)
+  .patch(validate(update), updateProxy)
+  .delete(validate(deleted), deleteProxy);
+
+router.use(validationHandler);
 
 module.exports = router;
