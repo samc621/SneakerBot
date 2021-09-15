@@ -21,6 +21,11 @@
     "url": "https://github.com/samc621/SneakerBot/issues"
   },
   "homepage": "https://github.com/samc621/SneakerBot#readme",
+  "jest": {
+    "testRegex": "((\\.|/*.)(test))\\.js?$",
+    "clearMocks": true,
+    "testEnvironment": "node"
+  },
   "dependencies": {
     "dotenv-flow": "^3.2.0",
     "eslint": "^7.28.0",
@@ -42,6 +47,7 @@
   },
   "devDependencies": {
     "jest": "^27.0.4",
+    "mock-knex": "^0.4.10",
     "supertest": "^6.1.3"
   }
 }
