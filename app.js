@@ -3,10 +3,12 @@ const pg = require('pg');
 
 const app = express();
 const routes = require('./routes');
+const validationHandler = require('./helpers/validation-handler');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use('/v1', routes);
+app.use(validationHandler);
 
 const { types } = pg;
 // Return numerics as Float (parsed from String)

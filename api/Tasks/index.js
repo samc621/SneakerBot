@@ -1,9 +1,5 @@
 const express = require('express');
 const { validate } = require('express-validation');
-const { validationRules, validationHandler } = require('./validation');
-
-const router = express.Router();
-
 const {
   createTask,
   getTask,
@@ -13,7 +9,6 @@ const {
   startTask,
   stopTask
 } = require('./controller');
-
 const {
   create,
   findOne,
@@ -22,7 +17,9 @@ const {
   deleted,
   start,
   stop
-} = validationRules;
+} = require('./validation');
+
+const router = express.Router();
 
 router
   .route('/')
@@ -42,7 +39,5 @@ router
   .get(validate(findOne), getTask)
   .patch(validate(update), updateTask)
   .delete(validate(deleted), deleteTask);
-
-router.use(validationHandler);
 
 module.exports = router;
