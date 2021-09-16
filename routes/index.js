@@ -7,12 +7,23 @@ const proxiesRoutes = require('../api/Proxies');
 const tasksRoutes = require('../api/Tasks');
 const validationHandler = require('../helpers/validation-handler');
 
-router.get('/', (req, res) => res.send('Welcome to the SneakerBot API'));
-router.use('/addresses', addressesRoutes);
-router.use('/proxies', proxiesRoutes);
-router.use('/tasks', tasksRoutes);
+// router paths
+const urlAddresses = '/addresses';
+const urlProxies = '/proxies';
+const urlTasks = '/tasks';
 
-// route handlers
+// routers
+router.get('/', (req, res) => res.send('Welcome to the SneakerBot API'));
+router.use(urlAddresses, addressesRoutes);
+router.use(urlProxies, proxiesRoutes);
+router.use(urlTasks, tasksRoutes);
+
+// router handlers
 router.use(validationHandler);
 
-module.exports = router;
+module.exports = {
+  router,
+  urlAddresses,
+  urlProxies,
+  urlTasks
+};
