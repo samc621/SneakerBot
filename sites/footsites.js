@@ -253,11 +253,11 @@ async function checkout({
 async function closeModal({ taskLogger, page }) {
   try {
     const modalSelector = 'div#bluecoreActionScreen';
-    await page.waitForSelector(modalSelector, { visible: true });
+    await page.waitForSelector(modalSelector, { visible: true, timeout: 0 });
     const modal = await page.$(modalSelector);
     taskLogger.info('Closing modal');
     await modal.evaluate(() => {
-      document.querySelector('button.closeButtonWhite').click();
+      document.querySelector('button.closeButtonWhite, button[name="bluecoreCloseButton"]').click();
     });
   } catch (err) {
     throw err;
@@ -410,7 +410,7 @@ exports.guestCheckout = async ({
           const recipient = notificationEmailAddress;
           const subject = 'Checkout task unsuccessful';
           const text = `The checkout task for ${url} size ${size} has a captcha. Please open the browser and complete it within 5 minutes.`;
-          await sendEmail(recipient, subject, text);
+          await sendEmail({ recipient, subject, text });
           taskLogger.info(text);
 
           try {

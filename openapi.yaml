@@ -1,0 +1,826 @@
+openapi: 3.0.1
+info:
+  title: SneakerBot
+  description: This is the api description for the SneakerBot by samc621
+  version: 1.0.0
+servers:
+  - url: 'http://localhost/v1'
+tags:
+  - name: address
+    description: Everything about your addresses
+  - name: proxies
+    description: Everything about your proxies
+  - name: tasks
+    description: Everything about your tasks
+paths:
+  /addresses:
+    get:
+      tags:
+        - address
+      summary: Get all address
+      operationId: getAddresses
+      parameters:
+        - name: type
+          in: query
+          description: Specifies the type of addresses to return
+          required: false
+          schema:
+            type: string
+            enum:
+              - billing
+              - shipping
+      responses:
+        '200':
+          description: Addresses successfully found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Address'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    post:
+      tags:
+        - address
+      summary: Add a new address
+      operationId: createAddress
+      requestBody:
+        description: The address object that needs to be added
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+        required: true
+      responses:
+        '200':
+          description: Address successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Address'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/addresses/{addressId}':
+    get:
+      tags:
+        - address
+      summary: Find address by ID
+      description: Returns a single address
+      operationId: getAddress
+      parameters:
+        - name: addressId
+          in: path
+          description: ID of address to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Address successfully found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Address'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    delete:
+      tags:
+        - address
+      summary: Delete an address
+      operationId: deleteAddress
+      parameters:
+        - name: addressId
+          in: path
+          description: ID of the address to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Address successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Address'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    patch:
+      tags:
+        - address
+      summary: Update an address
+      operationId: updateAddress
+      parameters:
+        - name: addressId
+          in: path
+          description: ID of address to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: The address object that needs to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+        required: true
+      responses:
+        '200':
+          description: Address successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Address'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /proxies:
+    get:
+      tags:
+        - proxies
+      summary: Get all proxies
+      operationId: getProxies
+      parameters:
+        - name: protocol
+          in: query
+          description: Specifies which protocol is to be queried for
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Proxies successfully found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Proxy'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    post:
+      tags:
+        - proxies
+      summary: Add a new proxy
+      operationId: createProxy
+      requestBody:
+        description: The proxy object that needs to be added
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Proxy'
+        required: true
+      responses:
+        '200':
+          description: Proxy successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Proxy'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/proxies/{proxyId}':
+    get:
+      tags:
+        - proxies
+      summary: Find proxy by ID
+      description: Returns a single proxy
+      operationId: getProxyById
+      parameters:
+        - name: proxyId
+          in: path
+          description: ID of the proxy to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Proxy successfully found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Proxy'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    delete:
+      tags:
+        - proxies
+      summary: Delete a proxy
+      operationId: deleteProxy
+      parameters:
+        - name: proxyId
+          in: path
+          description: ID of the proxy to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Proxy successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Proxy'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    patch:
+      tags:
+        - proxies
+      summary: Update a proxy
+      operationId: updateProxy
+      parameters:
+        - name: proxyId
+          in: path
+          description: ID of the proxy to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: The proxy object that needs to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Proxy'
+        required: true
+      responses:
+        '200':
+          description: Proxy successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Proxy'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /tasks:
+    get:
+      tags:
+        - tasks
+      summary: Get all tasks
+      operationId: getTasks
+      parameters:
+        - name: site_id
+          in: query
+          description: The ID of the site that is to be queried for
+          schema:
+            type: integer
+            nullable: true
+        - name: url
+          in: query
+          description: The URL of the task that is to be queried for
+          schema:
+            type: string
+            format: uri
+            nullable: true
+        - name: size
+          in: query
+          description: The size of the task that is to be queried for
+          schema:
+            type: string
+            nullable: true
+        - name: billing_address_id
+          in: query
+          description: The ID of the billing address of the task that is to be queried for
+          schema:
+            type: integer
+            nullable: true
+        - name: shipping_address_id
+          in: query
+          description: The ID of the shipping address of the task that is to be queried for
+          schema:
+            type: integer
+            nullable: true
+        - name: notification_email_address
+          in: query
+          description: The email address of the task that is to be queried for
+          schema:
+            type: string
+            format: email
+            nullable: true
+      responses:
+        '200':
+          description: Tasks successfully found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    post:
+      tags:
+        - tasks
+      summary: Add a new task
+      operationId: createTask
+      requestBody:
+        description: The task object that needs to be added
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+        required: true
+      responses:
+        '200':
+          description: Task successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      x-codegen-request-body-name: body
+  '/tasks/{taskId}':
+    get:
+      tags:
+        - tasks
+      summary: Find a task by ID
+      description: Returns a single task
+      operationId: getTaskById
+      parameters:
+        - name: taskId
+          in: path
+          description: ID of the task to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Task successfully found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    delete:
+      tags:
+        - tasks
+      summary: Delete a task
+      operationId: deleteTask
+      parameters:
+        - name: taskId
+          in: path
+          description: ID of the task to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Task successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    patch:
+      tags:
+        - tasks
+      summary: Update a task
+      operationId: updateTask
+      parameters:
+        - name: taskId
+          in: path
+          description: ID of the task to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: The task object that needs to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+        required: true
+      responses:
+        '200':
+          description: Task successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/tasks/{taskId}/start':
+    post:
+      tags:
+        - tasks
+      summary: Start a task
+      operationId: startTask
+      parameters:
+        - name: taskId
+          in: path
+          description: ID of the task to start
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: The card that should be used
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                card_friendly_name:
+                  type: string
+      responses:
+        '200':
+          description: Task successfully started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/tasks/{taskId}/stop':
+    post:
+      tags:
+        - tasks
+      summary: Stop a task
+      operationId: stopTask
+      parameters:
+        - name: taskId
+          in: path
+          description: ID of the task to stop
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Task successfully stopped
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+components:
+  schemas:
+    Address:
+      type: object
+      properties:
+        type:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        address_line_1:
+          type: string
+        address_line_2:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        postal_code:
+          type: integer
+        country:
+          type: string
+        email_address:
+          type: string
+        phone_number:
+          type: string
+    Proxy:
+      type: object
+      properties:
+        ip_address:
+          type: string
+        port:
+          type: integer
+        protocol:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+    Task:
+      type: object
+      properties:
+        site_id:
+          type: integer
+        url:
+          type: string
+          format: uri
+        product_code:
+          type: string
+        style_index:
+          type: integer
+        size:
+          type: number
+          format: double
+        shipping_speed_index:
+          type: integer
+        billing_address_id:
+          type: integer
+        shipping_address_id:
+          type: integer
+        notification_email_address:
+          type: string
+          format: email
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          nullable: true
