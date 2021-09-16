@@ -1,7 +1,7 @@
 const express = require('express');
 const supertest = require('supertest');
 const mockDb = require('mock-knex');
-const apiRoutes = require('../../../api/Addresses');
+const { router, urlAddresses } = require('../../../routes');
 const db = require('../../../config/knex');
 
 const testAddress = {
@@ -31,7 +31,7 @@ let tracker;
 
 const app = express();
 app.use(express.json());
-app.use('/', apiRoutes);
+app.use('/', router);
 
 beforeEach(() => {
   mockDb.mock(db);
@@ -67,7 +67,7 @@ describe('GET /addresses', () => {
       query.response(testAddresses);
     });
 
-    const response = await request.get('/');
+    const response = await request.get(urlAddresses);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -82,7 +82,7 @@ describe('GET /addresses', () => {
       query.response(testAddresses);
     });
 
-    const response = await request.get('/');
+    const response = await request.get(urlAddresses);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -97,7 +97,7 @@ describe('GET /addresses', () => {
       query.response(testAddresses);
     });
 
-    const response = await request.get('/');
+    const response = await request.get(urlAddresses);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -112,7 +112,7 @@ describe('GET /addresses/:id', () => {
       query.response(Promise.resolve(testAddressCreated));
     });
 
-    const response = await request.get('/1');
+    const response = await request.get(`${urlAddresses}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -125,7 +125,7 @@ describe('GET /addresses/:id', () => {
       query.response(Promise.resolve());
     });
 
-    const response = await request.get('/2');
+    const response = await request.get(`${urlAddresses}/2`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -140,7 +140,7 @@ describe('POST /addresses', () => {
       query.response(Promise.resolve([testAddressCreated]));
     });
 
-    const response = await request.post('/').send(testAddress);
+    const response = await request.post(urlAddresses).send(testAddress);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -158,7 +158,7 @@ describe('POST /addresses', () => {
       query.response(Promise.reject(new Error('DB insert failure')));
     });
 
-    const response = await request.post('/').send(testAddressWithError);
+    const response = await request.post(urlAddresses).send(testAddressWithError);
 
     expect(response.status).toBe(500);
     expect(response.body.success).toBeFalsy();
@@ -175,7 +175,7 @@ describe('POST /addresses', () => {
       query.response(Promise.reject(new Error('Email validation failure')));
     });
 
-    const response = await request.post('/').send(testAddressWithError);
+    const response = await request.post(urlAddresses).send(testAddressWithError);
 
     expect(response.status).toBe(400);
     expect(response.body.success).toBeFalsy();
@@ -190,7 +190,7 @@ describe('PATCH /addresses:id', () => {
       query.response(Promise.resolve([testAddressCreated]));
     });
 
-    const response = await request.patch('/1').send(testAddress);
+    const response = await request.patch(`${urlAddresses}/1`).send(testAddress);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -203,7 +203,7 @@ describe('PATCH /addresses:id', () => {
       query.response(Promise.resolve([]));
     });
 
-    const response = await request.patch('/1').send(testAddress);
+    const response = await request.patch(`${urlAddresses}/1`).send(testAddress);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -222,7 +222,7 @@ describe('DELETE /addresses:id', () => {
       query.response(Promise.resolve([testAddressDeleted]));
     });
 
-    const response = await request.delete('/1');
+    const response = await request.delete(`${urlAddresses}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -235,7 +235,7 @@ describe('DELETE /addresses:id', () => {
       query.response(Promise.resolve([]));
     });
 
-    const response = await request.delete('/1');
+    const response = await request.delete(`${urlAddresses}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();

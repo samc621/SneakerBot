@@ -1,7 +1,7 @@
 const express = require('express');
 const supertest = require('supertest');
 const mockDb = require('mock-knex');
-const apiRoutes = require('../../../api/Proxies');
+const { router, urlProxies } = require('../../../routes');
 const db = require('../../../config/knex');
 
 const testProxy = {
@@ -26,7 +26,7 @@ let tracker;
 
 const app = express();
 app.use(express.json());
-app.use('/', apiRoutes);
+app.use('/', router);
 
 beforeEach(() => {
   mockDb.mock(db);
@@ -62,7 +62,7 @@ describe('GET /proxies', () => {
       query.response(testProxies);
     });
 
-    const response = await request.get('/');
+    const response = await request.get(urlProxies);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -77,7 +77,7 @@ describe('GET /proxies', () => {
       query.response(testProxies);
     });
 
-    const response = await request.get('/');
+    const response = await request.get(urlProxies);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -92,7 +92,7 @@ describe('GET /proxies', () => {
       query.response(testProxies);
     });
 
-    const response = await request.get('/');
+    const response = await request.get(urlProxies);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -107,7 +107,7 @@ describe('GET /proxies/:id', () => {
       query.response(Promise.resolve(testProxyCreated));
     });
 
-    const response = await request.get('/1');
+    const response = await request.get(`${urlProxies}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -120,7 +120,7 @@ describe('GET /proxies/:id', () => {
       query.response(Promise.resolve());
     });
 
-    const response = await request.get('/2');
+    const response = await request.get(`${urlProxies}/2`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -135,7 +135,7 @@ describe('POST /proxies', () => {
       query.response(Promise.resolve([testProxyCreated]));
     });
 
-    const response = await request.post('/').send(testProxy);
+    const response = await request.post(urlProxies).send(testProxy);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -153,7 +153,7 @@ describe('POST /proxies', () => {
       query.response(Promise.reject(new Error('DB insert failure')));
     });
 
-    const response = await request.post('/').send(testProxyWithError);
+    const response = await request.post(urlProxies).send(testProxyWithError);
 
     expect(response.status).toBe(500);
     expect(response.body.success).toBeFalsy();
@@ -170,7 +170,7 @@ describe('POST /proxies', () => {
       query.response(Promise.reject(new Error('Validation failure')));
     });
 
-    const response = await request.post('/').send(testProxyWithError);
+    const response = await request.post(urlProxies).send(testProxyWithError);
 
     expect(response.status).toBe(400);
     expect(response.body.success).toBeFalsy();
@@ -185,7 +185,7 @@ describe('PATCH /proxies:id', () => {
       query.response(Promise.resolve([testProxyCreated]));
     });
 
-    const response = await request.patch('/1').send(testProxy);
+    const response = await request.patch(`${urlProxies}/1`).send(testProxy);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -198,7 +198,7 @@ describe('PATCH /proxies:id', () => {
       query.response(Promise.resolve([]));
     });
 
-    const response = await request.patch('/1').send(testProxy);
+    const response = await request.patch(`${urlProxies}/1`).send(testProxy);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -217,7 +217,7 @@ describe('DELETE /proxies:id', () => {
       query.response(Promise.resolve([testProxyDeleted]));
     });
 
-    const response = await request.delete('/1');
+    const response = await request.delete(`${urlProxies}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -230,7 +230,7 @@ describe('DELETE /proxies:id', () => {
       query.response(Promise.resolve([]));
     });
 
-    const response = await request.delete('/1');
+    const response = await request.delete(`${urlProxies}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();

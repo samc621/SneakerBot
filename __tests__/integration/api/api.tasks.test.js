@@ -1,7 +1,7 @@
 const express = require('express');
 const supertest = require('supertest');
 const mockDb = require('mock-knex');
-const apiRoutes = require('../../../api/Tasks');
+const { router, urlTasks } = require('../../../routes');
 const db = require('../../../config/knex');
 
 const testTask = {
@@ -12,8 +12,8 @@ const testTask = {
   shipping_speed_index: 2,
   billing_address_id: 3,
   shipping_address_id: 4,
-  notification_email_address: 'jsmith@gmail.com',
-  auto_solve_captchas: false
+  notification_email_address: 'jsmith@gmail.com'
+  // auto_solve_captchas: false
 };
 
 const testTaskCreated = {
@@ -32,7 +32,7 @@ let tracker;
 
 const app = express();
 app.use(express.json());
-app.use('/', apiRoutes);
+app.use(router);
 
 beforeEach(() => {
   mockDb.mock(db);
@@ -68,7 +68,7 @@ describe('GET /tasks', () => {
       query.response(testTasks);
     });
 
-    const response = await request.get('/');
+    const response = await request.get(urlTasks);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -83,7 +83,7 @@ describe('GET /tasks', () => {
       query.response(testTasks);
     });
 
-    const response = await request.get('/');
+    const response = await request.get(urlTasks);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -98,7 +98,7 @@ describe('GET /tasks', () => {
       query.response(testTasks);
     });
 
-    const response = await request.get('/');
+    const response = await request.get(urlTasks);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -113,7 +113,7 @@ describe('GET /tasks/:id', () => {
       query.response(Promise.resolve(testTaskCreated));
     });
 
-    const response = await request.get('/1');
+    const response = await request.get(`${urlTasks}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -126,7 +126,7 @@ describe('GET /tasks/:id', () => {
       query.response(Promise.resolve());
     });
 
-    const response = await request.get('/2');
+    const response = await request.get(`${urlTasks}/2`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -141,7 +141,7 @@ describe('POST /tasks', () => {
       query.response(Promise.resolve([testTaskCreated]));
     });
 
-    const response = await request.post('/').send(testTask);
+    const response = await request.post(urlTasks).send(testTask);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -159,7 +159,7 @@ describe('POST /tasks', () => {
       query.response(Promise.reject(new Error('DB insert failure')));
     });
 
-    const response = await request.post('/').send(testTaskWithError);
+    const response = await request.post(urlTasks).send(testTaskWithError);
 
     expect(response.status).toBe(500);
     expect(response.body.success).toBeFalsy();
@@ -176,7 +176,7 @@ describe('POST /tasks', () => {
       query.response(Promise.reject(new Error('Validation failure')));
     });
 
-    const response = await request.post('/').send(testTaskWithError);
+    const response = await request.post(urlTasks).send(testTaskWithError);
 
     expect(response.status).toBe(400);
     expect(response.body.success).toBeFalsy();
@@ -191,7 +191,7 @@ describe('PATCH /tasks:id', () => {
       query.response(Promise.resolve([testTaskCreated]));
     });
 
-    const response = await request.patch('/1').send(testTask);
+    const response = await request.patch(`${urlTasks}/1`).send(testTask);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -204,7 +204,7 @@ describe('PATCH /tasks:id', () => {
       query.response(Promise.resolve([]));
     });
 
-    const response = await request.patch('/1').send(testTask);
+    const response = await request.patch(`${urlTasks}/1`).send(testTask);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -223,7 +223,7 @@ describe('DELETE /tasks:id', () => {
       query.response(Promise.resolve([testTaskDeleted]));
     });
 
-    const response = await request.delete('/1');
+    const response = await request.delete(`${urlTasks}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -236,7 +236,7 @@ describe('DELETE /tasks:id', () => {
       query.response(Promise.resolve([]));
     });
 
-    const response = await request.delete('/1');
+    const response = await request.delete(`${urlTasks}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
