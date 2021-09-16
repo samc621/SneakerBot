@@ -3,7 +3,7 @@ const { BadRequest } = require('./server-response');
 
 module.exports = (err, req, res, next) => {
   if (err instanceof ValidationError) {
-    console.error(err);
+    console.error(JSON.stringify(err));
     return BadRequest(res, err.message, err.details);
   }
 
