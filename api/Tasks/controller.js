@@ -8,6 +8,8 @@ let cluster;
   cluster = await PuppeteerCluster.build();
 })();
 
+const result = (total) => (total ? 'successfully' : 'not');
+
 exports.createTask = async (req, res) => {
   try {
     const task = await new Task().create(req.body);
@@ -26,7 +28,7 @@ exports.getTask = async (req, res) => {
     data['tasks.id'] = id;
     const task = await new Task().findOne(data);
 
-    return response.Ok(res, 'Task successfully found', task);
+    return response.Ok(res, `Task ${result(task)} found`, task);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);
@@ -37,7 +39,7 @@ exports.getTasks = async (req, res) => {
   try {
     const tasks = await new Task().find(req.query);
 
-    return response.Ok(res, 'Tasks successfully found', tasks);
+    return response.Ok(res, `Tasks ${result(tasks.length)} found`, tasks);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);
@@ -49,7 +51,7 @@ exports.updateTask = async (req, res) => {
     const { id } = req.params;
     const task = await new Task(id).update(req.body);
 
-    return response.Ok(res, 'Task successfully updated', task);
+    return response.Ok(res, `Task ${result(task)} updated`, task);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);
@@ -61,7 +63,7 @@ exports.deleteTask = async (req, res) => {
     const { id } = req.params;
     const task = await new Task(id).update({ is_deleted: true });
 
-    return response.Ok(res, 'Task successfully deleted', task);
+    return response.Ok(res, `Task ${result(task)} deleted`, task);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);
@@ -74,7 +76,7 @@ exports.startTask = async (req, res) => {
     const { card_friendly_name } = req.body;
     const task = cluster.queue({ taskId: id, cardFriendlyName: card_friendly_name });
 
-    return response.Ok(res, 'Task successfully started', task);
+    return response.Ok(res, `Task ${result(task)} started`, task);
   } catch (err) {
     console.error(err.message);
     return response.InternalServerError(res, err.message);

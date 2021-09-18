@@ -1,4 +1,3 @@
-require('dotenv-flow').config();
 const nodemailer = require('nodemailer');
 
 exports.sendEmail = async ({ recipient: to, subject, text }) => {
