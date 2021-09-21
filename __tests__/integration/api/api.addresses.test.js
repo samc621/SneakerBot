@@ -1,8 +1,13 @@
 const express = require('express');
 const supertest = require('supertest');
-const mockDb = require('mock-knex');
+const { getTracker, MockClient } = require('knex-mock-client');
 const { router, urlAddresses } = require('../../../routes');
-const db = require('../../../config/knex');
+
+jest.mock('../../../config/knex', () => {
+  // eslint-disable-next-line global-require
+  const knex = require('knex');
+  return knex({ client: MockClient });
+});
 
 const testAddress = {
   type: 'billing',
@@ -34,19 +39,16 @@ app.use(express.json());
 app.use('/', router);
 
 beforeEach(() => {
-  mockDb.mock(db);
-  jest.resetAllMocks();
-  tracker = mockDb.getTracker();
-  tracker.install();
+  tracker.on.select('* from "proxies"').responseOnce([]);
 });
 
 afterEach(() => {
-  mockDb.unmock(db);
-  tracker.uninstall();
+  tracker.reset();
 });
 
 beforeAll(() => {
   request = supertest(app);
+  tracker = getTracker();
 });
 
 describe('GET /addresses', () => {
@@ -62,10 +64,7 @@ describe('GET /addresses', () => {
         id: 3
       }
     ];
-
-    tracker.on('query', (query) => {
-      query.response(testAddresses);
-    });
+    tracker.on.select('* from "addresses"').response(testAddresses);
 
     const response = await request.get(urlAddresses);
 
@@ -77,10 +76,7 @@ describe('GET /addresses', () => {
 
   it('should find a single address', async () => {
     const testAddresses = [testAddressCreated];
-
-    tracker.on('query', (query) => {
-      query.response(testAddresses);
-    });
+    tracker.on.select('* from "addresses"').response(testAddresses);
 
     const response = await request.get(urlAddresses);
 
@@ -92,10 +88,7 @@ describe('GET /addresses', () => {
 
   it('should find no addresses', async () => {
     const testAddresses = [];
-
-    tracker.on('query', (query) => {
-      query.response(testAddresses);
-    });
+    tracker.on.select('* from "addresses"').response(testAddresses);
 
     const response = await request.get(urlAddresses);
 
@@ -108,9 +101,7 @@ describe('GET /addresses', () => {
 
 describe('GET /addresses/:id', () => {
   it('should findOne single address', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve(testAddressCreated));
-    });
+    tracker.on.select('* from "addresses"').response(testAddressCreated);
 
     const response = await request.get(`${urlAddresses}/1`);
 
@@ -121,9 +112,7 @@ describe('GET /addresses/:id', () => {
   });
 
   it('should not findOne address', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve());
-    });
+    tracker.on.select('* from "addresses"').response(undefined);
 
     const response = await request.get(`${urlAddresses}/2`);
 
@@ -136,9 +125,7 @@ describe('GET /addresses/:id', () => {
 
 describe('POST /addresses', () => {
   it('should create an address', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([testAddressCreated]));
-    });
+    tracker.on.insert('into "addresses"').response([testAddressCreated]);
 
     const response = await request.post(urlAddresses).send(testAddress);
 
@@ -154,15 +141,13 @@ describe('POST /addresses', () => {
       first_name: 'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
         + 'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
     };
-    tracker.on('query', (query) => {
-      query.response(Promise.reject(new Error('DB insert failure')));
-    });
+    tracker.on.insert('into "addresses"').simulateError(new Error('DB insert failure'));
 
     const response = await request.post(urlAddresses).send(testAddressWithError);
 
     expect(response.status).toBe(500);
     expect(response.body.success).toBeFalsy();
-    expect(response.body.message).toBe('DB insert failure');
+    expect(response.body.message).toContain('DB insert failure');
     expect(response.body.data).toEqual({});
   });
 
@@ -171,9 +156,7 @@ describe('POST /addresses', () => {
       ...testAddress,
       email_address: 'test@failing-email.address'
     };
-    tracker.on('query', (query) => {
-      query.response(Promise.reject(new Error('Email validation failure')));
-    });
+    tracker.on.select('* from "addresses"').simulateError(new Error('Email validation failure'));
 
     const response = await request.post(urlAddresses).send(testAddressWithError);
 
@@ -186,9 +169,7 @@ describe('POST /addresses', () => {
 
 describe('PATCH /addresses:id', () => {
   it('should update known address', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([testAddressCreated]));
-    });
+    tracker.on.update('"addresses"').response([testAddressCreated]);
 
     const response = await request.patch(`${urlAddresses}/1`).send(testAddress);
 
@@ -199,9 +180,7 @@ describe('PATCH /addresses:id', () => {
   });
 
   it('should not update unknown address', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([]));
-    });
+    tracker.on.update('"addresses"').response([]);
 
     const response = await request.patch(`${urlAddresses}/1`).send(testAddress);
 
@@ -218,9 +197,7 @@ describe('DELETE /addresses:id', () => {
       ...testAddressCreated,
       is_deleted: true
     };
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([testAddressDeleted]));
-    });
+    tracker.on.update('"addresses"').response([testAddressDeleted]);
 
     const response = await request.delete(`${urlAddresses}/1`);
 
@@ -231,9 +208,7 @@ describe('DELETE /addresses:id', () => {
   });
 
   it('should not delete unknown address', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([]));
-    });
+    tracker.on.update('"addresses"').response([]);
 
     const response = await request.delete(`${urlAddresses}/1`);
 
