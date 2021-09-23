@@ -56,7 +56,7 @@ afterAll(() => {
   jest.resetModules();
   // eslint-disable-next-line global-require
   const knex = require('../../../config/knex');
-  knex.close();
+  knex.destroy();
 });
 
 describe('GET /addresses', () => {
