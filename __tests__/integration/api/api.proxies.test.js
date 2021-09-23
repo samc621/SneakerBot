@@ -3,11 +3,9 @@ const supertest = require('supertest');
 const { getTracker, MockClient } = require('knex-mock-client');
 const { router, urlProxies } = require('../../../routes');
 
-jest.mock('../../../config/knex', () => {
-  // eslint-disable-next-line global-require
-  const knex = require('knex');
-  return knex({ client: MockClient });
-});
+jest.mock('../../../knexfile', () => ({
+  test: { client: MockClient }
+}));
 
 const testProxy = {
   ip_address: '12.34.56.78',
@@ -33,6 +31,10 @@ const app = express();
 app.use(express.json());
 app.use('/', router);
 
+beforeEach(() => {
+  tracker.on.select('select 1+1').responseOnce([]);
+});
+
 afterEach(() => {
   tracker.reset();
 });
@@ -40,6 +42,15 @@ afterEach(() => {
 beforeAll(() => {
   request = supertest(app);
   tracker = getTracker();
+});
+
+afterAll(() => {
+  // This needs to be imported here to use the mock connection
+  jest.unmock('../../../knexfile');
+  jest.resetModules();
+  // eslint-disable-next-line global-require
+  const knex = require('../../../config/knex');
+  knex.close();
 });
 
 describe('GET /proxies', () => {
