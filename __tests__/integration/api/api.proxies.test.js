@@ -1,8 +1,13 @@
 const express = require('express');
 const supertest = require('supertest');
-const mockDb = require('mock-knex');
+const { getTracker, MockClient } = require('knex-mock-client');
 const { router, urlProxies } = require('../../../routes');
-const db = require('../../../config/knex');
+
+jest.mock('../../../config/knex', () => {
+  // eslint-disable-next-line global-require
+  const knex = require('knex');
+  return knex({ client: MockClient });
+});
 
 const testProxy = {
   ip_address: '12.34.56.78',
@@ -28,20 +33,13 @@ const app = express();
 app.use(express.json());
 app.use('/', router);
 
-beforeEach(() => {
-  mockDb.mock(db);
-  jest.resetAllMocks();
-  tracker = mockDb.getTracker();
-  tracker.install();
-});
-
 afterEach(() => {
-  mockDb.unmock(db);
-  tracker.uninstall();
+  tracker.reset();
 });
 
 beforeAll(() => {
   request = supertest(app);
+  tracker = getTracker();
 });
 
 describe('GET /proxies', () => {
@@ -57,10 +55,7 @@ describe('GET /proxies', () => {
         id: 3
       }
     ];
-
-    tracker.on('query', (query) => {
-      query.response(testProxies);
-    });
+    tracker.on.select('* from "proxies"').response(testProxies);
 
     const response = await request.get(urlProxies);
 
@@ -72,10 +67,7 @@ describe('GET /proxies', () => {
 
   it('should find a single proxy', async () => {
     const testProxies = [testProxyCreated];
-
-    tracker.on('query', (query) => {
-      query.response(testProxies);
-    });
+    tracker.on.select('* from "proxies"').response(testProxies);
 
     const response = await request.get(urlProxies);
 
@@ -87,10 +79,7 @@ describe('GET /proxies', () => {
 
   it('should find no proxies', async () => {
     const testProxies = [];
-
-    tracker.on('query', (query) => {
-      query.response(testProxies);
-    });
+    tracker.on.select('* from "proxies"').response(testProxies);
 
     const response = await request.get(urlProxies);
 
@@ -103,9 +92,7 @@ describe('GET /proxies', () => {
 
 describe('GET /proxies/:id', () => {
   it('should findOne single proxy', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve(testProxyCreated));
-    });
+    tracker.on.select('* from "proxies"').response(testProxyCreated);
 
     const response = await request.get(`${urlProxies}/1`);
 
@@ -116,9 +103,7 @@ describe('GET /proxies/:id', () => {
   });
 
   it('should not findOne proxy', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve());
-    });
+    tracker.on.select('* from "proxies"').response(undefined);
 
     const response = await request.get(`${urlProxies}/2`);
 
@@ -131,9 +116,7 @@ describe('GET /proxies/:id', () => {
 
 describe('POST /proxies', () => {
   it('should create an proxy', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([testProxyCreated]));
-    });
+    tracker.on.insert('into "proxies"').response([testProxyCreated]);
 
     const response = await request.post(urlProxies).send(testProxy);
 
@@ -149,15 +132,13 @@ describe('POST /proxies', () => {
       ip_address: 'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
         + 'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
     };
-    tracker.on('query', (query) => {
-      query.response(Promise.reject(new Error('DB insert failure')));
-    });
+    tracker.on.insert('into "proxies"').simulateError(new Error('DB insert failure'));
 
     const response = await request.post(urlProxies).send(testProxyWithError);
 
     expect(response.status).toBe(500);
     expect(response.body.success).toBeFalsy();
-    expect(response.body.message).toBe('DB insert failure');
+    expect(response.body.message).toContain('DB insert failure');
     expect(response.body.data).toEqual({});
   });
 
@@ -166,9 +147,7 @@ describe('POST /proxies', () => {
       ...testProxy,
       ip_address: null
     };
-    tracker.on('query', (query) => {
-      query.response(Promise.reject(new Error('Validation failure')));
-    });
+    tracker.on.insert('into "proxies"').simulateError(new Error('Validation failure'));
 
     const response = await request.post(urlProxies).send(testProxyWithError);
 
@@ -181,9 +160,7 @@ describe('POST /proxies', () => {
 
 describe('PATCH /proxies:id', () => {
   it('should update known address', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([testProxyCreated]));
-    });
+    tracker.on.update('"proxies"').response([testProxyCreated]);
 
     const response = await request.patch(`${urlProxies}/1`).send(testProxy);
 
@@ -194,9 +171,7 @@ describe('PATCH /proxies:id', () => {
   });
 
   it('should not update unknown proxy', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([]));
-    });
+    tracker.on.update('"proxies"').response([]);
 
     const response = await request.patch(`${urlProxies}/1`).send(testProxy);
 
@@ -213,9 +188,7 @@ describe('DELETE /proxies:id', () => {
       ...testProxyCreated,
       is_deleted: true
     };
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([testProxyDeleted]));
-    });
+    tracker.on.update('"proxies"').response([testProxyDeleted]);
 
     const response = await request.delete(`${urlProxies}/1`);
 
@@ -226,9 +199,7 @@ describe('DELETE /proxies:id', () => {
   });
 
   it('should not delete unknown proxy', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([]));
-    });
+    tracker.on.update('"proxies"').response([]);
 
     const response = await request.delete(`${urlProxies}/1`);
 

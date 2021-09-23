@@ -1,8 +1,13 @@
 const express = require('express');
 const supertest = require('supertest');
-const mockDb = require('mock-knex');
+const { getTracker, MockClient } = require('knex-mock-client');
 const { router, urlTasks } = require('../../../routes');
-const db = require('../../../config/knex');
+
+jest.mock('../../../config/knex', () => {
+  // eslint-disable-next-line global-require
+  const knex = require('knex');
+  return knex({ client: MockClient });
+});
 
 const testTask = {
   site_id: 2,
@@ -13,7 +18,6 @@ const testTask = {
   billing_address_id: 3,
   shipping_address_id: 4,
   notification_email_address: 'jsmith@gmail.com'
-  // auto_solve_captchas: false
 };
 
 const testTaskCreated = {
@@ -35,19 +39,16 @@ app.use(express.json());
 app.use(router);
 
 beforeEach(() => {
-  mockDb.mock(db);
-  jest.resetAllMocks();
-  tracker = mockDb.getTracker();
-  tracker.install();
+  tracker.on.select('* from "proxies"').responseOnce([]);
 });
 
 afterEach(() => {
-  mockDb.unmock(db);
-  tracker.uninstall();
+  tracker.reset();
 });
 
 beforeAll(() => {
   request = supertest(app);
+  tracker = getTracker();
 });
 
 describe('GET /tasks', () => {
@@ -63,10 +64,7 @@ describe('GET /tasks', () => {
         id: 3
       }
     ];
-
-    tracker.on('query', (query) => {
-      query.response(testTasks);
-    });
+    tracker.on.select('tasks.*').response(testTasks);
 
     const response = await request.get(urlTasks);
 
@@ -78,10 +76,7 @@ describe('GET /tasks', () => {
 
   it('should find a single proxy', async () => {
     const testTasks = [testTaskCreated];
-
-    tracker.on('query', (query) => {
-      query.response(testTasks);
-    });
+    tracker.on.select('tasks.*').response(testTasks);
 
     const response = await request.get(urlTasks);
 
@@ -93,10 +88,7 @@ describe('GET /tasks', () => {
 
   it('should find no tasks', async () => {
     const testTasks = [];
-
-    tracker.on('query', (query) => {
-      query.response(testTasks);
-    });
+    tracker.on.select('tasks.*').response(testTasks);
 
     const response = await request.get(urlTasks);
 
@@ -109,9 +101,7 @@ describe('GET /tasks', () => {
 
 describe('GET /tasks/:id', () => {
   it('should findOne single proxy', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve(testTaskCreated));
-    });
+    tracker.on.select('tasks.*').response(testTaskCreated);
 
     const response = await request.get(`${urlTasks}/1`);
 
@@ -122,9 +112,7 @@ describe('GET /tasks/:id', () => {
   });
 
   it('should not findOne proxy', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve());
-    });
+    tracker.on.select('tasks.*').response(undefined);
 
     const response = await request.get(`${urlTasks}/2`);
 
@@ -137,9 +125,7 @@ describe('GET /tasks/:id', () => {
 
 describe('POST /tasks', () => {
   it('should create an proxy', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([testTaskCreated]));
-    });
+    tracker.on.insert('into "tasks"').response([testTaskCreated]);
 
     const response = await request.post(urlTasks).send(testTask);
 
@@ -155,15 +141,13 @@ describe('POST /tasks', () => {
       url: 'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
         + 'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
     };
-    tracker.on('query', (query) => {
-      query.response(Promise.reject(new Error('DB insert failure')));
-    });
+    tracker.on.insert('into "tasks"').simulateError(new Error('DB insert failure'));
 
     const response = await request.post(urlTasks).send(testTaskWithError);
 
     expect(response.status).toBe(500);
     expect(response.body.success).toBeFalsy();
-    expect(response.body.message).toBe('DB insert failure');
+    expect(response.body.message).toContain('DB insert failure');
     expect(response.body.data).toEqual({});
   });
 
@@ -172,9 +156,7 @@ describe('POST /tasks', () => {
       ...testTask,
       site_id: null
     };
-    tracker.on('query', (query) => {
-      query.response(Promise.reject(new Error('Validation failure')));
-    });
+    tracker.on.insert('into "tasks"').simulateError(new Error('Validation failure'));
 
     const response = await request.post(urlTasks).send(testTaskWithError);
 
@@ -187,9 +169,7 @@ describe('POST /tasks', () => {
 
 describe('PATCH /tasks:id', () => {
   it('should update known address', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([testTaskCreated]));
-    });
+    tracker.on.update('"tasks"').response([testTaskCreated]);
 
     const response = await request.patch(`${urlTasks}/1`).send(testTask);
 
@@ -200,9 +180,7 @@ describe('PATCH /tasks:id', () => {
   });
 
   it('should not update unknown proxy', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([]));
-    });
+    tracker.on.update('"tasks"').response([]);
 
     const response = await request.patch(`${urlTasks}/1`).send(testTask);
 
@@ -219,9 +197,7 @@ describe('DELETE /tasks:id', () => {
       ...testTaskCreated,
       is_deleted: true
     };
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([testTaskDeleted]));
-    });
+    tracker.on.update('"tasks"').response([testTaskDeleted]);
 
     const response = await request.delete(`${urlTasks}/1`);
 
@@ -232,9 +208,7 @@ describe('DELETE /tasks:id', () => {
   });
 
   it('should not delete unknown proxy', async () => {
-    tracker.on('query', (query) => {
-      query.response(Promise.resolve([]));
-    });
+    tracker.on.update('"tasks"').response([]);
 
     const response = await request.delete(`${urlTasks}/1`);
 
