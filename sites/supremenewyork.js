@@ -105,15 +105,8 @@ async function checkout({
     taskLogger.info('Entering card details');
     await page.waitForTimeout(500);
     await page.waitForSelector(creditCardNumberSelector);
-    // Using this methos instead of page.type because its faster and less error prone
+    // Using this method instead of page.type to avoid errors with typing out of order
     await page.$eval(creditCardNumberSelector, (el, value) => el.value = value, cardDetails.cardNumber);
-    // await page.type(
-    //   creditCardNumberSelector,
-    //   cardDetails.cardNumber,
-    //   {
-    //     delay: 10
-    //   }
-    // );
 
     await page.waitForSelector(
       creditCardExpirationMonthSelector
@@ -228,7 +221,6 @@ exports.guestCheckout = async ({
         const form = document.querySelector('div#cctrl form#cart-add');
 
         if (sizeStr) {
-            // THIS IS WHERE ITS NOT WORKING
           const sElem = form.querySelectorAll('fieldset select#s');
           sElem.selected = true;
         }
