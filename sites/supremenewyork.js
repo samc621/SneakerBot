@@ -7,47 +7,40 @@ async function enterAddressDetails({ page, address }) {
     const nameSelector = 'input#order_billing_name';
     const emailSelector = 'input#order_email';
     const phoneNumberSelector = 'input#order_tel';
-    const address1Selector = 'input#bo';
-    const address2Selector = 'input#oba3';
+    const address1Selector = 'input#order_billing_address';
+    const address2Selector = 'input#order_billing_address_2';
     const postalCodeSelector = 'input#order_billing_zip';
     // const citySelector = 'input#order_billing_city';
     // const stateSelector = 'select#order_billing_state';
 
     await page.waitForSelector(nameSelector);
-    await page.type(nameSelector, `${address.first_name} ${address.last_name}`, {
-      delay: 10
-    });
-    await page.waitForTimeout(2000);
+    await page.$eval(nameSelector, (el, value) => el.value = value, `${address.first_name} ${address.last_name}`);
+    await page.waitForTimeout(500);
 
     await page.waitForSelector(emailSelector);
-    await page.type(emailSelector, address.email_address, {
-      delay: 10
-    });
-    await page.waitForTimeout(2000);
+    await page.$eval(emailSelector, (el, value) => el.value = value, address.email_address);
+    await page.waitForTimeout(100);
 
     await page.waitForSelector(phoneNumberSelector);
-    await page.type(phoneNumberSelector, address.phone_number, {
-      delay: 10
-    });
-    await page.waitForTimeout(2000);
+    await page.$eval(phoneNumberSelector, (el, value) => el.value = value, address.phone_number);
+
+    await page.waitForTimeout(1000);
 
     await page.waitForSelector(address1Selector);
     await page.type(address1Selector, address.address_line_1, {
-      delay: 10
+      delay: 6
     });
-    await page.waitForTimeout(2000);
 
     await page.waitForSelector(address2Selector);
     await page.type(address2Selector, address.address_line_2, {
-      delay: 10
+      delay: 8
     });
-    await page.waitForTimeout(2000);
 
     await page.waitForSelector(postalCodeSelector);
     await page.type(postalCodeSelector, address.postal_code, {
       delay: 10
     });
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(1000);
 
     // Prefilled by supremenewyork
 
@@ -103,18 +96,24 @@ async function checkout({
     const orderTermsCheckboxSelector = 'input#order_terms';
     const submitButtonsSelector = 'div#pay input[type="submit"]';
 
+    // Added this to check if credit card year is 2 or 4 characters
+    const ccYear = cardDetails.expirationYear.length === 4 ? cardDetails.expirationYear : `20${cardDetails.expirationYear}`
+
     taskLogger.info('Entering billing details (must be same as shipping details)');
     await enterAddressDetails({ page, address: billingAddress });
 
     taskLogger.info('Entering card details');
+    await page.waitForTimeout(500);
     await page.waitForSelector(creditCardNumberSelector);
-    await page.type(
-      creditCardNumberSelector,
-      cardDetails.cardNumber,
-      {
-        delay: 10
-      }
-    );
+    // Using this methos instead of page.type because its faster and less error prone
+    await page.$eval(creditCardNumberSelector, (el, value) => el.value = value, cardDetails.cardNumber);
+    // await page.type(
+    //   creditCardNumberSelector,
+    //   cardDetails.cardNumber,
+    //   {
+    //     delay: 10
+    //   }
+    // );
 
     await page.waitForSelector(
       creditCardExpirationMonthSelector
@@ -123,25 +122,25 @@ async function checkout({
       creditCardExpirationMonthSelector,
       cardDetails.expirationMonth
     );
-    await page.waitForTimeout(2000);
+//    await page.waitForTimeout(2000);
 
     await page.waitForSelector(
       creditCardExpirationYearSelector
     );
     await page.select(
       creditCardExpirationYearSelector,
-      `20${cardDetails.expirationYear}`
+      ccYear
     );
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(500);
 
     await page.type(creditCardCVVSelector, cardDetails.securityCode, {
       delay: 10
     });
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(500);
 
     await page.waitForSelector(orderTermsCheckboxSelector);
     await page.click(orderTermsCheckboxSelector);
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(500);
 
     taskLogger.info('Clicking submit order button');
     await page.waitForSelector(submitButtonsSelector);
@@ -226,9 +225,10 @@ exports.guestCheckout = async ({
     while (!isInCart) {
       taskLogger.info('Attempting to add product to cart');
       await page.evaluate((sizeStr) => {
-        const form = document.querySelector('div#cctrl form#cart-addf');
+        const form = document.querySelector('div#cctrl form#cart-add');
 
         if (sizeStr) {
+            // THIS IS WHERE ITS NOT WORKING
           const sElem = form.querySelectorAll('fieldset select#s');
           sElem.selected = true;
         }
