@@ -2,10 +2,31 @@ const rp = require('request-promise');
 
 const apiKey = process.env.API_KEY_2CAPTCHA;
 
-async function submitCaptcha(googleKey, pageUrl) {
+async function submitReCAPTCHAV2(googleKey, pageUrl) {
   try {
     const options = {
       uri: `http://2captcha.com/in.php?key=${apiKey}&method=userrecaptcha&googlekey=${googleKey}&pageurl=${pageUrl}&json=1`,
+      method: 'POST'
+    };
+
+    const response = await rp(options);
+    const responseJson = JSON.parse(response);
+    if (responseJson.status) {
+      return responseJson;
+    }
+
+    throw new Error(responseJson.error_text);
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function submitGeeTest(gt, challenge, api_server, pageUrl) {
+  try {
+    const options = {
+      uri: `
+        http://2captcha.com/in.php?key=${apiKey}&method=geetest&gt=${gt}&challenge=${challenge}&api_server=${api_server}&pageurl=${pageUrl}&json=1
+      `,
       method: 'POST'
     };
 
@@ -40,7 +61,7 @@ async function getCaptchaResult(captchaId) {
   }
 }
 
-exports.solveCaptcha = async ({
+exports.solveReCAPTCHAV2 = async ({
   taskLogger, page, captchaSelector, captchaIframeSelector
 }) => {
   try {
@@ -66,7 +87,7 @@ exports.solveCaptcha = async ({
     }, { captchaSelector, captchaIframeSelector });
     taskLogger.info(`Extracted googleKey ${googleKey}`);
 
-    const captcha = await submitCaptcha(googleKey, context.url());
+    const captcha = await submitReCAPTCHAV2(googleKey, context.url());
     const captchaId = captcha.request;
     taskLogger.info(`Submitted captcha to 2captcha, got id ${captchaId}`);
 
@@ -75,13 +96,14 @@ exports.solveCaptcha = async ({
     while (!solved) {
       try {
         const result = await getCaptchaResult(captchaId);
-        if (result && result.request) {
+        if (result && result.request && result.status !== 0) {
           captchaAnswer = result.request;
           solved = true;
         }
       } catch (err) {
-        await page.waitForTimeout(1000);
+        // no-op
       }
+      await page.waitForTimeout(1000);
     }
 
     if (captchaAnswer) {
@@ -136,6 +158,64 @@ exports.solveCaptcha = async ({
         }
 
         return callbackFunction;
+      }, captchaAnswer);
+    }
+    const submissionSucccess = true;
+    return submissionSucccess;
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.solveGeeTest = async ({ taskLogger, page, captchaIframeSelector }) => {
+  try {
+    taskLogger.info('Detected captcha, solving');
+
+    if (!apiKey) {
+      throw new Error('You must set an API_KEY_2CAPTCHA in your .env file.');
+    }
+
+    let context = page;
+    if (captchaIframeSelector) {
+      const frameHandle = await page.$(captchaIframeSelector);
+      context = await frameHandle.contentFrame();
+    }
+
+    const iframeUrl = context.url();
+    taskLogger.info(`Geetest iframe URL: ${iframeUrl}`);
+    const pageHtml = await rp(iframeUrl);
+    const [api_server, gt, challenge] = pageHtml
+      .split('initGeetest({').pop().split('}, handlerEmbed')[0]
+      .split(/:|,/)
+      .filter((e, i) => i % 2 !== 0)
+      .map((val) => val.trim().replace(/'/g, ''));
+    taskLogger.info(`Extracted gt ${gt}, challenge ${challenge}, api_server ${api_server}, pageurl=${page.url()}`);
+
+    const captcha = await submitGeeTest(gt, challenge, api_server, page.url());
+    const captchaId = captcha.request;
+    taskLogger.info(`Submitted captcha to 2captcha, got id ${captchaId}`);
+
+    let solved = false;
+    let captchaAnswer;
+    while (!solved) {
+      try {
+        const result = await getCaptchaResult(captchaId);
+        if (result && result.request && result.status !== 0) {
+          captchaAnswer = result.request;
+          solved = true;
+        }
+      } catch (err) {
+        // no-op
+      }
+      await page.waitForTimeout(1000);
+    }
+
+    if (captchaAnswer) {
+      taskLogger.info(`Got captcha result ${JSON.stringify(captchaAnswer)} from 2captcha, submitting`);
+
+      await context.evaluate((captchaAnswerObj) => {
+        window.geetestResponse = captchaAnswerObj;
+        window.captchaCallback();
       }, captchaAnswer);
     }
     const submissionSucccess = true;
