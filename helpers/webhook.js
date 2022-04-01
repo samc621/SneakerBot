@@ -10,6 +10,6 @@ exports.sendWebhookEvent = async (data) => {
 
     await axios.post(webhookEndpoint, data);
   } catch (err) {
-    throw err;
+    console.error('Error sending webhook event', err);
   }
 };

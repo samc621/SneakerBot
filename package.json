@@ -7,6 +7,8 @@
     "start": "node ./app.js",
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
+    "prettier-check": "./node_modules/.bin/prettier --check .",
+    "prettier-write": "./node_modules/.bin/prettier --write .",
     "knex": "knex",
     "test": "jest",
     "test:watch": "jest --watch"
@@ -29,9 +31,6 @@
   "dependencies": {
     "axios": "^0.26.1",
     "dotenv-flow": "^3.2.0",
-    "eslint": "^8.12.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.23.4",
     "express": "^4.17.1",
     "express-validation": "^3.0.8",
     "http-proxy-agent": "^5.0.0",
@@ -48,8 +47,13 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
+    "eslint": "^8.12.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.25.4",
     "jest": "^27.0.4",
     "knex-mock-client": "^1.6.2",
+    "prettier": "^2.6.1",
     "supertest": "^6.1.3"
   }
 }
