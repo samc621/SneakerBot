@@ -27,30 +27,29 @@
     "testEnvironment": "node"
   },
   "dependencies": {
+    "axios": "^0.26.1",
     "dotenv-flow": "^3.2.0",
-    "eslint": "^7.28.0",
-    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint": "^8.12.0",
+    "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.23.4",
     "express": "^4.17.1",
     "express-validation": "^3.0.8",
+    "http-proxy-agent": "^5.0.0",
     "joi": "^17.4.0",
-    "knex": "^0.21.19",
-    "knex-mock-client": "^1.5.1",
+    "knex": "^1.0.4",
     "nodemailer": "^6.6.1",
     "pg": "^8.6.0",
-    "puppeteer": "^10.0.0",
-    "puppeteer-cluster": "^0.22.0",
+    "puppeteer": "^13.5.2",
+    "puppeteer-cluster": "^0.23.0",
     "puppeteer-extra": "^3.1.18",
     "puppeteer-extra-plugin-anonymize-ua": "^2.2.17",
     "puppeteer-extra-plugin-stealth": "^2.7.8",
-    "request": "^2.88.2",
-    "request-promise": "^4.2.6",
     "user-agents": "^1.0.705",
     "winston": "^3.3.3"
   },
   "devDependencies": {
     "jest": "^27.0.4",
-    "mock-knex": "^0.4.10",
+    "knex-mock-client": "^1.6.2",
     "supertest": "^6.1.3"
   }
 }
