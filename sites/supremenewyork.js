@@ -14,15 +14,24 @@ async function enterAddressDetails({ page, address }) {
     // const stateSelector = 'select#order_billing_state';
 
     await page.waitForSelector(nameSelector);
-    await page.$eval(nameSelector, (el, value) => el.value = value, `${address.first_name} ${address.last_name}`);
+    await page.evaluate(({ selector, value }) => {
+      const el = document.querySelector(selector);
+      el.value = value;
+    }, { selector: nameSelector, value: `${address.first_name} ${address.last_name}` });
     await page.waitForTimeout(500);
 
     await page.waitForSelector(emailSelector);
-    await page.$eval(emailSelector, (el, value) => el.value = value, address.email_address);
+    await page.evaluate(({ selector, value }) => {
+      const el = document.querySelector(selector);
+      el.value = value;
+    }, { selector: emailSelector, value: address.email_address });
     await page.waitForTimeout(100);
 
     await page.waitForSelector(phoneNumberSelector);
-    await page.$eval(phoneNumberSelector, (el, value) => el.value = value, address.phone_number);
+    await page.evaluate(({ selector, value }) => {
+      const el = document.querySelector(selector);
+      el.value = value;
+    }, { selector: phoneNumberSelector, value: address.phone_number });
 
     await page.waitForTimeout(1000);
 
@@ -97,7 +106,7 @@ async function checkout({
     const submitButtonsSelector = 'div#pay input[type="submit"]';
 
     // Added this to check if credit card year is 2 or 4 characters
-    const ccYear = cardDetails.expirationYear.length === 4 ? cardDetails.expirationYear : `20${cardDetails.expirationYear}`
+    const ccYear = cardDetails.expirationYear.length === 4 ? cardDetails.expirationYear : `20${cardDetails.expirationYear}`;
 
     taskLogger.info('Entering billing details (must be same as shipping details)');
     await enterAddressDetails({ page, address: billingAddress });
@@ -106,7 +115,10 @@ async function checkout({
     await page.waitForTimeout(500);
     await page.waitForSelector(creditCardNumberSelector);
     // Using this method instead of page.type to avoid errors with typing out of order
-    await page.$eval(creditCardNumberSelector, (el, value) => el.value = value, cardDetails.cardNumber);
+    await page.evaluate(({ selector, value }) => {
+      const el = document.querySelector(selector);
+      el.value = value;
+    }, { selector: creditCardNumberSelector, value: cardDetails.cardNumber });
 
     await page.waitForSelector(
       creditCardExpirationMonthSelector
@@ -115,7 +127,7 @@ async function checkout({
       creditCardExpirationMonthSelector,
       cardDetails.expirationMonth
     );
-//    await page.waitForTimeout(2000);
+    //    await page.waitForTimeout(2000);
 
     await page.waitForSelector(
       creditCardExpirationYearSelector
