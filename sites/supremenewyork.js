@@ -14,21 +14,21 @@ async function enterAddressDetails({ page, address }) {
     // const stateSelector = 'select#order_billing_state';
 
     await page.waitForSelector(nameSelector);
-    await page.evaluate((selector, value) => {
+    await page.evaluate(({ selector, value }) => {
       const el = document.querySelector(selector);
       el.value = value;
     }, { selector: nameSelector, value: `${address.first_name} ${address.last_name}` });
     await page.waitForTimeout(500);
 
     await page.waitForSelector(emailSelector);
-    await page.evaluate((selector, value) => {
+    await page.evaluate(({ selector, value }) => {
       const el = document.querySelector(selector);
       el.value = value;
     }, { selector: emailSelector, value: address.email_address });
     await page.waitForTimeout(100);
 
     await page.waitForSelector(phoneNumberSelector);
-    await page.evaluate((selector, value) => {
+    await page.evaluate(({ selector, value }) => {
       const el = document.querySelector(selector);
       el.value = value;
     }, { selector: phoneNumberSelector, value: address.phone_number });
@@ -115,7 +115,7 @@ async function checkout({
     await page.waitForTimeout(500);
     await page.waitForSelector(creditCardNumberSelector);
     // Using this method instead of page.type to avoid errors with typing out of order
-    await page.evaluate((selector, value) => {
+    await page.evaluate(({ selector, value }) => {
       const el = document.querySelector(selector);
       el.value = value;
     }, { selector: creditCardNumberSelector, value: cardDetails.cardNumber });
