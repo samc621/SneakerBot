@@ -14,7 +14,7 @@ const db = knex(configuration);
   } catch (err) {
     console.error("Couldn't connect to DB:", { err });
     console.info(`Retries left: ${retries}`);
-    setTimeout(connectToDB(retries - 1), 5000);
+    await connectToDB(retries - 1);
   }
 })();
 
