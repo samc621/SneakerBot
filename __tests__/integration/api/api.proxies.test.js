@@ -140,8 +140,9 @@ describe('POST /proxies', () => {
   it('should create no proxy when db insert fails', async () => {
     const testProxyWithError = {
       ...testProxy,
-      ip_address: 'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
-        + 'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
+      ip_address:
+        'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters' +
+        'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
     };
     tracker.on.insert('into "proxies"').simulateError(new Error('DB insert failure'));
 

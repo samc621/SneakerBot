@@ -54,14 +54,7 @@ async function enterAddressDetails({ page, address }) {
   await page.waitForTimeout(2000);
 }
 
-async function checkout({
-  taskLogger,
-  page,
-  shippingAddress,
-  shippingSpeedIndex,
-  billingAddress,
-  cardFriendlyName
-}) {
+async function checkout({ taskLogger, page, shippingAddress, shippingSpeedIndex, billingAddress, cardFriendlyName }) {
   let cardDetails = {
     cardNumber: process.env.CARD_NUMBER,
     nameOnCard: process.env.NAME_ON_CARD,
@@ -139,10 +132,13 @@ async function checkout({
 
   // strange bug with Nike, frame.type() doesn't work on this field.
   // have to manually set the value
-  await frame.evaluate(({ creditCardNumberSelector: creditCardNumberSelectorStr, cardDetails: cardDetailsObj }) => {
-    const fieldHandle = document.querySelector(creditCardNumberSelectorStr);
-    fieldHandle.value = cardDetailsObj.cardNumber;
-  }, { creditCardNumberSelector, cardDetails });
+  await frame.evaluate(
+    ({ creditCardNumberSelector: creditCardNumberSelectorStr, cardDetails: cardDetailsObj }) => {
+      const fieldHandle = document.querySelector(creditCardNumberSelectorStr);
+      fieldHandle.value = cardDetailsObj.cardNumber;
+    },
+    { creditCardNumberSelector, cardDetails }
+  );
   await page.waitForTimeout(2000);
 
   await frame.click(creditCardNumberSelector);
@@ -150,13 +146,9 @@ async function checkout({
 
   await frame.click(creditCardExpirationDateSelector);
   await page.waitForTimeout(2000);
-  await frame.type(
-    creditCardExpirationDateSelector,
-    String(cardDetails.expirationMonth).concat(cardDetails.expirationYear),
-    {
-      delay: 10
-    }
-  );
+  await frame.type(creditCardExpirationDateSelector, String(cardDetails.expirationMonth).concat(cardDetails.expirationYear), {
+    delay: 10
+  });
   await page.waitForTimeout(2000);
 
   await frame.type(creditCardCVVSelector, cardDetails.securityCode, {
@@ -276,13 +268,17 @@ exports.guestCheckout = async ({
     // using timeout 0 in case we are waiting for product drop and then sizes are enabled
     await page.waitForSelector(sizesSelector, { timeout: 0 });
     taskLogger.info('Selecting size');
-    await page.evaluate((sizesSelectorText, sizeValue) => {
-      const sizes = Array.from(document.querySelectorAll(sizesSelectorText));
-      const matchingSize = sizes.find((sz) => sz.value.endsWith(sizeValue));
-      if (matchingSize) {
-        matchingSize.click();
-      }
-    }, sizesSelector, size);
+    await page.evaluate(
+      (sizesSelectorText, sizeValue) => {
+        const sizes = Array.from(document.querySelectorAll(sizesSelectorText));
+        const matchingSize = sizes.find((sz) => sz.value.endsWith(sizeValue));
+        if (matchingSize) {
+          matchingSize.click();
+        }
+      },
+      sizesSelector,
+      size
+    );
 
     const atcButtonSelector = 'button.add-to-cart-btn';
     await page.waitForSelector(atcButtonSelector);
@@ -309,7 +305,12 @@ exports.guestCheckout = async ({
 
   if (isInCart) {
     await checkout({
-      taskLogger, page, shippingAddress, shippingSpeedIndex, billingAddress, cardFriendlyName
+      taskLogger,
+      page,
+      shippingAddress,
+      shippingSpeedIndex,
+      billingAddress,
+      cardFriendlyName
     });
 
     const cartSelector = 'span.va-sm-m.fs12-sm.ta-sm-c';

@@ -116,7 +116,9 @@ async function checkout({
   if (hasCaptcha) {
     if (autoSolveCaptchas) {
       const solved = await solveCaptcha({
-        taskLogger, page, captchaSelector
+        taskLogger,
+        page,
+        captchaSelector
       });
       if (solved) hasCaptcha = false;
     } else {
@@ -179,40 +181,24 @@ async function checkout({
   const cardNumberFrameHandle = cardFieldIframes[0];
   const cardNumberFrame = await cardNumberFrameHandle.contentFrame();
   await cardNumberFrame.waitForSelector(creditCardNumberSelector);
-  await cardNumberFrame.type(
-    creditCardNumberSelector,
-    cardDetails.cardNumber,
-    {
-      delay: 10
-    }
-  );
+  await cardNumberFrame.type(creditCardNumberSelector, cardDetails.cardNumber, {
+    delay: 10
+  });
 
   const nameOnCardFrameHandle = cardFieldIframes[1];
   const nameOnCardFrame = await nameOnCardFrameHandle.contentFrame();
-  await nameOnCardFrame.waitForSelector(
-    nameOnCardSelector
-  );
-  await nameOnCardFrame.type(
-    nameOnCardSelector,
-    cardDetails.nameOnCard,
-    {
-      delay: 10
-    }
-  );
+  await nameOnCardFrame.waitForSelector(nameOnCardSelector);
+  await nameOnCardFrame.type(nameOnCardSelector, cardDetails.nameOnCard, {
+    delay: 10
+  });
   await page.waitForTimeout(2000);
 
   const cardExpirationDateFrameHandle = cardFieldIframes[2];
   const cardExpirationDateFrame = await cardExpirationDateFrameHandle.contentFrame();
-  await cardExpirationDateFrame.waitForSelector(
-    creditCardExpirationDateSelector
-  );
-  await cardExpirationDateFrame.type(
-    creditCardExpirationDateSelector,
-    cardDetails.expirationMonth + cardDetails.expirationYear,
-    {
-      delay: 10
-    }
-  );
+  await cardExpirationDateFrame.waitForSelector(creditCardExpirationDateSelector);
+  await cardExpirationDateFrame.type(creditCardExpirationDateSelector, cardDetails.expirationMonth + cardDetails.expirationYear, {
+    delay: 10
+  });
   await page.waitForTimeout(2000);
 
   const cardCVVFrameHandle = cardFieldIframes[3];
@@ -230,7 +216,9 @@ async function checkout({
 
     taskLogger.info('Entering billing details');
     await enterAddressDetails({
-      page, address: billingAddress, type: 'billing'
+      page,
+      address: billingAddress,
+      type: 'billing'
     });
   } catch (err) {
     // no-op if timeout occurs

@@ -74,15 +74,7 @@ async function enterAddressDetails({ page, address, type }) {
   await page.waitForTimeout(2000);
 }
 
-async function checkout({
-  taskLogger,
-  page,
-  shippingAddress,
-  shippingSpeedIndex,
-  billingAddress,
-  domain,
-  cardFriendlyName
-}) {
+async function checkout({ taskLogger, page, shippingAddress, shippingSpeedIndex, billingAddress, domain, cardFriendlyName }) {
   taskLogger.info('Navigating to checkout page');
   await page.goto(`${domain}/delivery`, { waitUntil: 'domcontentloaded' });
 
@@ -132,7 +124,9 @@ async function checkout({
 
   taskLogger.info('Entering billing details');
   await enterAddressDetails({
-    page, address: billingAddress, type: 'billing'
+    page,
+    address: billingAddress,
+    type: 'billing'
   });
 
   await page.waitForSelector(reviewAndPayButtonsSelector);
@@ -144,42 +138,26 @@ async function checkout({
   const cardNumberFrameHandle = await page.$(creditCardNumberIframeSelector);
   const cardNumberFrame = await cardNumberFrameHandle.contentFrame();
   await cardNumberFrame.waitForSelector(creditCardNumberSelector);
-  await cardNumberFrame.type(
-    creditCardNumberSelector,
-    cardDetails.cardNumber,
-    {
-      delay: 10
-    }
-  );
+  await cardNumberFrame.type(creditCardNumberSelector, cardDetails.cardNumber, {
+    delay: 10
+  });
 
-  await page.waitForSelector(
-    nameOnCardSelector
-  );
+  await page.waitForSelector(nameOnCardSelector);
   const nameOnCardHandle = await page.$(nameOnCardSelector);
   await nameOnCardHandle.click();
   await nameOnCardHandle.focus();
   await nameOnCardHandle.click({ clickCount: 3 });
   await nameOnCardHandle.press('Backspace');
 
-  await page.type(
-    nameOnCardSelector,
-    cardDetails.nameOnCard,
-    {
-      delay: 10
-    }
-  );
+  await page.type(nameOnCardSelector, cardDetails.nameOnCard, {
+    delay: 10
+  });
   await page.waitForTimeout(2000);
 
-  await page.waitForSelector(
-    creditCardExpirationDateSelector
-  );
-  await page.type(
-    creditCardExpirationDateSelector,
-    cardDetails.expirationMonth + cardDetails.expirationYear,
-    {
-      delay: 10
-    }
-  );
+  await page.waitForSelector(creditCardExpirationDateSelector);
+  await page.type(creditCardExpirationDateSelector, cardDetails.expirationMonth + cardDetails.expirationYear, {
+    delay: 10
+  });
   await page.waitForTimeout(2000);
 
   await page.waitForSelector(creditCardCVVIframeSelector);
@@ -214,12 +192,7 @@ async function closeModal({ taskLogger, page }) {
   }
 }
 
-async function searchByProductCode({
-  taskLogger,
-  page,
-  productCode,
-  domain
-}) {
+async function searchByProductCode({ taskLogger, page, productCode, domain }) {
   taskLogger.info('Searching for product by product code');
   let searchResult;
   while (!searchResult) {
@@ -296,29 +269,33 @@ exports.guestCheckout = async ({
   let isInCart = false;
   while (!isInCart) {
     taskLogger.info('Attempting to add product to cart');
-    isInCart = await page.evaluate(async ({
-      productId, productVariationSku, sizeStr, sitePathStr
-    }) => {
-      const data = {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          product_id: productId,
-          quantity: 1,
-          product_variation_sku: productVariationSku,
-          productId: productVariationSku,
-          size: sizeStr,
-          displaySize: sizeStr
-        })
-      };
-      const response = await fetch(`/api/chk/baskets/-/items?sitePath=${sitePathStr}`, data);
-      return response.ok;
-    }, {
-      productId: product_id, productVariationSku: product_variation_sku, sizeStr: size, sitePathStr: sitePath
-    });
+    isInCart = await page.evaluate(
+      async ({ productId, productVariationSku, sizeStr, sitePathStr }) => {
+        const data = {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            product_id: productId,
+            quantity: 1,
+            product_variation_sku: productVariationSku,
+            productId: productVariationSku,
+            size: sizeStr,
+            displaySize: sizeStr
+          })
+        };
+        const response = await fetch(`/api/chk/baskets/-/items?sitePath=${sitePathStr}`, data);
+        return response.ok;
+      },
+      {
+        productId: product_id,
+        productVariationSku: product_variation_sku,
+        sizeStr: size,
+        sitePathStr: sitePath
+      }
+    );
 
     if (!isInCart) {
       taskLogger.info('Got error while adding to cart from API, falling back to DOM');

@@ -146,8 +146,9 @@ describe('POST /tasks', () => {
   it('should create no proxy when db insert fails', async () => {
     const testTaskWithError = {
       ...testTask,
-      url: 'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
-        + 'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
+      url:
+        'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters' +
+        'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
     };
     tracker.on.insert('into "tasks"').simulateError(new Error('DB insert failure'));
 

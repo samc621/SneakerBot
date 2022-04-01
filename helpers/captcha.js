@@ -22,9 +22,7 @@ async function getCaptchaResult(captchaId) {
   throw new Error(responseJson.error_text);
 }
 
-exports.solveCaptcha = async ({
-  taskLogger, page, captchaSelector, captchaIframeSelector
-}) => {
+exports.solveCaptcha = async ({ taskLogger, page, captchaSelector, captchaIframeSelector }) => {
   taskLogger.info('Detected captcha, solving');
 
   if (!apiKey) {
@@ -37,14 +35,17 @@ exports.solveCaptcha = async ({
     context = await frameHandle.contentFrame();
   }
 
-  const googleKey = await context.evaluate(({ captchaSelector: captchaDivSelectorStr, captchaIframeSelector: captchaIframeSelectorStr }) => {
-    const captchaDiv = captchaDivSelectorStr && document.querySelector(captchaDivSelectorStr);
-    const iframe = captchaDiv ? captchaDiv.querySelector('iframe') : document.querySelector(captchaIframeSelectorStr);
-    const iframeSrc = iframe.getAttribute('src');
-    const iframeSrcParams = new URLSearchParams(iframeSrc);
-    const kValue = iframeSrcParams.get('k');
-    return kValue;
-  }, { captchaSelector, captchaIframeSelector });
+  const googleKey = await context.evaluate(
+    ({ captchaSelector: captchaDivSelectorStr, captchaIframeSelector: captchaIframeSelectorStr }) => {
+      const captchaDiv = captchaDivSelectorStr && document.querySelector(captchaDivSelectorStr);
+      const iframe = captchaDiv ? captchaDiv.querySelector('iframe') : document.querySelector(captchaIframeSelectorStr);
+      const iframeSrc = iframe.getAttribute('src');
+      const iframeSrcParams = new URLSearchParams(iframeSrc);
+      const kValue = iframeSrcParams.get('k');
+      return kValue;
+    },
+    { captchaSelector, captchaIframeSelector }
+  );
   taskLogger.info(`Extracted googleKey ${googleKey}`);
 
   const captcha = await submitCaptcha(googleKey, context.url());
@@ -69,15 +70,13 @@ exports.solveCaptcha = async ({
     taskLogger.info(`Got captcha result ${captchaAnswer} from 2captcha, submitting`);
     await context.evaluate((captchaAnswerText) => {
       function findRecaptchaClients() {
-        if (typeof (window.___grecaptcha_cfg) !== 'undefined') {
+        if (typeof window.___grecaptcha_cfg !== 'undefined') {
           return Object.entries(window.___grecaptcha_cfg.clients).map(([cid, client]) => {
             const data = { id: cid, version: cid >= 10000 ? 'V3' : 'V2' };
             const objects = Object.entries(client).filter(([, value]) => value && typeof value === 'object');
 
             objects.forEach(([toplevelKey, toplevel]) => {
-              const found = Object.entries(toplevel).find(([, value]) => (
-                value && typeof value === 'object' && 'sitekey' in value && 'size' in value
-              ));
+              const found = Object.entries(toplevel).find(([, value]) => value && typeof value === 'object' && 'sitekey' in value && 'size' in value);
               if (found) {
                 const [sublevelKey, sublevel] = found;
 

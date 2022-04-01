@@ -66,15 +66,7 @@ async function enterAddressDetails({ page, address }) {
   // await page.waitForTimeout(2000);
 }
 
-async function checkout({
-  taskLogger,
-  page,
-  domain,
-  shippingAddress,
-  shippingSpeedIndex,
-  billingAddress,
-  cardFriendlyName
-}) {
+async function checkout({ taskLogger, page, domain, shippingAddress, shippingSpeedIndex, billingAddress, cardFriendlyName }) {
   let cardDetails = {
     cardNumber: process.env.CARD_NUMBER,
     nameOnCard: process.env.NAME_ON_CARD,
@@ -134,9 +126,7 @@ async function checkout({
   await page.waitForTimeout(2000);
 
   await page.waitForSelector(submitButtonsSelector);
-  const contactInformationSubmitButtonSelector = await page.$$(
-    submitButtonsSelector
-  );
+  const contactInformationSubmitButtonSelector = await page.$$(submitButtonsSelector);
   await contactInformationSubmitButtonSelector[0].click();
   await page.waitForTimeout(2000);
 
@@ -147,9 +137,7 @@ async function checkout({
   await page.click(differentBillingAddressSelector);
   await page.waitForTimeout(2000);
 
-  const shippingSpeedsAvailable = await page.$(
-    shippingSpeedsAvailableSelector
-  );
+  const shippingSpeedsAvailable = await page.$(shippingSpeedsAvailableSelector);
   if (shippingSpeedsAvailable) {
     taskLogger.info('Selecting desired shipping speed');
     await page.click(shippingSpeedsAvailableSelector);
@@ -160,16 +148,12 @@ async function checkout({
   }
 
   await page.waitForSelector(submitButtonsSelector);
-  const shippingAddressSubmitButtonSelector = await page.$$(
-    submitButtonsSelector
-  );
+  const shippingAddressSubmitButtonSelector = await page.$$(submitButtonsSelector);
   await shippingAddressSubmitButtonSelector[1].click();
   await page.waitForTimeout(2000);
 
   await page.waitForSelector(submitButtonsSelector);
-  const shippingAddressSubmitButtonTwoSelector = await page.$$(
-    submitButtonsSelector
-  );
+  const shippingAddressSubmitButtonTwoSelector = await page.$$(submitButtonsSelector);
   await shippingAddressSubmitButtonTwoSelector[3].click();
   await page.waitForTimeout(2000);
 
@@ -178,46 +162,26 @@ async function checkout({
   const cardNumberFrameHandle = await page.$(cardNumberIframeSelector);
   const cardNumberFrame = await cardNumberFrameHandle.contentFrame();
   await cardNumberFrame.waitForSelector(creditCardNumberSelector);
-  await cardNumberFrame.type(
-    creditCardNumberSelector,
-    cardDetails.cardNumber,
-    {
-      delay: 10
-    }
-  );
+  await cardNumberFrame.type(creditCardNumberSelector, cardDetails.cardNumber, {
+    delay: 10
+  });
 
   await page.waitForSelector(cardExpMonthIframeSelector);
-  const cardExpirationMonthFrameHandle = await page.$(
-    cardExpMonthIframeSelector
-  );
+  const cardExpirationMonthFrameHandle = await page.$(cardExpMonthIframeSelector);
   const cardExpirationMonthFrame = await cardExpirationMonthFrameHandle.contentFrame();
-  await cardExpirationMonthFrame.waitForSelector(
-    creditCardExpirationMonthSelector
-  );
-  await cardExpirationMonthFrame.type(
-    creditCardExpirationMonthSelector,
-    cardDetails.expirationMonth,
-    {
-      delay: 10
-    }
-  );
+  await cardExpirationMonthFrame.waitForSelector(creditCardExpirationMonthSelector);
+  await cardExpirationMonthFrame.type(creditCardExpirationMonthSelector, cardDetails.expirationMonth, {
+    delay: 10
+  });
   await page.waitForTimeout(2000);
 
   await page.waitForSelector(cardExpYearIframeSelector);
-  const cardExpirationYearFrameHandle = await page.$(
-    cardExpYearIframeSelector
-  );
+  const cardExpirationYearFrameHandle = await page.$(cardExpYearIframeSelector);
   const cardExpirationYearFrame = await cardExpirationYearFrameHandle.contentFrame();
-  await cardExpirationYearFrame.waitForSelector(
-    creditCardExpirationYearSelector
-  );
-  await cardExpirationYearFrame.type(
-    creditCardExpirationYearSelector,
-    cardDetails.expirationYear,
-    {
-      delay: 10
-    }
-  );
+  await cardExpirationYearFrame.waitForSelector(creditCardExpirationYearSelector);
+  await cardExpirationYearFrame.type(creditCardExpirationYearSelector, cardDetails.expirationYear, {
+    delay: 10
+  });
   await page.waitForTimeout(2000);
 
   const cardCVVFrameHandle = await page.$(cardCVVIframeSelector);
@@ -230,9 +194,7 @@ async function checkout({
   taskLogger.info('Entering billing details');
   await enterAddressDetails({ page, address: billingAddress });
 
-  const billingAddressSubmitButtonSelector = await page.$$(
-    submitButtonsSelector
-  );
+  const billingAddressSubmitButtonSelector = await page.$$(submitButtonsSelector);
   await billingAddressSubmitButtonSelector[4].click();
   await page.waitForTimeout(2000);
 
@@ -252,12 +214,7 @@ async function closeModal({ taskLogger, page }) {
   });
 }
 
-async function searchByProductCode({
-  taskLogger,
-  page,
-  productCode,
-  domain
-}) {
+async function searchByProductCode({ taskLogger, page, productCode, domain }) {
   taskLogger.info('Searching for product by product code');
   let searchResult;
   while (!searchResult) {
@@ -335,16 +292,20 @@ exports.guestCheckout = async ({
     taskLogger.info('Selecting size');
     const sizesSelector = 'div.c-form-field.c-form-field--radio.ProductSize';
     await page.waitForSelector(sizesSelector);
-    await page.waitForFunction(({ selector, sizeStr }) => {
-      const sizeDivs = Array.from(document.querySelectorAll(selector));
-      const matchingSizeDiv = sizeDivs.find((el) => new RegExp(sizeStr, 'i').test(el.innerText));
-      const matchingSizeInput = matchingSizeDiv && matchingSizeDiv.querySelector('input');
-      if (matchingSizeInput) {
-        matchingSizeInput.click();
-        return true;
-      }
-      return false;
-    }, {}, { selector: sizesSelector, sizeStr: size });
+    await page.waitForFunction(
+      ({ selector, sizeStr }) => {
+        const sizeDivs = Array.from(document.querySelectorAll(selector));
+        const matchingSizeDiv = sizeDivs.find((el) => new RegExp(sizeStr, 'i').test(el.innerText));
+        const matchingSizeInput = matchingSizeDiv && matchingSizeDiv.querySelector('input');
+        if (matchingSizeInput) {
+          matchingSizeInput.click();
+          return true;
+        }
+        return false;
+      },
+      {},
+      { selector: sizesSelector, sizeStr: size }
+    );
     taskLogger.info('Selected size');
     await page.waitForTimeout(2000);
 
@@ -389,7 +350,10 @@ exports.guestCheckout = async ({
     if (hasCaptcha) {
       if (autoSolveCaptchas) {
         const solved = await solveCaptcha({
-          taskLogger, page, captchaSelector, captchaIframeSelector
+          taskLogger,
+          page,
+          captchaSelector,
+          captchaIframeSelector
         });
         if (solved) hasCaptcha = false;
       } else {
@@ -418,7 +382,13 @@ exports.guestCheckout = async ({
 
   if (isInCart) {
     await checkout({
-      taskLogger, page, domain, shippingAddress, shippingSpeedIndex, billingAddress, cardFriendlyName
+      taskLogger,
+      page,
+      domain,
+      shippingAddress,
+      shippingSpeedIndex,
+      billingAddress,
+      cardFriendlyName
     });
 
     const cartSelector = 'span.CartCount-badge';

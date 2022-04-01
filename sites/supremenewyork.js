@@ -13,24 +13,33 @@ async function enterAddressDetails({ page, address }) {
   // const stateSelector = 'select#order_billing_state';
 
   await page.waitForSelector(nameSelector);
-  await page.evaluate(({ selector, value }) => {
-    const el = document.querySelector(selector);
-    el.value = value;
-  }, { selector: nameSelector, value: `${address.first_name} ${address.last_name}` });
+  await page.evaluate(
+    ({ selector, value }) => {
+      const el = document.querySelector(selector);
+      el.value = value;
+    },
+    { selector: nameSelector, value: `${address.first_name} ${address.last_name}` }
+  );
   await page.waitForTimeout(500);
 
   await page.waitForSelector(emailSelector);
-  await page.evaluate(({ selector, value }) => {
-    const el = document.querySelector(selector);
-    el.value = value;
-  }, { selector: emailSelector, value: address.email_address });
+  await page.evaluate(
+    ({ selector, value }) => {
+      const el = document.querySelector(selector);
+      el.value = value;
+    },
+    { selector: emailSelector, value: address.email_address }
+  );
   await page.waitForTimeout(100);
 
   await page.waitForSelector(phoneNumberSelector);
-  await page.evaluate(({ selector, value }) => {
-    const el = document.querySelector(selector);
-    el.value = value;
-  }, { selector: phoneNumberSelector, value: address.phone_number });
+  await page.evaluate(
+    ({ selector, value }) => {
+      const el = document.querySelector(selector);
+      el.value = value;
+    },
+    { selector: phoneNumberSelector, value: address.phone_number }
+  );
 
   await page.waitForTimeout(1000);
 
@@ -63,16 +72,7 @@ async function enterAddressDetails({ page, address }) {
   // await page.waitForTimeout(2000);
 }
 
-async function checkout({
-  taskLogger,
-  page,
-  billingAddress,
-  autoSolveCaptchas,
-  notificationEmailAddress,
-  url,
-  size,
-  cardFriendlyName
-}) {
+async function checkout({ taskLogger, page, billingAddress, autoSolveCaptchas, notificationEmailAddress, url, size, cardFriendlyName }) {
   taskLogger.info('Navigating to checkout page');
   const checkoutButtonSelector = 'a.button.checkout';
   await page.waitForSelector(checkoutButtonSelector);
@@ -110,27 +110,20 @@ async function checkout({
   await page.waitForTimeout(500);
   await page.waitForSelector(creditCardNumberSelector);
   // Using this method instead of page.type to avoid errors with typing out of order
-  await page.evaluate(({ selector, value }) => {
-    const el = document.querySelector(selector);
-    el.value = value;
-  }, { selector: creditCardNumberSelector, value: cardDetails.cardNumber });
+  await page.evaluate(
+    ({ selector, value }) => {
+      const el = document.querySelector(selector);
+      el.value = value;
+    },
+    { selector: creditCardNumberSelector, value: cardDetails.cardNumber }
+  );
 
-  await page.waitForSelector(
-    creditCardExpirationMonthSelector
-  );
-  await page.select(
-    creditCardExpirationMonthSelector,
-    cardDetails.expirationMonth
-  );
+  await page.waitForSelector(creditCardExpirationMonthSelector);
+  await page.select(creditCardExpirationMonthSelector, cardDetails.expirationMonth);
   //    await page.waitForTimeout(2000);
 
-  await page.waitForSelector(
-    creditCardExpirationYearSelector
-  );
-  await page.select(
-    creditCardExpirationYearSelector,
-    ccYear
-  );
+  await page.waitForSelector(creditCardExpirationYearSelector);
+  await page.select(creditCardExpirationYearSelector, ccYear);
   await page.waitForTimeout(500);
 
   await page.type(creditCardCVVSelector, cardDetails.securityCode, {
@@ -157,7 +150,9 @@ async function checkout({
   if (hasCaptcha) {
     if (autoSolveCaptchas) {
       const solved = await solveCaptcha({
-        taskLogger, page, captchaSelector
+        taskLogger,
+        page,
+        captchaSelector
       });
       if (solved) hasCaptcha = false;
       await page.evaluate(() => {
@@ -204,16 +199,7 @@ async function checkout({
   return checkoutComplete;
 }
 
-exports.guestCheckout = async ({
-  taskLogger,
-  page,
-  url,
-  size,
-  billingAddress,
-  autoSolveCaptchas,
-  notificationEmailAddress,
-  cardFriendlyName
-}) => {
+exports.guestCheckout = async ({ taskLogger, page, url, size, billingAddress, autoSolveCaptchas, notificationEmailAddress, cardFriendlyName }) => {
   taskLogger.info('Navigating to URL');
   await page.goto(url, { waitUntil: 'domcontentloaded' });
 

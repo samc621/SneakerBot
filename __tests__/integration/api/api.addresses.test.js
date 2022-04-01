@@ -146,8 +146,9 @@ describe('POST /addresses', () => {
   it('should create no address when db insert fails', async () => {
     const testAddressWithError = {
       ...testAddress,
-      first_name: 'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
-        + 'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
+      first_name:
+        'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters' +
+        'testWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacterstestWithTooManyCharacters'
     };
     tracker.on.insert('into "addresses"').simulateError(new Error('DB insert failure'));
 
