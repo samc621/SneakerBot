@@ -1,16 +1,12 @@
-const rp = require('request-promise');
+const axios = require('axios').default;
 
 const apiKey = process.env.API_KEY_2CAPTCHA;
 
 async function submitCaptcha(googleKey, pageUrl) {
   try {
-    const options = {
-      uri: `http://2captcha.com/in.php?key=${apiKey}&method=userrecaptcha&googlekey=${googleKey}&pageurl=${pageUrl}&json=1`,
-      method: 'POST'
-    };
-
-    const response = await rp(options);
-    const responseJson = JSON.parse(response);
+    const { data: responseJson } = await axios.post(
+      `http://2captcha.com/in.php?key=${apiKey}&method=userrecaptcha&googlekey=${googleKey}&pageurl=${pageUrl}&json=1`
+    );
     if (responseJson.status) {
       return responseJson;
     }
@@ -23,13 +19,7 @@ async function submitCaptcha(googleKey, pageUrl) {
 
 async function getCaptchaResult(captchaId) {
   try {
-    const options = {
-      uri: `http://2captcha.com/res.php?key=${apiKey}&action=get&id=${captchaId}&json=1`,
-      method: 'GET'
-    };
-
-    const response = await rp(options);
-    const responseJson = JSON.parse(response);
+    const { data: responseJson } = await axios.get(`http://2captcha.com/res.php?key=${apiKey}&action=get&id=${captchaId}&json=1`);
     if (responseJson.status) {
       return responseJson;
     }
@@ -127,7 +117,7 @@ exports.solveCaptcha = async ({
         if (typeof callbackFunction === 'function') {
           callbackFunction(captchaAnswerText);
         } else if (typeof callbackFunction === 'string') {
-          callbackFunction = eval(callbackFunction);
+          callbackFunction = window[callbackFunction];
           if (typeof callbackFunction === 'function') {
             callbackFunction(captchaAnswerText);
           } else if (typeof callbackFunction === 'string') {
