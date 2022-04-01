@@ -127,7 +127,7 @@ exports.solveCaptcha = async ({
         if (typeof callbackFunction === 'function') {
           callbackFunction(captchaAnswerText);
         } else if (typeof callbackFunction === 'string') {
-          callbackFunction = eval(callbackFunction);
+          callbackFunction = window[callbackFunction];
           if (typeof callbackFunction === 'function') {
             callbackFunction(captchaAnswerText);
           } else if (typeof callbackFunction === 'string') {
