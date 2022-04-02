@@ -1,7 +1,7 @@
-const express = require('express');
-const { validate } = require('express-validation');
-const { createProxy, getProxy, getProxies, updateProxy, deleteProxy } = require('./controller');
-const { create, findOne, findAll, update, deleted } = require('./validation');
+import express from 'express';
+import { validate } from 'express-validation';
+import { createProxy, getProxy, getProxies, updateProxy, deleteProxy } from './controller.js';
+import { create, findOne, findAll, update, deleted } from './validation.js';
 
 const router = express.Router();
 
@@ -9,4 +9,4 @@ router.route('/').post(validate(create), createProxy).get(validate(findAll), get
 
 router.route('/:id').get(validate(findOne), getProxy).patch(validate(update), updateProxy).delete(validate(deleted), deleteProxy);
 
-module.exports = router;
+export default router;

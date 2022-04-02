@@ -1,10 +1,10 @@
-const nike = require('./nike');
-const footsites = require('./footsites');
-const shopify = require('./shopify');
-const demandware = require('./demandware');
-const supremenewyork = require('./supremenewyork');
+import nike from './nike.js';
+import footsites from './footsites.js';
+import shopify from './shopify.js';
+import demandware from './demandware.js';
+import supremenewyork from './supremenewyork.js';
 
-module.exports = {
+export default {
   nike,
   footsites,
   shopify,

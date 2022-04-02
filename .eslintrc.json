@@ -6,7 +6,7 @@
   "root": true,
   "env": {
     "node": true,
-    "es6": true,
+    "es2020": true,
     "browser": true
   },
   "overrides": [
@@ -18,13 +18,24 @@
       "env": {
         "jest": true
       }
+    },
+    {
+      "files": [
+        "*.js"
+      ],
+      "rules": {
+        "import/extensions": "off"
+      }
     }
   ],
   "rules": {
     "linebreak-style": 0,
     "max-len": [
       "warn",
-      150
+      {
+        "code": 150,
+        "ignoreTemplateLiterals": true
+      }
     ],
     "no-console": "off",
     "comma-dangle": [
@@ -38,5 +49,8 @@
     "no-continue": "off",
     "camelcase": "off",
     "no-underscore-dangle": "off"
-  }
+  },
+    "parserOptions": {
+      "ecmaVersion": 2020
+    }
 }

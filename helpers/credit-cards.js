@@ -1,5 +1,7 @@
-const creditCards = require('../credit-cards.json');
+import creditCards from '../credit-cards.js';
 
-exports.getCardDetailsByFriendlyName = (friendlyName) => {
+const getCardDetailsByFriendlyName = (friendlyName) => {
   return creditCards.find((card) => card.friendlyName === friendlyName);
 };
+
+export default getCardDetailsByFriendlyName;

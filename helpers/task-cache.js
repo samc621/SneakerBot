@@ -1,14 +1,14 @@
 const taskCache = {};
 
-exports.storePageInTaskCache = ({ taskId, page }) => {
+export const storePageInTaskCache = ({ taskId, page }) => {
   taskCache[taskId] = page;
 };
 
-exports.retrievePageFromTaskCache = ({ taskId }) => {
+export const retrievePageFromTaskCache = ({ taskId }) => {
   return taskCache[taskId];
 };
 
-exports.removePageFromTaskCache = async ({ taskId }) => {
+export const removePageFromTaskCache = async ({ taskId }) => {
   const page = this.retrievePageFromTaskCache({ taskId });
   if (page) await page.close();
   delete taskCache[taskId];

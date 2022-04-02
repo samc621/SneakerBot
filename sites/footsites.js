@@ -1,6 +1,6 @@
-const { solveCaptcha } = require('../helpers/captcha');
-const { sendEmail } = require('../helpers/email');
-const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
+import solveCaptcha from '../helpers/captcha.js';
+import sendEmail from '../helpers/email.js';
+import getCardDetailsByFriendlyName from '../helpers/credit-cards.js';
 
 async function enterAddressDetails({ page, address }) {
   const firstNameSelector = 'input[name="firstName"]';
@@ -241,7 +241,7 @@ async function searchByProductCode({ taskLogger, page, productCode, domain }) {
   }
 }
 
-exports.guestCheckout = async ({
+const guestCheckout = async ({
   taskLogger,
   page,
   url,
@@ -404,3 +404,5 @@ exports.guestCheckout = async ({
 
   return checkoutComplete;
 };
+
+export default guestCheckout;

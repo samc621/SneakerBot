@@ -1,8 +1,8 @@
-const express = require('express');
-const pg = require('pg');
+import express from 'express';
+import pg from 'pg';
+import router from './routes/index.js';
 
 const app = express();
-const router = require('./routes');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

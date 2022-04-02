@@ -1,4 +1,4 @@
-const knex = require('../../config/knex');
+import knex from '../../config/knex/index.js';
 
 class TasksModel {
   constructor(id) {
@@ -14,19 +14,19 @@ class TasksModel {
   }
 
   async find(data) {
-    data['tasks.is_deleted'] = false;
     return knex(this.tableName)
       .select(knex.raw(`tasks.*, sites.name AS "site_name"`))
       .leftJoin('sites', 'tasks.site_id', '=', 'sites.id')
+      .whereRaw(knex.raw('tasks.is_deleted = false'))
       .where(data)
       .orderBy('tasks.created_at', 'desc');
   }
 
   async findOne(data) {
-    data['tasks.is_deleted'] = false;
     return knex(this.tableName)
       .select(knex.raw(`tasks.*, sites.name AS "site_name"`))
       .leftJoin('sites', 'tasks.site_id', '=', 'sites.id')
+      .whereRaw(knex.raw('tasks.is_deleted = false'))
       .where(data)
       .orderBy('tasks.created_at', 'desc')
       .first();
@@ -45,4 +45,4 @@ class TasksModel {
   }
 }
 
-module.exports = TasksModel;
+export default TasksModel;

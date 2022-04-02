@@ -1,6 +1,6 @@
-const { solveCaptcha } = require('../helpers/captcha');
-const { sendEmail } = require('../helpers/email');
-const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
+import solveCaptcha from '../helpers/captcha.js';
+import sendEmail from '../helpers/email.js';
+import getCardDetailsByFriendlyName from '../helpers/credit-cards.js';
 
 async function enterAddressDetails({ page, address }) {
   const nameSelector = 'input#order_billing_name';
@@ -199,7 +199,7 @@ async function checkout({ taskLogger, page, billingAddress, autoSolveCaptchas, n
   return checkoutComplete;
 }
 
-exports.guestCheckout = async ({ taskLogger, page, url, size, billingAddress, autoSolveCaptchas, notificationEmailAddress, cardFriendlyName }) => {
+const guestCheckout = async ({ taskLogger, page, url, size, billingAddress, autoSolveCaptchas, notificationEmailAddress, cardFriendlyName }) => {
   taskLogger.info('Navigating to URL');
   await page.goto(url, { waitUntil: 'domcontentloaded' });
 
@@ -245,3 +245,5 @@ exports.guestCheckout = async ({ taskLogger, page, url, size, billingAddress, au
 
   return checkoutComplete;
 };
+
+export default guestCheckout;

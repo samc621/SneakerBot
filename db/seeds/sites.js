@@ -1,4 +1,4 @@
-exports.seed = (knex) => {
+export const seed = (knex) => {
   const sites = [
     { id: 1, name: 'nike' },
     { id: 2, name: 'footsites' },
@@ -14,3 +14,5 @@ exports.seed = (knex) => {
     .returning('*')
     .then((rows) => rows);
 };
+
+export default seed;

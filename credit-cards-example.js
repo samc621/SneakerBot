@@ -1,4 +1,4 @@
-[
+const cards = [
   {
     "friendlyName": "Visa",
     "cardNumber": "4242424242424242",
@@ -16,3 +16,4 @@
     "securityCode": "123"
   }
 ]
+export default cards;

@@ -1,5 +1,5 @@
-const { getStateNameFromAbbreviation } = require('../helpers/states');
-const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
+import getStateNameFromAbbreviation from '../helpers/states.js';
+import getCardDetailsByFriendlyName from '../helpers/credit-cards.js';
 
 async function enterAddressDetails({ page, address, type }) {
   const firstNameSelector = `input#${type}Address-firstName`;
@@ -219,7 +219,7 @@ async function searchByProductCode({ taskLogger, page, productCode, domain }) {
   }
 }
 
-exports.guestCheckout = async ({
+const guestCheckout = async ({
   taskLogger,
   page,
   url,
@@ -342,3 +342,5 @@ exports.guestCheckout = async ({
 
   return checkoutComplete;
 };
+
+export default guestCheckout;

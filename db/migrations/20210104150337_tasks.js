@@ -1,5 +1,5 @@
-exports.up = function (knex) {
+export const up = (knex) => {
   knex.raw(`ALTER TABLE tasks ALTER COLUMN size TYPE varchar (255);`);
 };
 
-exports.down = function () {};
+export const down = () => { };

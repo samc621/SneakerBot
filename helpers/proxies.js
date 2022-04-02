@@ -1,12 +1,11 @@
-const axios = require('axios').default;
-const HttpProxyAgent = require('http-proxy-agent');
+import axios from 'axios';
+import HttpProxyAgent from 'http-proxy-agent';
 
-exports.createProxyString = (proxy) =>
-  `${proxy.protocol}://${proxy.username ? `${proxy.username}${proxy.password ? `:${proxy.password}@` : '@'}` : ''}${proxy.ip_address}${
-    proxy.port ? `:${proxy.port}` : ''
+export const createProxyString = (proxy) =>
+  `${proxy.protocol}://${proxy.username ? `${proxy.username}${proxy.password ? `:${proxy.password}@` : '@'}` : ''}${proxy.ip_address}${proxy.port ? `:${proxy.port}` : ''
   }`;
 
-exports.testProxy = async (proxyString) => {
+export const testProxy = async (proxyString) => {
   try {
     const httpAgent = new HttpProxyAgent(proxyString);
     const response = await axios.get('http://www.google.com', { httpAgent });

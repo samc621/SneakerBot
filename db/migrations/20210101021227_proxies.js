@@ -1,4 +1,4 @@
-exports.up = function (knex) {
+export const up = (knex) => {
   return knex.schema.createTable('proxies', (table) => {
     table.increments();
     table.string('ip_address').notNullable();
@@ -13,6 +13,6 @@ exports.up = function (knex) {
   });
 };
 
-exports.down = function (knex) {
+export const down = (knex) => {
   return knex.schema.dropTable('proxies');
 };
