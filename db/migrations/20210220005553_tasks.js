@@ -4,6 +4,6 @@ export const up = (knex) => {
     table.string('size').nullable().alter();
     table.integer('shipping_speed_index').nullable().alter();
   });
-}
+};
 
-export const down = () => { };
+export const down = () => {};

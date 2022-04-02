@@ -39,4 +39,4 @@ jobs:
           push: true
           cache-from: type=registry,ref=samc621/sneakerbot:latest
           cache-to: type=inline
-          tags: samc621/sneakerbot:latest    
+          tags: samc621/sneakerbot:latest

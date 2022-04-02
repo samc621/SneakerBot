@@ -8,19 +8,19 @@ export const create = {
     username: Joi.string().allow(null).optional(),
     password: Joi.string().allow(null).optional()
   })
-}
+};
 
 export const findOne = {
   params: Joi.object({
     id: Joi.number().required()
   })
-}
+};
 
 export const findAll = {
   query: Joi.object({
     protocol: Joi.string().optional()
   })
-}
+};
 
 export const update = {
   params: Joi.object({
@@ -33,10 +33,10 @@ export const update = {
     username: Joi.string().allow(null).optional(),
     password: Joi.string().allow(null).optional()
   })
-}
+};
 
 export const deleted = {
   params: Joi.object({
     id: Joi.number().required()
   })
-}
+};

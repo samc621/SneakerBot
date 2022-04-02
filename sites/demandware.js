@@ -219,17 +219,7 @@ async function searchByProductCode({ taskLogger, page, productCode, domain }) {
   }
 }
 
-const guestCheckout = async ({
-  taskLogger,
-  page,
-  url,
-  productCode,
-  size,
-  shippingAddress,
-  shippingSpeedIndex,
-  billingAddress,
-  cardFriendlyName
-}) => {
+const guestCheckout = async ({ taskLogger, page, url, productCode, size, shippingAddress, shippingSpeedIndex, billingAddress, cardFriendlyName }) => {
   const splitDomain = url.split('/').slice(0, 4);
   const sitePath = splitDomain[3];
   const domain = splitDomain.join('/');

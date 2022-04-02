@@ -30,7 +30,6 @@ let tracker;
 let app;
 const urlProxies = '/v1/proxies';
 
-
 beforeAll(async () => {
   const router = (await import('../../../routes')).default;
 

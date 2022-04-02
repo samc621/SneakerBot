@@ -14,11 +14,16 @@ class ProxiesModel {
   }
 
   async find(data) {
-    return knex(this.tableName).where({ is_deleted: false, ...data }).orderBy('created_at', 'desc');
+    return knex(this.tableName)
+      .where({ is_deleted: false, ...data })
+      .orderBy('created_at', 'desc');
   }
 
   async findOne(data) {
-    return knex(this.tableName).where({ is_deleted: false, ...data }).orderBy('created_at', 'desc').first();
+    return knex(this.tableName)
+      .where({ is_deleted: false, ...data })
+      .orderBy('created_at', 'desc')
+      .first();
   }
 
   async update(data) {

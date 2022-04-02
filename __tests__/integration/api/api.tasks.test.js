@@ -38,7 +38,6 @@ const urlTasks = '/v1/tasks';
 beforeAll(async () => {
   const router = (await import('../../../routes')).default;
 
-
   app = express();
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));

@@ -14,4 +14,4 @@ const sendWebhookEvent = async (data) => {
   }
 };
 
-export default sendWebhookEvent
+export default sendWebhookEvent;

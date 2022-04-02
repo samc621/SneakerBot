@@ -26,7 +26,7 @@ export const findAll = {
   query: Joi.object({
     type: Joi.string().valid('billing', 'shipping').optional()
   })
-}
+};
 
 export const update = {
   params: Joi.object({
@@ -45,10 +45,10 @@ export const update = {
     email_address: Joi.string().email().optional(),
     phone_number: Joi.string().optional()
   })
-}
+};
 
 export const deleted = {
   params: Joi.object({
     id: Joi.number().required()
   })
-}
+};

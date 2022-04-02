@@ -12,13 +12,13 @@ export const create = {
     shipping_address_id: Joi.number().integer().required(),
     notification_email_address: Joi.string().email().allow(null).optional()
   })
-}
+};
 
 export const findOne = {
   params: Joi.object({
     id: Joi.number().required()
   })
-}
+};
 
 export const findAll = {
   query: Joi.object({
@@ -29,7 +29,7 @@ export const findAll = {
     shipping_address_id: Joi.number().integer().optional(),
     notification_email_address: Joi.string().email().optional()
   })
-}
+};
 
 export const update = {
   params: Joi.object({
@@ -46,13 +46,13 @@ export const update = {
     shipping_address_id: Joi.number().integer().optional(),
     notification_email_address: Joi.string().email().allow(null).optional()
   })
-}
+};
 
 export const deleted = {
   params: Joi.object({
     id: Joi.number().required()
   })
-}
+};
 
 export const start = {
   params: Joi.object({
@@ -61,10 +61,10 @@ export const start = {
   body: Joi.object({
     card_friendly_name: Joi.string().optional()
   })
-}
+};
 
 export const stop = {
   params: Joi.object({
     id: Joi.number().required()
   })
-}
+};
