@@ -2,7 +2,7 @@ const express = require('express');
 const pg = require('pg');
 
 const app = express();
-const { router } = require('./routes');
+const router = require('./routes');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

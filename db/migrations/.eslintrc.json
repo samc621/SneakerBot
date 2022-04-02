@@ -1,5 +1,8 @@
 {
-    "extends": "airbnb-base",
+    "extends": [
+        "airbnb-base",
+        "prettier"
+    ],
     "root": false,
     "env": {
         "node": true,

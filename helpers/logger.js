@@ -22,9 +22,7 @@ class Logger {
       format: format.combine(
         format.errors({ stack: true }),
         format.printf((info) => {
-          return info.level === 'info'
-            ? `[${new Date().toLocaleString()}] - ${info.message}`
-            : `[${new Date().toLocaleString()}] - ${info.stack}`;
+          return info.level === 'info' ? `[${new Date().toLocaleString()}] - ${info.message}` : `[${new Date().toLocaleString()}] - ${info.stack}`;
         })
       )
     });

@@ -16,7 +16,7 @@ jobs:
       - name: Run ESLint
         run: npm run lint
       - name: Run tests
-        run: npm test       
+        run: npm test
   deploy:
     if: github.ref == 'refs/heads/master'
     name: Push Docker image to Docker Hub

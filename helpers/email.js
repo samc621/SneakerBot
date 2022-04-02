@@ -12,15 +12,13 @@ exports.sendEmail = async ({ recipient: to, subject, text }) => {
       }
     });
 
-    const info = await transporter.sendMail({
+    await transporter.sendMail({
       from: process.env.EMAIL_USERNAME,
       to,
       subject,
       text
     });
-
-    return info.messageId;
   } catch (err) {
-    throw err;
+    console.warn('Error sending email', err);
   }
 };

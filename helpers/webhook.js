@@ -1,4 +1,4 @@
-const rp = require('request-promise');
+const axios = require('axios').default;
 
 const webhookEndpoint = process.env.WEBHOOK_ENDPOINT;
 
@@ -8,15 +8,8 @@ exports.sendWebhookEvent = async (data) => {
       return;
     }
 
-    const options = {
-      uri: webhookEndpoint,
-      method: 'POST',
-      body: data,
-      json: true
-    };
-
-    await rp(options);
+    await axios.post(webhookEndpoint, data);
   } catch (err) {
-    throw err;
+    console.error('Error sending webhook event', err);
   }
 };

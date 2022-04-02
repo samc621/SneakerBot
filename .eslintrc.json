@@ -1,5 +1,8 @@
 {
-  "extends": "airbnb-base",
+  "extends": [
+    "airbnb-base",
+    "prettier"
+  ],
   "root": true,
   "env": {
     "node": true,
@@ -30,13 +33,10 @@
     ],
     "no-await-in-loop": "off",
     "radix": "off",
-    "no-undef": "warn",
     "no-loop-func": "off",
     "arrow-body-style": "off",
     "no-continue": "off",
     "camelcase": "off",
-    "no-useless-catch": "off",
-    "no-underscore-dangle": "off",
-    "no-eval": "warn"
+    "no-underscore-dangle": "off"
   }
 }
