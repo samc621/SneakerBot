@@ -1,5 +1,7 @@
 # SneakerBot
 
+[![build, lint, test, deploy](https://github.com/samc621/SneakerBot/actions/workflows/build_lint_deploy.yml/badge.svg)](https://github.com/samc621/SneakerBot/actions/workflows/build_lint_deploy.yml)
+
 This bot uses Node.js and Puppeteer to automate the checkout on various sneaker websites. It currently works on:
 
 1. Footsites (footlocker.com, footaction.com, eastbay.com, champssports.com)
