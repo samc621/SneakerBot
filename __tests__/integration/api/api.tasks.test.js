@@ -3,7 +3,7 @@ import express from 'express';
 import request from 'supertest';
 import { getTracker, MockClient } from 'knex-mock-client';
 
-jest.mock('../../../config/knex', () => {
+jest.mock('../../../db', () => {
   // eslint-disable-next-line global-require
   const knex = require('knex');
   return knex({ client: MockClient });
@@ -55,7 +55,7 @@ afterEach(() => {
 });
 
 afterAll(() => {
-  jest.unmock('../../../config/knex');
+  jest.unmock('../../../db');
   jest.resetModules();
 });
 

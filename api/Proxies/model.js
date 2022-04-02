@@ -1,4 +1,4 @@
-import knex from '../../config/knex/index.js';
+import knex from '../../db/index.js';
 
 class ProxiesModel {
   constructor(id) {

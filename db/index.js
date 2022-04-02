@@ -1,5 +1,5 @@
 import knex from 'knex';
-import configs from '../../knexfile.js';
+import configs from '../knexfile.js';
 
 const environment = process.env.NODE_ENV || 'local';
 const configuration = configs[environment];
