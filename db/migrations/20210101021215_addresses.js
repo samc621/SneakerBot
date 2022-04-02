@@ -24,5 +24,7 @@ export const up = (knex) => {
 };
 
 export const down = (knex) => {
-  return knex.schema.dropTable('addresses');
+  return knex.schema.dropTable('addresses').then(() => {
+    return knex.raw('DROP TYPE address_types');
+  })
 };
