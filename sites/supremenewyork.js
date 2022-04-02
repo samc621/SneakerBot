@@ -206,6 +206,7 @@ exports.guestCheckout = async ({ taskLogger, page, url, size, billingAddress, au
   let isInCart = false;
   while (!isInCart) {
     taskLogger.info('Attempting to add product to cart');
+    await page.waitForSelector('div#cctrl form#cart-add')
     await page.evaluate((sizeStr) => {
       const form = document.querySelector('div#cctrl form#cart-add');
 

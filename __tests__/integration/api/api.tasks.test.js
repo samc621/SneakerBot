@@ -1,11 +1,12 @@
 const express = require('express');
-const supertest = require('supertest');
+const request = require('supertest');
 const { getTracker, MockClient } = require('knex-mock-client');
-const { router, urlTasks } = require('../../../routes');
 
-jest.mock('../../../knexfile', () => ({
-  test: { client: MockClient }
-}));
+jest.mock('../../../config/knex', () => {
+  // eslint-disable-next-line global-require
+  const knex = require('knex');
+  return knex({ client: MockClient });
+});
 
 const testTask = {
   site_id: 2,
@@ -29,15 +30,23 @@ const testTaskCreated = {
   product_code: 'PR0DUCT-100'
 };
 
-let request;
 let tracker;
+let app;
+const urlTasks = '/v1/tasks';
 
-const app = express();
-app.use(express.json());
-app.use(router);
+beforeAll(() => {
+  // eslint-disable-next-line global-require
+  const router = require('../../../routes');
+
+  app = express();
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
+  app.use('/v1', router);
+
+  tracker = getTracker();
+});
 
 beforeEach(() => {
-  tracker.on.select('select 1+1').responseOnce([]);
   tracker.on.select('* from "proxies"').responseOnce([]);
 });
 
@@ -45,18 +54,9 @@ afterEach(() => {
   tracker.reset();
 });
 
-beforeAll(() => {
-  request = supertest(app);
-  tracker = getTracker();
-});
-
 afterAll(() => {
-  // This needs to be imported here to use the mock connection
-  jest.unmock('../../../knexfile');
+  jest.unmock('../../../config/knex');
   jest.resetModules();
-  // eslint-disable-next-line global-require
-  const knex = require('../../../config/knex');
-  knex.destroy();
 });
 
 describe('GET /tasks', () => {
@@ -74,7 +74,7 @@ describe('GET /tasks', () => {
     ];
     tracker.on.select('tasks.*').response(testTasks);
 
-    const response = await request.get(urlTasks);
+    const response = await request(app).get(urlTasks);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -86,7 +86,7 @@ describe('GET /tasks', () => {
     const testTasks = [testTaskCreated];
     tracker.on.select('tasks.*').response(testTasks);
 
-    const response = await request.get(urlTasks);
+    const response = await request(app).get(urlTasks);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -98,7 +98,7 @@ describe('GET /tasks', () => {
     const testTasks = [];
     tracker.on.select('tasks.*').response(testTasks);
 
-    const response = await request.get(urlTasks);
+    const response = await request(app).get(urlTasks);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -111,7 +111,7 @@ describe('GET /tasks/:id', () => {
   it('should findOne single proxy', async () => {
     tracker.on.select('tasks.*').response(testTaskCreated);
 
-    const response = await request.get(`${urlTasks}/1`);
+    const response = await request(app).get(`${urlTasks}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -122,7 +122,7 @@ describe('GET /tasks/:id', () => {
   it('should not findOne proxy', async () => {
     tracker.on.select('tasks.*').response(undefined);
 
-    const response = await request.get(`${urlTasks}/2`);
+    const response = await request(app).get(`${urlTasks}/2`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -135,7 +135,7 @@ describe('POST /tasks', () => {
   it('should create an proxy', async () => {
     tracker.on.insert('into "tasks"').response([testTaskCreated]);
 
-    const response = await request.post(urlTasks).send(testTask);
+    const response = await request(app).post(urlTasks).send(testTask);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -152,7 +152,7 @@ describe('POST /tasks', () => {
     };
     tracker.on.insert('into "tasks"').simulateError(new Error('DB insert failure'));
 
-    const response = await request.post(urlTasks).send(testTaskWithError);
+    const response = await request(app).post(urlTasks).send(testTaskWithError);
 
     expect(response.status).toBe(500);
     expect(response.body.success).toBeFalsy();
@@ -167,7 +167,7 @@ describe('POST /tasks', () => {
     };
     tracker.on.insert('into "tasks"').simulateError(new Error('Validation failure'));
 
-    const response = await request.post(urlTasks).send(testTaskWithError);
+    const response = await request(app).post(urlTasks).send(testTaskWithError);
 
     expect(response.status).toBe(400);
     expect(response.body.success).toBeFalsy();
@@ -180,7 +180,7 @@ describe('PATCH /tasks:id', () => {
   it('should update known address', async () => {
     tracker.on.update('"tasks"').response([testTaskCreated]);
 
-    const response = await request.patch(`${urlTasks}/1`).send(testTask);
+    const response = await request(app).patch(`${urlTasks}/1`).send(testTask);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -191,7 +191,7 @@ describe('PATCH /tasks:id', () => {
   it('should not update unknown proxy', async () => {
     tracker.on.update('"tasks"').response([]);
 
-    const response = await request.patch(`${urlTasks}/1`).send(testTask);
+    const response = await request(app).patch(`${urlTasks}/1`).send(testTask);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -208,7 +208,7 @@ describe('DELETE /tasks:id', () => {
     };
     tracker.on.update('"tasks"').response([testTaskDeleted]);
 
-    const response = await request.delete(`${urlTasks}/1`);
+    const response = await request(app).delete(`${urlTasks}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -219,7 +219,7 @@ describe('DELETE /tasks:id', () => {
   it('should not delete unknown proxy', async () => {
     tracker.on.update('"tasks"').response([]);
 
-    const response = await request.delete(`${urlTasks}/1`);
+    const response = await request(app).delete(`${urlTasks}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();

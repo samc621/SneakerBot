@@ -10,7 +10,7 @@
     "prettier-check": "./node_modules/.bin/prettier --check .",
     "prettier-write": "./node_modules/.bin/prettier --write .",
     "knex": "knex",
-    "test": "jest",
+    "test": "jest --forceExit --detectOpenHandles",
     "test:watch": "jest --watch"
   },
   "repository": {

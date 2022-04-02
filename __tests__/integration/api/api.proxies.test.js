@@ -1,11 +1,12 @@
 const express = require('express');
-const supertest = require('supertest');
+const request = require('supertest');
 const { getTracker, MockClient } = require('knex-mock-client');
-const { router, urlProxies } = require('../../../routes');
 
-jest.mock('../../../knexfile', () => ({
-  test: { client: MockClient }
-}));
+jest.mock('../../../config/knex', () => {
+  // eslint-disable-next-line global-require
+  const knex = require('knex');
+  return knex({ client: MockClient });
+});
 
 const testProxy = {
   ip_address: '12.34.56.78',
@@ -24,12 +25,22 @@ const testProxyCreated = {
   is_deleted: false
 };
 
-let request;
 let tracker;
+let app;
+const urlProxies = '/v1/proxies';
 
-const app = express();
-app.use(express.json());
-app.use('/', router);
+
+beforeAll(() => {
+  // eslint-disable-next-line global-require
+  const router = require('../../../routes');
+
+  app = express();
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
+  app.use('/v1', router);
+
+  tracker = getTracker();
+});
 
 beforeEach(() => {
   tracker.on.select('select 1+1').responseOnce([]);
@@ -39,18 +50,9 @@ afterEach(() => {
   tracker.reset();
 });
 
-beforeAll(() => {
-  request = supertest(app);
-  tracker = getTracker();
-});
-
 afterAll(() => {
-  // This needs to be imported here to use the mock connection
-  jest.unmock('../../../knexfile');
+  jest.unmock('../../../config/knex');
   jest.resetModules();
-  // eslint-disable-next-line global-require
-  const knex = require('../../../config/knex');
-  knex.destroy();
 });
 
 describe('GET /proxies', () => {
@@ -68,7 +70,7 @@ describe('GET /proxies', () => {
     ];
     tracker.on.select('* from "proxies"').response(testProxies);
 
-    const response = await request.get(urlProxies);
+    const response = await request(app).get(urlProxies);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -80,7 +82,7 @@ describe('GET /proxies', () => {
     const testProxies = [testProxyCreated];
     tracker.on.select('* from "proxies"').response(testProxies);
 
-    const response = await request.get(urlProxies);
+    const response = await request(app).get(urlProxies);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -92,7 +94,7 @@ describe('GET /proxies', () => {
     const testProxies = [];
     tracker.on.select('* from "proxies"').response(testProxies);
 
-    const response = await request.get(urlProxies);
+    const response = await request(app).get(urlProxies);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -105,7 +107,7 @@ describe('GET /proxies/:id', () => {
   it('should findOne single proxy', async () => {
     tracker.on.select('* from "proxies"').response(testProxyCreated);
 
-    const response = await request.get(`${urlProxies}/1`);
+    const response = await request(app).get(`${urlProxies}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -116,7 +118,7 @@ describe('GET /proxies/:id', () => {
   it('should not findOne proxy', async () => {
     tracker.on.select('* from "proxies"').response(undefined);
 
-    const response = await request.get(`${urlProxies}/2`);
+    const response = await request(app).get(`${urlProxies}/2`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -129,7 +131,7 @@ describe('POST /proxies', () => {
   it('should create an proxy', async () => {
     tracker.on.insert('into "proxies"').response([testProxyCreated]);
 
-    const response = await request.post(urlProxies).send(testProxy);
+    const response = await request(app).post(urlProxies).send(testProxy);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -146,7 +148,7 @@ describe('POST /proxies', () => {
     };
     tracker.on.insert('into "proxies"').simulateError(new Error('DB insert failure'));
 
-    const response = await request.post(urlProxies).send(testProxyWithError);
+    const response = await request(app).post(urlProxies).send(testProxyWithError);
 
     expect(response.status).toBe(500);
     expect(response.body.success).toBeFalsy();
@@ -161,7 +163,7 @@ describe('POST /proxies', () => {
     };
     tracker.on.insert('into "proxies"').simulateError(new Error('Validation failure'));
 
-    const response = await request.post(urlProxies).send(testProxyWithError);
+    const response = await request(app).post(urlProxies).send(testProxyWithError);
 
     expect(response.status).toBe(400);
     expect(response.body.success).toBeFalsy();
@@ -174,7 +176,7 @@ describe('PATCH /proxies:id', () => {
   it('should update known address', async () => {
     tracker.on.update('"proxies"').response([testProxyCreated]);
 
-    const response = await request.patch(`${urlProxies}/1`).send(testProxy);
+    const response = await request(app).patch(`${urlProxies}/1`).send(testProxy);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -185,7 +187,7 @@ describe('PATCH /proxies:id', () => {
   it('should not update unknown proxy', async () => {
     tracker.on.update('"proxies"').response([]);
 
-    const response = await request.patch(`${urlProxies}/1`).send(testProxy);
+    const response = await request(app).patch(`${urlProxies}/1`).send(testProxy);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -202,7 +204,7 @@ describe('DELETE /proxies:id', () => {
     };
     tracker.on.update('"proxies"').response([testProxyDeleted]);
 
-    const response = await request.delete(`${urlProxies}/1`);
+    const response = await request(app).delete(`${urlProxies}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
@@ -213,7 +215,7 @@ describe('DELETE /proxies:id', () => {
   it('should not delete unknown proxy', async () => {
     tracker.on.update('"proxies"').response([]);
 
-    const response = await request.delete(`${urlProxies}/1`);
+    const response = await request(app).delete(`${urlProxies}/1`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBeTruthy();
