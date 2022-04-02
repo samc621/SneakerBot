@@ -1,11 +1,10 @@
-const express = require('express');
+import express from 'express';
+import addressesRoutes from '../api/Addresses/index.js';
+import proxiesRoutes from '../api/Proxies/index.js';
+import tasksRoutes from '../api/Tasks/index.js';
+import validationHandler from '../helpers/validation-handler.js';
 
 const router = express.Router();
-
-const addressesRoutes = require('../api/Addresses');
-const proxiesRoutes = require('../api/Proxies');
-const tasksRoutes = require('../api/Tasks');
-const validationHandler = require('../helpers/validation-handler');
 
 // routers
 router.get('/', (req, res) => res.send('Welcome to the SneakerBot API'));
@@ -16,4 +15,4 @@ router.use('/tasks', tasksRoutes);
 // router handlers
 router.use(validationHandler);
 
-module.exports = router;
+export default router;

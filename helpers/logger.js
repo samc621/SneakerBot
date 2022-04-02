@@ -1,6 +1,10 @@
-const winston = require('winston');
-const path = require('path');
-const fs = require('fs');
+import winston from 'winston';
+import path from 'path';
+import fs from 'fs';
+import { promisify } from 'util';
+
+const exists = promisify(fs.exists);
+const mkdir = promisify(fs.mkdir);
 
 const { format } = winston;
 
@@ -9,9 +13,9 @@ class Logger {
     this.logDir = path.resolve('logs');
   }
 
-  startTaskLogger(taskId) {
-    if (!fs.existsSync(this.logDir)) {
-      fs.mkdirSync(this.logDir);
+  async startTaskLogger(taskId) {
+    if (!(await exists(this.logDir))) {
+      await mkdir(this.logDir);
     }
 
     return winston.createLogger({
@@ -29,4 +33,4 @@ class Logger {
   }
 }
 
-module.exports = Logger;
+export default Logger;

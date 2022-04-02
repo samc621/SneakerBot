@@ -1,8 +1,8 @@
-const axios = require('axios').default;
+import axios from 'axios';
 
 const webhookEndpoint = process.env.WEBHOOK_ENDPOINT;
 
-exports.sendWebhookEvent = async (data) => {
+const sendWebhookEvent = async (data) => {
   try {
     if (!webhookEndpoint) {
       return;
@@ -13,3 +13,5 @@ exports.sendWebhookEvent = async (data) => {
     console.error('Error sending webhook event', err);
   }
 };
+
+export default sendWebhookEvent;

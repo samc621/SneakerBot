@@ -1,4 +1,4 @@
-const { getCardDetailsByFriendlyName } = require('../helpers/credit-cards');
+import getCardDetailsByFriendlyName from '../helpers/credit-cards.js';
 
 async function enterAddressDetails({ page, address }) {
   const firstNameSelector = 'input[name="address.firstName"]';
@@ -187,7 +187,7 @@ async function searchByProductCode({ taskLogger, page, productCode }) {
   await searchResult.click();
 }
 
-exports.guestCheckout = async ({
+const guestCheckout = async ({
   taskLogger,
   page,
   url,
@@ -326,3 +326,5 @@ exports.guestCheckout = async ({
 
   return checkoutComplete;
 };
+
+export default guestCheckout;

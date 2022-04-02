@@ -1,4 +1,4 @@
-exports.up = function (knex) {
+export const up = (knex) => {
   return knex.schema.createTable('tasks', (table) => {
     table.increments();
     table.integer('site_id').unsigned().notNullable();
@@ -18,6 +18,6 @@ exports.up = function (knex) {
   });
 };
 
-exports.down = function (knex) {
+export const down = (knex) => {
   return knex.schema.dropTable('tasks');
 };

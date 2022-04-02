@@ -1,6 +1,7 @@
-const express = require('express');
-const request = require('supertest');
-const { getTracker, MockClient } = require('knex-mock-client');
+import { jest } from '@jest/globals';
+import express from 'express';
+import request from 'supertest';
+import { getTracker, MockClient } from 'knex-mock-client';
 
 jest.mock('../../../config/knex', () => {
   // eslint-disable-next-line global-require
@@ -34,9 +35,8 @@ let tracker;
 let app;
 const urlAddresses = '/v1/addresses';
 
-beforeAll(() => {
-  // eslint-disable-next-line global-require
-  const router = require('../../../routes');
+beforeAll(async () => {
+  const router = (await import('../../../routes')).default;
 
   app = express();
   app.use(express.json());

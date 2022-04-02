@@ -1,7 +1,7 @@
-const express = require('express');
-const { validate } = require('express-validation');
-const { createAddress, getAddress, getAddresses, updateAddress, deleteAddress } = require('./controller');
-const { create, findOne, findAll, update, deleted } = require('./validation');
+import express from 'express';
+import { validate } from 'express-validation';
+import { createAddress, getAddress, getAddresses, updateAddress, deleteAddress } from './controller.js';
+import { create, findOne, findAll, update, deleted } from './validation.js';
 
 const router = express.Router();
 
@@ -9,4 +9,4 @@ router.route('/').post(validate(create), createAddress).get(validate(findAll), g
 
 router.route('/:id').get(validate(findOne), getAddress).patch(validate(update), updateAddress).delete(validate(deleted), deleteAddress);
 
-module.exports = router;
+export default router;

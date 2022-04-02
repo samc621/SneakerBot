@@ -60,6 +60,8 @@ const states = {
   WY: 'Wyoming'
 };
 
-exports.getStateNameFromAbbreviation = (abbr) => {
+const getStateNameFromAbbreviation = (abbr) => {
   return states[abbr];
 };
+
+export default getStateNameFromAbbreviation;

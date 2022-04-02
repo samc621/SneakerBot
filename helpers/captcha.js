@@ -1,4 +1,4 @@
-const axios = require('axios').default;
+import axios from 'axios';
 
 const apiKey = process.env.API_KEY_2CAPTCHA;
 
@@ -22,7 +22,7 @@ async function getCaptchaResult(captchaId) {
   throw new Error(responseJson.error_text);
 }
 
-exports.solveCaptcha = async ({ taskLogger, page, captchaSelector, captchaIframeSelector }) => {
+const solveCaptcha = async ({ taskLogger, page, captchaSelector, captchaIframeSelector }) => {
   taskLogger.info('Detected captcha, solving');
 
   if (!apiKey) {
@@ -121,3 +121,5 @@ exports.solveCaptcha = async ({ taskLogger, page, captchaSelector, captchaIframe
   const submissionSucccess = true;
   return submissionSucccess;
 };
+
+export default solveCaptcha;

@@ -1,4 +1,6 @@
-require('dotenv-flow').config();
+import { config } from 'dotenv-flow';
+
+config();
 
 const local = {
   client: 'pg',
@@ -25,7 +27,7 @@ const docker = {
   debug: false
 };
 
-module.exports = {
+export default {
   local,
   test: local,
   docker

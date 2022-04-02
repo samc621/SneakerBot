@@ -1,4 +1,4 @@
-exports.up = function (knex) {
+export const up = (knex) => {
   return knex.schema.createTable('sites', (table) => {
     table.increments();
     table.string('name').notNullable();
@@ -8,6 +8,6 @@ exports.up = function (knex) {
   });
 };
 
-exports.down = function (knex) {
+export const down = (knex) => {
   return knex.schema.dropTable('sites');
 };

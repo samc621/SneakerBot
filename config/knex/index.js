@@ -1,5 +1,5 @@
-const knex = require('knex');
-const configs = require('../../knexfile');
+import knex from 'knex';
+import configs from '../../knexfile.js';
 
 const environment = process.env.NODE_ENV || 'local';
 const configuration = configs[environment];
@@ -18,4 +18,4 @@ const db = knex(configuration);
   }
 })();
 
-module.exports = db;
+export default db;

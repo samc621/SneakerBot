@@ -1,4 +1,4 @@
-exports.up = function (knex) {
+export const up = (knex) => {
   return knex.schema.createTable('addresses', (table) => {
     table.increments();
     table
@@ -23,6 +23,8 @@ exports.up = function (knex) {
   });
 };
 
-exports.down = function (knex) {
-  return knex.schema.dropTable('addresses');
+export const down = (knex) => {
+  return knex.schema.dropTable('addresses').then(() => {
+    return knex.raw('DROP TYPE address_types');
+  })
 };
