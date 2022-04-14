@@ -1,21 +1,21 @@
-const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const { Cluster } = require('puppeteer-cluster');
-const proxyChain = require('proxy-chain');
-const Ua = require('puppeteer-extra-plugin-anonymize-ua');
-const UserAgent = require('user-agents');
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { Cluster } from 'puppeteer-cluster';
+import proxyChain from 'proxy-chain';
+import Ua from 'puppeteer-extra-plugin-anonymize-ua';
+import UserAgent from 'user-agents';
 
-const Task = require('../api/Tasks/model');
-const Proxy = require('../api/Proxies/model');
-const Address = require('../api/Addresses/model');
+import Task from '../api/Tasks/model.js';
+import Proxy from '../api/Proxies/model.js';
+import Address from '../api/Addresses/model.js';
 
-const { testProxy, createProxyString } = require('./proxies');
-const { sendEmail } = require('./email');
-const { sendWebhookEvent } = require('./webhook');
-const Logger = require('./logger');
-const { storePageInTaskCache } = require('./task-cache');
+import { testProxy, createProxyString } from './proxies.js';
+import sendEmail from './email.js';
+import sendWebhookEvent from './webhook.js';
+import Logger from './logger.js';
+import { storePageInTaskCache } from './task-cache.js';
 
-const sites = require('../sites');
+import sites from '../sites/index.js';
 
 const userAgent = new UserAgent();
 
@@ -85,7 +85,7 @@ class PuppeteerCluster {
           notification_email_address
         } = task;
 
-        taskLogger = new Logger().startTaskLogger(id);
+        taskLogger = await new Logger().startTaskLogger(id);
         storePageInTaskCache({ taskId, page });
 
         if (newProxyUrl) {
@@ -99,7 +99,7 @@ class PuppeteerCluster {
           id: billing_address_id
         });
 
-        const checkoutComplete = await sites[site_name].guestCheckout({
+        const checkoutComplete = await sites[site_name]({
           taskLogger,
           page,
           url,
@@ -151,4 +151,4 @@ class PuppeteerCluster {
   }
 }
 
-module.exports = PuppeteerCluster;
+export default PuppeteerCluster;

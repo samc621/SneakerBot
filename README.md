@@ -1,5 +1,7 @@
 # SneakerBot
 
+[![build, lint, test, deploy](https://github.com/samc621/SneakerBot/actions/workflows/build_lint_deploy.yml/badge.svg)](https://github.com/samc621/SneakerBot/actions/workflows/build_lint_deploy.yml)
+
 This bot uses Node.js and Puppeteer to automate the checkout on various sneaker websites. It currently works on:
 
 1. Footsites (footlocker.com, footaction.com, eastbay.com, champssports.com)
@@ -54,9 +56,9 @@ When you're ready, declare the environment name with:
 
 The `.env` file that you configure is set up for a single credit card.
 
-However, if you want to specify multiple credit cards, populate `credit-cards.json` using the example from `credit-cards-example.json`.
+However, if you want to specify multiple credit cards, populate `credit-cards.js` using the example from `credit-cards-example.js`.
 
-If you prefer not to use this method, you can simply leave this JSON file as-is.
+If you prefer not to use this method, you can simply leave this JS file as-is.
 
 When starting a task, you can optionally specify the card you want to use via its `friendlyName`, otherwise the card from the `.env` file will be used.
 

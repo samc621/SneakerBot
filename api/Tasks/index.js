@@ -1,46 +1,16 @@
-const express = require('express');
-const { validate } = require('express-validation');
-const { validationRules, validationHandler } = require('./validation');
+import express from 'express';
+import { validate } from 'express-validation';
+import { createTask, getTask, getTasks, updateTask, deleteTask, startTask, stopTask } from './controller.js';
+import { create, findOne, findAll, update, deleted, start, stop } from './validation.js';
 
 const router = express.Router();
 
-const {
-  createTask,
-  getTask,
-  getTasks,
-  updateTask,
-  deleteTask,
-  startTask,
-  stopTask
-} = require('./controller');
+router.route('/').post(validate(create), createTask).get(validate(findAll), getTasks);
 
-const {
-  create,
-  findOne,
-  findAll,
-  update,
-  deleted,
-  start,
-  stop
-} = validationRules;
+router.route('/:id/start').post(validate(start), startTask);
 
-router
-  .route('/')
-  .post(validate(create), validationHandler, createTask)
-  .get(validate(findAll), validationHandler, getTasks);
+router.route('/:id/stop').post(validate(stop), stopTask);
 
-router
-  .route('/:id/start')
-  .post(validate(start), validationHandler, startTask);
+router.route('/:id').get(validate(findOne), getTask).patch(validate(update), updateTask).delete(validate(deleted), deleteTask);
 
-router
-  .route('/:id/stop')
-  .post(validate(stop), validationHandler, stopTask);
-
-router
-  .route('/:id')
-  .get(validate(findOne), validationHandler, getTask)
-  .patch(validate(update), validationHandler, updateTask)
-  .delete(validate(deleted), validationHandler, deleteTask);
-
-module.exports = router;
+export default router;

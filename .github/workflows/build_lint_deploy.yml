@@ -1,7 +1,7 @@
-name: build, lint, deploy
+name: build, lint, test, deploy
 on: push
 jobs:
-  build-and-lint:
+  build-lint-test:
     name: Build and lint
     runs-on: ubuntu-latest
     steps:
@@ -14,7 +14,9 @@ jobs:
       - name: Install modules
         run: npm install
       - name: Run ESLint
-        run: npm run lint  
+        run: npm run lint
+      - name: Run tests
+        run: npm test
   deploy:
     if: github.ref == 'refs/heads/master'
     name: Push Docker image to Docker Hub
@@ -22,10 +24,19 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-      - name: Push to Docker Hub
-        uses: docker/build-push-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: samc621/sneakerbot
-          tag_with_ref: true
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          pull: true
+          push: true
+          cache-from: type=registry,ref=samc621/sneakerbot:latest
+          cache-to: type=inline
+          tags: samc621/sneakerbot:latest

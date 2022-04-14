@@ -1,23 +1,17 @@
-const rp = require('request-promise');
-require('dotenv-flow').config();
+import axios from 'axios';
 
 const webhookEndpoint = process.env.WEBHOOK_ENDPOINT;
 
-exports.sendWebhookEvent = async (data) => {
+const sendWebhookEvent = async (data) => {
   try {
     if (!webhookEndpoint) {
       return;
     }
 
-    const options = {
-      uri: webhookEndpoint,
-      method: 'POST',
-      body: data,
-      json: true
-    };
-
-    await rp(options);
+    await axios.post(webhookEndpoint, data);
   } catch (err) {
-    throw err;
+    console.error('Error sending webhook event', err);
   }
 };
+
+export default sendWebhookEvent;

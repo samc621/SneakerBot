@@ -1,28 +1,28 @@
-const knex = require('../../config/knex');
+import knex from '../../db/index.js';
 
 class AddressesModel {
   constructor(id) {
-    this.tableName = "addresses";
+    this.tableName = 'addresses';
     this.id = id;
   }
 
   async create(data) {
     return knex(this.tableName)
       .insert(Object.assign(data))
-      .returning("*")
-      .then(rows => rows[0]);
+      .returning('*')
+      .then((rows) => rows[0]);
   }
 
   async find(data) {
-    data["is_deleted"] = false;
-    return knex(this.tableName).where(data).orderBy("created_at", "desc");
+    return knex(this.tableName)
+      .where({ is_deleted: false, ...data })
+      .orderBy('created_at', 'desc');
   }
 
   async findOne(data) {
-    data["is_deleted"] = false;
     return knex(this.tableName)
-      .where(data)
-      .orderBy("created_at", "desc")
+      .where({ is_deleted: false, ...data })
+      .orderBy('created_at', 'desc')
       .first();
   }
 
@@ -30,8 +30,8 @@ class AddressesModel {
     return knex(this.tableName)
       .where({ id: this.id })
       .update(data)
-      .returning("*")
-      .then(rows => rows[0]);
+      .returning('*')
+      .then((rows) => rows[0]);
   }
 
   async hardDelete() {
@@ -39,4 +39,4 @@ class AddressesModel {
   }
 }
 
-module.exports = AddressesModel;
+export default AddressesModel;

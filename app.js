@@ -1,13 +1,12 @@
-const express = require('express');
-const pg = require('pg');
+import express from 'express';
+import pg from 'pg';
+import router from './routes/index.js';
 
 const app = express();
-const routes = require('./routes');
-require('dotenv-flow').config();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use('/v1', routes);
+app.use('/v1', router);
 
 const { types } = pg;
 // Return numerics as Float (parsed from String)

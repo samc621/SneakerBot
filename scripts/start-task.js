@@ -1,4 +1,4 @@
-const PuppeteerCluster = require('../helpers/cluster');
+import PuppeteerCluster from '../helpers/cluster.js';
 
 const { TASK_ID, CARD_FRIENDLY_NAME } = process.env;
 
