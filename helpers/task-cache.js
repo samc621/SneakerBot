@@ -9,7 +9,7 @@ export const retrievePageFromTaskCache = ({ taskId }) => {
 };
 
 export const removePageFromTaskCache = async ({ taskId }) => {
-  const page = this.retrievePageFromTaskCache({ taskId });
+  const page = retrievePageFromTaskCache({ taskId });
   if (page) await page.close();
   delete taskCache[taskId];
 };
