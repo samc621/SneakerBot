@@ -1,6 +1,6 @@
 const cards = [
   {
-    friendlyName: 'Visa',
+    cardType: 'Visa',
     cardNumber: '4242424242424242',
     nameOnCard: 'John Smith',
     expirationMonth: '01',
@@ -8,7 +8,7 @@ const cards = [
     securityCode: '123'
   },
   {
-    friendlyName: 'Mastercard',
+    cardType: 'Mastercard',
     cardNumber: '5555555555554444',
     nameOnCard: 'John Smith',
     expirationMonth: '01',
