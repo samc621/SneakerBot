@@ -1,7 +1,9 @@
 import { jest } from '@jest/globals';
 import express from 'express';
 import request from 'supertest';
-import { getTracker, MockClient } from 'knex-mock-client';
+import { createTracker, MockClient } from 'knex-mock-client';
+import db from '../../../db/index.js';
+
 
 jest.mock('../../../db', () => {
   // eslint-disable-next-line global-require
@@ -43,7 +45,7 @@ beforeAll(async () => {
   app.use(express.urlencoded({ extended: false }));
   app.use('/v1', router);
 
-  tracker = getTracker();
+  tracker = createTracker(db);
 });
 
 beforeEach(() => {
