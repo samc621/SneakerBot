@@ -14,7 +14,7 @@
     "test:watch": "jest --watch"
   },
   "engines": {
-    "node": "16.13.0"
+    "node": "18.16.0"
   },
   "type": "module",
   "repository": {
@@ -59,7 +59,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.25.4",
     "jest": "^27.0.4",
-    "knex-mock-client": "^1.6.2",
+    "knex-mock-client": "^2.0.0",
     "prettier": "^2.6.1",
     "supertest": "^6.1.3"
   }
