@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600;700&display=swap');
+
+*{
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+:root{
+    /* Colors */
+    --body-color: #f8faff;
+    --sidebar-color: #dbdbdb;
+    --hover-color: rgb(97, 112, 145);
+    --primary--color: rgb(97, 112, 145);
+    --primary-color-light: rgb(87, 99, 126);
+    --toggle-color: #DDD;
+    --text-color: #4a545e;
+    /* Transitions */
+    --tran-02: all 0.2s ease;
+    --tran-03: all 0.3s ease;
+    --tran-04: all 0.4s ease;
+    --tran-05: all 0.5s ease;
+}
+body {
+  height: 100vh;
+  background-color: var(--body-color);
+  transition: var(--tran-04);
+}
+
+body.dark{
+    --body-color: #2f3a46;
+    --sidebar-color: #242526;
+    --hover-color: #4b4d52;
+    --primary--color: rgb(226, 227, 229);
+    --primary-color-light: #3A3B3C;
+    --toggle-color: #FFF;
+    --text-color: #e2e2e2;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+::-webkit-scrollbar {  
+  display: 1px;  
+  }

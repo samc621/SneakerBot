@@ -1,0 +1,29 @@
+.title{
+    text-align: center;
+    font-weight: 100;
+    font-size: 60px;
+    color: var(--text-color);
+    
+
+}
+
+.section_title{
+    text-align: center;
+    font-weight: 100;
+    font-size: 30px;
+    color: var(--text-color);
+    margin-bottom: 25px;
+}
+
+.addresses{
+    margin-bottom: 50px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.section{
+    margin-top: 20px;
+    z-index: 1;
+    padding-bottom: 35px;
+}
+
