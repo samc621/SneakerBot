@@ -188,7 +188,7 @@ Fastforward several years, I decided to upgrade this all-in-one bot from Java + 
 
 I am open sourcing this repo now, since I no longer operate the business, but also because I am of the opinion that this software can rival many of its commercial competitors.
 
-Feel free to open a Pull Request to contribute to this proejct and help make it better! I will continue to support more websites and add more features as I can.
+Feel free to open a Pull Request to contribute to this project and help make it better! I will continue to support more websites and add more features as I can.
 
 Also feel free to open an Issue or contact me via Telegram @samc621 if you have any trouble.
 
