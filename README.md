@@ -39,7 +39,13 @@ When you're ready, declare the environment name with:
 
 ### Windows
 
+#### Cmd
+
 `$ set NODE_ENV=local`
+
+#### PowerShell
+
+`$env:NODE_ENV="local"`
 
 ### How to populate the .env file
 
