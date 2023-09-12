@@ -1,4 +1,6 @@
-# SneakerBot
+# SneakerBot brik-patch version
+
+This is an update, this bot is up and running and we do not need 
 
 [![build, lint, test, deploy](https://github.com/samc621/SneakerBot/actions/workflows/build_lint_deploy.yml/badge.svg)](https://github.com/samc621/SneakerBot/actions/workflows/build_lint_deploy.yml)
 
@@ -114,7 +116,7 @@ Then run it and specify the env file with:
 
 `docker run -p 5900:5900 -p 8000:8000 --env NODE_ENV=docker --env-file .env.docker sneakerbot` (replace `8000` with whatever `PORT` you specified in `.env.docker`)
 
-This Docker image is built from `node:12` and uses [xvfb](https://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml) with [x11vnc](https://github.com/LibVNC/x11vnc) to provide access to a GUI.
+This Docker image is built from `node:16` and uses [xvfb](https://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml) with [x11vnc](https://github.com/LibVNC/x11vnc) to provide access to a GUI.
 
 You can use [vncviewer](https://www.realvnc.com/en/connect/download/viewer/) to connect to the VNC server running in the container.
 
