@@ -5,15 +5,23 @@ This is an update, this bot is up and running and we do not need vncviewer for t
 ### To run the bot:
 
 ```docker build -t sneakerbot .```
+
 ```docker ps```
+
 - from your output of docker ps find the name "samc621/sneakerbot"
+
 ```docker kill [Container ID for samc621/sneakerbot]```
+
 ```docker run -p 5900:5900 -p 8000:8000 -p 8080:8080 -p 8888:8888 --env NODE_ENV=docker --env-file .env.docker sneakerbot```
+
 - Open chrome and type in url:
+
 ```localhost:8888/v1```
 
 Use the ```POST``` method mentioned down below to create tasks.
+
 Use [this link](https://editor.swagger.io/?_ga=2.252362959.790550088.1692949915-879429909.1692949915) for API docs
+
 API doc is openapi.yaml file
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
