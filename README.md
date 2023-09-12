@@ -13,7 +13,7 @@ This is an update, this bot is up and running and we do not need vncviewer for t
 ```localhost:8888/v1```
 
 Use the ```POST``` method mentioned down below to create tasks.
-Use [this link] (https://editor.swagger.io/?_ga=2.252362959.790550088.1692949915-879429909.1692949915) for API docs
+Use [this link](https://editor.swagger.io/?_ga=2.252362959.790550088.1692949915-879429909.1692949915) for API docs
 API doc is openapi.yaml file
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
