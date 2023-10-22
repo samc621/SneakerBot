@@ -1,0 +1,223 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+/* Reusable CSS */
+
+.sidebar .text{
+    font-size: 18px;
+    font-weight: 200px;
+    color: var(--text-color);
+    transition: var(--tran-04);
+    white-space: nowrap;
+    opacity: 1;
+}
+
+.sidebar .image{
+    min-width: 60px;
+    display: flex;
+    align-items: center;
+}
+/* Sidebar */
+
+.sidebar{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: var(--sidebar-color);
+    padding: 10px 14px;
+    transition: var(--tran-02);
+    z-index: 100;
+}
+
+.sidebar.close{
+    width: 70px;
+}
+
+
+.sidebar li{
+    height: 50px;
+    margin-top: 10px;
+    list-style: none;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar.close .text{
+   opacity: 0;
+}
+
+.sidebar li .icon{
+    font-size: 20px;
+    padding-right: 20px;
+    min-width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+}
+
+.sidebar header{
+    position: relative;
+}
+
+.sidebar .image-text img{
+    width: 40px;
+    border-radius: 6px;
+
+}
+
+.sidebar header .image-text{
+    display: flex;
+    align-items: center;
+    color: var(--text-color);
+}
+
+header .image-text .header-text{
+    display: flex;
+    flex-direction: column;
+}
+
+.header-text .name{
+    font-weight: 600;
+}
+
+.header-text .profession{
+    margin-top: -2px;
+}
+
+.sidebar header .toggle{
+    position: absolute;
+    top: 80%;
+    right: -25px;
+    transform: translateY(-50%) rotate(180deg);
+    height: 25px;
+    width: 25px;
+    background: var(--sidebar-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 22px;
+    transition: var(--tran-02);
+}
+
+body.dark .sidebar header .toggle{
+    color: var(--text-color);
+}
+
+.sidebar.close header .toggle{
+    transform: translateY(-50%) ;
+}
+
+.sidebar li .a{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: 0.4s ease;
+}
+
+.sidebar li .a:hover{
+    background-color: var(--body-color);
+    opacity: 90%;
+}
+.sidebar li .a:hover{
+    transform: translateX(.5rem);
+}
+
+.sidebar .menu-bar{
+    margin-top: 20px;
+    height: calc(100% - 70px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.menu-bar .mode{
+    position: relative;
+}
+
+
+.menu-bar .mode i{
+    position: absolute;
+    transition: var(--tran-03);
+}
+
+.menu-bar .mode .moon-sun{
+    height: 50px;
+    width: 60px;
+    display: flex;
+    align-items: center;
+}
+
+.menu-bar .mode i.moon{
+    opacity: 0;
+}
+
+body.dark .menu-bar .mode i.sun{
+    opacity: 0;
+}
+body.dark .menu-bar .mode i.moon{
+    opacity: 1;
+}
+
+.menu-bar .mode .toggle-switch{
+    height: 100%;
+    min-width: 60px;
+    display: flex;
+    right: -10px;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    cursor: pointer;
+    background: var(--body-color);
+    border-radius: 6px;
+  
+}
+
+.toggle-switch .switch{
+    height: 22px;
+    width: 44px;
+    background: rgb(160, 160, 160);
+    position: relative;
+    border-radius: 25px;
+}
+
+.switch::before{
+    height: 15px;
+    width: 15px;
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    top: 50%;
+    left: 3px;
+    transform: translateY(-50%);
+    background-color: #272c36;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+body.dark .switch::before{
+    left:25px
+}
+
+.content{
+    position: relative;
+    left: 250px;
+    height: 100vh;
+    width: calc(100% -250px);
+    margin-top: 50px;
+    transition: var(--tran-05);
+    z-index: 1;
+}
+
+.sidebar.close ~ .content{
+    left:100px;
+    width: calc(100% - 88px);
+}

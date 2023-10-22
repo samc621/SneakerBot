@@ -1,0 +1,65 @@
+.address_list{
+    background-color: transparent;
+    text-align: center;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    overflow-x: hidden;
+    overflow-y: hidden scroll;
+    height: 300px;
+    padding-left: 20px;
+    padding-top: 40px;
+
+}
+
+.address_list::-webkit-scrollbar{
+    display: none;
+}
+.styled-table{
+    border-collapse: collapse;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.35);
+    color: white;
+    width: 95%;
+    font-weight: 300;
+}
+
+.styled-table th,td{
+    font-size: 17px;
+    font-weight: 300;
+    padding: 12px 15px;
+
+}
+
+.styled-table tr{
+    background-color: transparent;
+    color: var(--primary--color);
+    text-align: center;
+}
+
+.current_address_section{
+    width: 100%;
+    height: 100%;
+    align-items: center;
+}
+
+.styled-table tbody tr {
+    border-bottom: thin solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: transparent;
+    color: var(--primary--color);
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid #f5f7f6;
+}
+
+.styled-table tbody tr.active-row {
+    font-weight: bold;
+    color: var(--primary--color);
+}
+

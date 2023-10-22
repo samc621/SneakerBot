@@ -1,0 +1,77 @@
+.title{
+    text-align: center;
+}
+
+.task_stop{
+    width: 50%;
+    position: relative;
+    text-align: left;
+    left: 50px;
+    bottom: 300px;
+    
+
+}
+
+.task_stop p{
+    left: 50px;
+    position: absolute;
+}
+
+.task_stop input{
+    position: relative;
+    left: -200px;
+}
+
+.task_stop button{
+    position: relative;
+    width: 25%;
+    left: 50px;
+    height: 50%;
+    top: 50%;
+
+
+}
+
+.task_start{
+    width: 50%;
+    position: relative;
+    text-align: left;
+    right: -50%;
+
+}
+
+.task_start p{
+    left: -110px;
+    position: relative;
+}
+
+.task_start input{
+    position: relative;
+    left: -200px;
+}
+
+.task_start button{
+    position: relative;
+    width: 25%;
+    left: 50px;
+    height: 50%;
+
+}
+
+.taskFunctions{
+    display: block
+}
+
+.start_title, .stop_title{
+    font-size: 18px;
+    font-weight: 200;
+    display: block;
+
+}
+
+.start_title{
+    margin-left: 15px;
+}
+.stop_title{
+    margin-left: 30px;
+}
