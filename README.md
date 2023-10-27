@@ -205,16 +205,4 @@ You must sign up for and fund a 2Captcha account, and then add your `API_KEY_2CA
 
 For manually-solving captchas, you will be given a 5-minute timeout after the email notification to check the browser and solve the captcha.
 
-## Motivation
 
-As a teenager, I operated sneakerbots.us, where I sold sneakerbots like this in addition to early links and ATC services.
-
-Fastforward several years, I decided to upgrade this all-in-one bot from Java + Selenium to Node.js + Puppeteer, which I enjoy more for bot projects.
-
-I am open sourcing this repo now, since I no longer operate the business, but also because I am of the opinion that this software can rival many of its commercial competitors.
-
-Feel free to open a Pull Request to contribute to this project and help make it better! I will continue to support more websites and add more features as I can.
-
-Also feel free to open an Issue or contact me via Telegram @samc621 if you have any trouble.
-
-If you appreciate this, consider [buying me a coffee](https://www.buymeacoffee.com/samc621).
