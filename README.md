@@ -1,5 +1,30 @@
-# SneakerBot
+# SneakerBot brik-patch version
 
+This is an update, this bot is up and running and we do not need vncviewer for this.
+
+### To run the bot:
+
+```docker build -t sneakerbot .```
+
+```docker ps```
+
+- from your output of docker ps find the name "samc621/sneakerbot"
+
+```docker kill [Container ID for samc621/sneakerbot]```
+
+```docker run -p 5900:5900 -p 8000:8000 -p 8080:8080 -p 8888:8888 --env NODE_ENV=docker --env-file .env.docker sneakerbot```
+
+- Open chrome and type in url:
+
+```localhost:8888/v1```
+
+Use the ```POST``` method mentioned down below to create tasks.
+
+Use [this link](https://editor.swagger.io/?_ga=2.252362959.790550088.1692949915-879429909.1692949915) for API docs
+
+API doc is openapi.yaml file
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [![build, lint, test, deploy](https://github.com/samc621/SneakerBot/actions/workflows/build_lint_deploy.yml/badge.svg)](https://github.com/samc621/SneakerBot/actions/workflows/build_lint_deploy.yml)
 
 This bot uses Node.js and Puppeteer to automate the checkout on various sneaker websites. It currently works on:
@@ -120,7 +145,7 @@ Then run it and specify the env file with:
 
 `docker run -p 5900:5900 -p 8000:8000 --env NODE_ENV=docker --env-file .env.docker sneakerbot` (replace `8000` with whatever `PORT` you specified in `.env.docker`)
 
-This Docker image is built from `node:12` and uses [xvfb](https://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml) with [x11vnc](https://github.com/LibVNC/x11vnc) to provide access to a GUI.
+This Docker image is built from `node:16` and uses [xvfb](https://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml) with [x11vnc](https://github.com/LibVNC/x11vnc) to provide access to a GUI.
 
 You can use [vncviewer](https://www.realvnc.com/en/connect/download/viewer/) to connect to the VNC server running in the container.
 
@@ -186,16 +211,4 @@ You must sign up for and fund a 2Captcha account, and then add your `API_KEY_2CA
 
 For manually-solving captchas, you will be given a 5-minute timeout after the email notification to check the browser and solve the captcha.
 
-## Motivation
 
-As a teenager, I operated sneakerbots.us, where I sold sneakerbots like this in addition to early links and ATC services.
-
-Fastforward several years, I decided to upgrade this all-in-one bot from Java + Selenium to Node.js + Puppeteer, which I enjoy more for bot projects.
-
-I am open sourcing this repo now, since I no longer operate the business, but also because I am of the opinion that this software can rival many of its commercial competitors.
-
-Feel free to open a Pull Request to contribute to this project and help make it better! I will continue to support more websites and add more features as I can.
-
-Also feel free to open an Issue or contact me via Telegram @samc621 if you have any trouble.
-
-If you appreciate this, consider [buying me a coffee](https://www.buymeacoffee.com/samc621).
