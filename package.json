@@ -43,7 +43,7 @@
     "nodemailer": "^6.9.9",
     "pg": "^8.6.0",
     "proxy-chain": "^1.0.2",
-    "puppeteer": "^13.5.2",
+    "puppeteer": "^24.10.0",
     "puppeteer-cluster": "^0.23.0",
     "puppeteer-extra": "^3.1.18",
     "puppeteer-extra-plugin-anonymize-ua": "^2.2.17",
